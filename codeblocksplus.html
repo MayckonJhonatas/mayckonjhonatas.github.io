@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Política de Privacidade — CodeBlocks+</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Fonte parecida com a do CodeBlocks+ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --cbx-azul: #2ea8ff;
+      --cbx-azul-escuro: #0b6db1;
+      --cbx-fundo: #f3f6fb;
+      --cbx-texto: #1f2933;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #e4f3ff 0, #f3f6fb 45%, #e9f1ff 100%);
+      color: var(--cbx-texto);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Barra superior no estilo CodeBlocks+ */
+    header {
+      background: linear-gradient(90deg, var(--cbx-azul), var(--cbx-azul-escuro));
+      color: #fff;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icone {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--cbx-azul-escuro);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+    }
+
+    .logo-texto {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .logo-texto strong {
+      font-size: 18px;
+    }
+
+    .logo-texto span {
+      font-size: 11px;
+      opacity: 0.9;
+    }
+
+    .tag-app {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.7);
+      opacity: 0.95;
+      white-space: nowrap;
+    }
+
+    /* Conteúdo principal */
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 26px 12px 34px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 960px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(15,23,42,0.15);
+      padding: 24px 22px 26px;
+      border: 1px solid rgba(148,163,184,0.3);
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        padding: 32px 40px 34px;
+        margin-top: 16px;
+      }
+    }
+
+    .titulo-principal {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--cbx-azul-escuro);
+      margin-bottom: 4px;
+    }
+
+    .subtitulo {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 18px;
+    }
+
+    .info-meta {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 22px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin: 22px 0 8px;
+      color: var(--cbx-azul-escuro);
+    }
+
+    h3 {
+      font-size: 15px;
+      margin: 14px 0 6px;
+      color: #1f2937;
+    }
+
+    p {
+      font-size: 14px;
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+
+    ul {
+      margin: 6px 0 12px 18px;
+      font-size: 14px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    .destaque {
+      background: #e6f4ff;
+      border-left: 3px solid var(--cbx-azul);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      color: #1f2937;
+    }
+
+    .contato-box {
+      background: #f8fafc;
+      border-radius: 10px;
+      border: 1px dashed #cbd5f5;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .contato-box b {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+      padding: 10px 12px 16px;
+    }
+
+    footer b {
+      color: #111827;
+    }
+
+    .btn-voltar {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--cbx-azul-escuro);
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      background: #f9fafb;
+    }
+
+    .btn-voltar span {
+      font-size: 16px;
+      line-height: 0;
+    }
+
+    .btn-voltar:hover {
+      background: #eef2ff;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-icone">C+</div>
+    <div class="logo-texto">
+      <strong>CodeBlocks+</strong>
+      <span>Ambiente de Programação em Blocos</span>
+    </div>
+  </div>
+  <div class="tag-app">
+    Política de Privacidade
+  </div>
+</header>
+
+<main>
+  <article class="card">
+    <h1 class="titulo-principal">Política de Privacidade do CodeBlocks+</h1>
+    <div class="subtitulo">
+      Aplicativo educacional de programação em blocos para Arduino e ESP32.
+    </div>
+    <div class="info-meta">
+      <b>Última atualização:</b> 15/11/2025
+    </div>
+
+    <div class="destaque">
+      O CodeBlocks+ foi desenvolvido com foco em uso educacional, offline e local.  
+      Não coletamos, não armazenamos e não enviamos dados pessoais dos usuários para servidores externos.
+    </div>
+
+    <p>
+      Esta Política de Privacidade descreve como o aplicativo <b>CodeBlocks+</b>, desenvolvido por
+      <b>Mayckon Jhônatas</b>, lida com as informações dos usuários. Ao utilizar o aplicativo,
+      você concorda com os termos descritos abaixo.
+    </p>
+
+    <h2>1. Coleta de Informações</h2>
+    <p>
+      O CodeBlocks+ <b>não solicita, não coleta e não armazena</b> informações pessoais como
+      nome completo, endereço, documentos, fotos, contatos, localização precisa ou qualquer outro dado sensível.
+    </p>
+
+    <h3>1.1. Dados armazenados localmente</h3>
+    <p>O aplicativo armazena apenas informações necessárias para o seu funcionamento, e sempre de forma local no dispositivo, tais como:</p>
+    <ul>
+      <li>Projetos criados pelo usuário (arquivos de programação em blocos, por exemplo em formato XML);</li>
+      <li>Configurações de preferência do aplicativo (tema, idioma, último projeto aberto etc.);</li>
+      <li>Histórico de conexões com placas e dispositivos (quando aplicável), apenas enquanto o app estiver em uso.</li>
+    </ul>
+    <p>
+      Esses dados <b>não são enviados para a internet</b>, não são compartilhados com terceiros e permanecem apenas no dispositivo do usuário.
+    </p>
+
+    <h3>1.2. Conexões com dispositivos externos</h3>
+    <p>
+      O CodeBlocks+ pode se conectar a placas e módulos (como Arduino, ESP32 e módulos Bluetooth) para
+      envio de código e comunicação serial. Essas conexões acontecem somente quando o próprio usuário
+      inicia a ação, por exemplo:
+    </p>
+    <ul>
+      <li>Conexão via <b>Bluetooth</b> com módulos como HC-05, HC-06 ou ESP32;</li>
+      <li>Conexão via <b>Wi-Fi</b> (OTA) para envio de código ao ESP32;</li>
+      <li>Conexão via <b>USB</b> (quando aplicável) para gravação de código em placas.</li>
+    </ul>
+    <p>
+      Todo o tráfego acontece apenas entre o aplicativo e o dispositivo conectado (placa, módulo, robô),
+      sem uso de servidores remotos.
+    </p>
+
+    <h2>2. Permissões Utilizadas</h2>
+    <p>
+      O CodeBlocks+ solicita apenas as permissões necessárias para que os recursos de programação
+      e comunicação com as placas funcionem corretamente. Essas permissões são utilizadas exclusivamente
+      para a finalidade descrita abaixo.
+    </p>
+
+    <ul>
+      <li>
+        <b>Bluetooth / Bluetooth LE:</b> usado para pesquisar e se conectar a dispositivos como módulos
+        Bluetooth e placas ESP32. Sem essa permissão, não é possível enviar código ou dados via Bluetooth.
+      </li>
+      <li>
+        <b>Localização aproximada (quando exigida pelo sistema):</b> em algumas versões do Android, o acesso
+        ao Bluetooth exige permissões de localização. O CodeBlocks+ <b>não utiliza esses dados para rastreamento
+        ou monitoramento</b>; a permissão é apenas uma exigência técnica do sistema operacional.
+      </li>
+      <li>
+        <b>Armazenamento / Arquivos:</b> utilizado para salvar e carregar projetos criados pelo usuário no dispositivo.
+        Nenhum arquivo é enviado para a nuvem ou para serviços de terceiros pelo aplicativo.
+      </li>
+    </ul>
+
+    <p>
+      Em todos os casos, as permissões podem ser gerenciadas diretamente pelo usuário nas configurações
+      do sistema operacional (Android).
+    </p>
+
+    <h2>3. Compartilhamento de Informações</h2>
+    <p>
+      O CodeBlocks+ <b>não compartilha</b> dados com:
+    </p>
+    <ul>
+      <li>empresas terceiras;</li>
+      <li>serviços de anúncios;</li>
+      <li>plataformas de análise de uso (analytics);</li>
+      <li>servidores externos ou bancos de dados na nuvem.</li>
+    </ul>
+    <p>
+      Toda a atividade do app é voltada ao uso local e educacional, sem coleta ou envio automático de informações.
+    </p>
+
+    <h2>4. Serviços de Terceiros</h2>
+    <p>
+      O aplicativo não integra, até o momento, serviços como Firebase, Google Analytics, redes de anúncios
+      ou outros mecanismos de rastreamento. Caso futuramente algum serviço de terceiros seja integrado,
+      esta Política de Privacidade será atualizada para informar claramente o tipo de dado utilizado.
+    </p>
+
+    <h2>5. Segurança</h2>
+    <p>
+      Como o CodeBlocks+ não coleta dados pessoais nem envia informações para servidores externos,
+      os riscos relacionados à exposição de dados são significativamente reduzidos.
+    </p>
+    <p>
+      Ainda assim, recomenda-se que o usuário mantenha o dispositivo protegido com senha, biometria
+      ou outro método de segurança oferecido pelo sistema operacional, e evite instalar o aplicativo
+      por meios não oficiais.
+    </p>
+
+    <h2>6. Direitos do Usuário</h2>
+    <p>
+      Como não há coleta de dados pessoais pelo aplicativo, não há cadastro interno para edição,
+      exportação ou exclusão de dados em servidores. Todas as informações são controladas diretamente
+      pelo usuário em seu próprio dispositivo.
+    </p>
+    <p>O usuário pode, a qualquer momento:</p>
+    <ul>
+      <li>Excluir projetos e arquivos criados dentro do CodeBlocks+;</li>
+      <li>Limpar dados do aplicativo nas configurações do sistema;</li>
+      <li>Desinstalar o aplicativo, removendo completamente os dados locais relacionados a ele.</li>
+    </ul>
+
+    <h2>7. Alterações nesta Política de Privacidade</h2>
+    <p>
+      Esta Política de Privacidade poderá ser atualizada periodicamente para refletir melhorias do
+      aplicativo ou alterações legais. Sempre que houver mudança relevante, a nova versão será
+      disponibilizada nesta mesma página.
+    </p>
+
+    <h2>8. Contato</h2>
+    <p>
+      Em caso de dúvidas, sugestões ou solicitações sobre esta Política de Privacidade ou sobre o
+      funcionamento do CodeBlocks+, você pode entrar em contato com o desenvolvedor:
+    </p>
+
+    <div class="contato-box">
+      <b>Desenvolvedor:</b>
+      Mayckon Jhônatas<br>
+      <b>E-mail:</b> <a href="mailto:mayckonjhonata@gmail.com">mayckonjhonata@gmail.com</a>
+    </div>
+
+    <!-- Botão opcional para voltar ao app / site principal -->
+    <!-- Você pode ajustar o href conforme quiser -->
+    <a class="btn-voltar" href="https://play.google.com/store/apps" target="_blank" rel="noopener noreferrer">
+      <span>⟵</span> Voltar para o aplicativo
+    </a>
+  </article>
+</main>
+
+<footer>
+  Desenvolvido por <b>Mayckon Jhônatas</b> — CodeBlocks+ • 2025
+</footer>
+
+</body>
+</html>
