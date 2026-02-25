@@ -172,7 +172,7 @@
       min-width: 820px;
     }
     .table thead th{
-      text-align:left;
+      text-align:center;
       font-size:12px;
       color:#0b245c;
       background:linear-gradient(180deg, rgba(37,99,235,.13), rgba(37,99,235,.07));
@@ -242,9 +242,17 @@
       overflow:hidden;
       border:1px solid var(--border);
       border-radius:16px;
+      min-width: 500px;
+    }
+    .rank-scroll{
+      width:100%;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;
+      padding-bottom:2px;
     }
     .rank thead th{
-      text-align:left;
+      text-align:center;
       font-size:12px;
       color:#0b245c;
       background:linear-gradient(180deg, rgba(37,99,235,.13), rgba(37,99,235,.07));
@@ -745,7 +753,8 @@
       }).join("");
 
       $("rankWrap").innerHTML = `
-        <table class="rank">
+        <div class="rank-scroll">
+          <table class="rank">
           <thead>
             <tr>
               <th>#</th>
