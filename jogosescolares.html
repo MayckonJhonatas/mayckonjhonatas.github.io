@@ -206,6 +206,21 @@
       border-color: rgba(239,68,68,.35);
       font-weight:800;
     }
+    .pill--live2{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+
+      background: rgba(239,68,68,.12);
+      color:#7f1d1d;
+      border-color: rgba(239,68,68,.35);
+      color:#ffffff;        /* 🔥 TEXTO BRANCO */
+
+      font-size:13px;
+      font-weight:600;
+    }
     .dot-live{
       width:8px;height:8px;border-radius:50%;
       background:#ef4444;
@@ -783,7 +798,16 @@
       renderRanking(list);
 
       const liveCount = list.filter(m => isLiveMatch(m)).length;
-      $("badgeCount").textContent = `${list.length} jogos${liveCount ? " • 🔴 " + liveCount + " ao vivo" : ""}`;
+      $("badgeCount").innerHTML = `
+        ${list.length} jogos
+        ${liveCount 
+          ? ` • <span class="pill pill--live2">
+               <span class="dot-live"></span>
+               ${liveCount} ao vivo
+             </span>` 
+          : ""
+        }
+      `;
 
       const now = new Date();
       const hh = String(now.getHours()).padStart(2,"0");
@@ -802,3 +826,4 @@
   </script>
 </body>
 </html>
+
