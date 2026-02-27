@@ -56,12 +56,17 @@
     .title span{display:block;font-size:12px; opacity:.9}
     .badges{display:flex;gap:8px;flex-wrap:wrap}
     .badge{
-      padding:7px 10px;
+      display:inline-flex;          /* ✅ vira flex */
+      align-items:center;           /* ✅ centraliza vertical */
+      justify-content:center;       /* ✅ centraliza horizontal (se precisar) */
+      min-height:34px;              /* ✅ mesma “altura” pros badges */
+      padding:7px 12px;             /* pode manter como quiser */
       border-radius:999px;
       background:rgba(255,255,255,.16);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
       font-size:12px;
       white-space:nowrap;
+      line-height:1;                /* ✅ evita desalinhamento */
     }
 
     main{padding:16px}
