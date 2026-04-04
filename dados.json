@@ -64,36 +64,9 @@
       "name": "Atletismo",
       "category": "individual",
       "icon": "🏃"
-    },
-    {
-      "id": "natacao",
-      "name": "Natação",
-      "category": "individual",
-      "icon": "🏊"
-    },
-    {
-      "id": "xadrez",
-      "name": "Xadrez",
-      "category": "individual",
-      "icon": "♟️"
     }
   ],
-  "matches": [
-    {
-      "id": "m1775325327164",
-      "sportId": "volei",
-      "phase": "Grupo A",
-      "date": "2025-04-04",
-      "time": "14:55",
-      "place": "Borracha",
-      "home": "jr",
-      "away": "ba",
-      "homeScore": 0,
-      "awayScore": 0,
-      "status": "scheduled",
-      "durationMin": 40
-    }
-  ],
+  "matches": [],
   "athletics": [
     {
       "id": "a1",
