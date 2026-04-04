@@ -74,9 +74,9 @@
       "place": "Borracha",
       "home": "jr",
       "away": "eu",
-      "homeScore": 0,
+      "homeScore": 1,
       "awayScore": 0,
-      "status": "live",
+      "status": "finished",
       "durationMin": 40
     }
   ],
