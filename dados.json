@@ -1,19 +1,10 @@
 {
   "general": {
-    "title": "XXIX Jogos Escolares — Resultados",
-    "subtitle": "Secretaria de educação, cultura e esporte de Vicência",
-    "footer": "Desenvolvido por Mayckon Jhônatas"
+    "title": "Jogos Escolares — Resultados",
+    "subtitle": "Secretaria de educação, cultura e esporte • Atualiza conforme os jogos forem lançados",
+    "footer": "Desenvolvido por Mayckon Jhônatas • Consulta pública para alunos"
   },
-  "schools": [
-    {
-      "id": "jr",
-      "name": "José Rufino"
-    },
-    {
-      "id": "eu",
-      "name": "EURAL"
-    }
-  ],
+  "schools": [],
   "sports": [
     {
       "id": "volei",
@@ -60,25 +51,10 @@
     {
       "id": "xadrez",
       "name": "Xadrez",
-      "icon": "♟️",
-      "category": "coletivo"
+      "category": "individual",
+      "icon": "♟️"
     }
   ],
-  "matches": [
-    {
-      "id": "m1775329068972",
-      "sportId": "futsal",
-      "phase": "Grupo A",
-      "date": "2026-04-04",
-      "time": "16:00",
-      "place": "Borracha",
-      "home": "jr",
-      "away": "eu",
-      "homeScore": 1,
-      "awayScore": 0,
-      "status": "finished",
-      "durationMin": 40
-    }
-  ],
+  "matches": [],
   "athletics": []
 }
