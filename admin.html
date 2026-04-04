@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel Admin — Jogos Escolares</title>
+  <style>
+    :root{
+      --blue:#2563eb;
+      --blue2:#1d4ed8;
+      --soft:#eff6ff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:rgba(15,23,42,.10);
+      --radius:18px;
+      --shadow:0 14px 35px rgba(2,6,23,.10);
+      --shadow2:0 8px 18px rgba(2,6,23,.08);
+      --danger:#dc2626;
+      --ok:#16a34a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(37,99,235,.25), transparent 60%),
+        radial-gradient(900px 520px at 90% 0%, rgba(29,78,216,.18), transparent 55%),
+        linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      min-height:100vh;
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      background: linear-gradient(90deg, var(--blue) 0%, var(--blue2) 100%);
+      color:#fff;
+      padding:16px 16px 14px;
+      box-shadow: 0 10px 25px rgba(2,6,23,.18);
+    }
+    .wrap{max-width:1600px;margin:0 auto}
+    .top{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .brand{display:flex; gap:12px; align-items:center;}
+    .logo{
+      width:40px;height:40px;border-radius:12px;
+      background:rgba(255,255,255,.18);
+      display:grid;place-items:center;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.22);
+      font-weight:800;
+    }
+    .title{line-height:1.1;}
+    .title b{display:block;font-size:16px}
+    .title span{display:block;font-size:12px; opacity:.9}
+    .badge-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:34px;
+      padding:7px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.16);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+      font-size:12px;
+      white-space:nowrap;
+      line-height:1;
+      text-decoration:none;
+      color:#fff;
+    }
+
+    main{padding:16px}
+    .layout{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow2);
+      overflow:hidden;
+      margin-bottom:14px;
+    }
+    .card-h{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap:10px; flex-wrap:wrap;
+    }
+    .card-h h2{margin:0;font-size:15px;letter-spacing:.2px}
+    .muted{color:var(--muted); font-size:12px}
+    .card-b{padding:14px}
+
+    .fields{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .fields-3{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 900px){
+      .fields,.fields-3{grid-template-columns:1fr}
+    }
+    .field label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px;
+    }
+    select, input, button{
+      width:100%;
+      padding:11px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#fff;
+      outline:none;
+      font-size:14px;
+    }
+    button{
+      cursor:pointer;
+    }
+    .btn-primary{
+      background:linear-gradient(90deg, var(--blue), var(--blue2));
+      color:#fff;
+      border:none;
+    }
+    .btn-soft{background:#fff}
+    .btn-danger{
+      background:rgba(220,38,38,.08);
+      color:#991b1b;
+      border:1px solid rgba(220,38,38,.18);
+    }
+    .actions{
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+    .actions button{width:auto}
+
+    .table-scroll{
+      width:100%;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;
+      padding-bottom:2px;
+    }
+    .table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border:1px solid var(--border);
+      border-radius:16px;
+      min-width: 680px;
+    }
+    .table thead th{
+      text-align:center;
+      font-size:12px;
+      color:#0b245c;
+      background:linear-gradient(180deg, rgba(37,99,235,.13), rgba(37,99,235,.07));
+      padding:10px 10px;
+      border-bottom:1px solid var(--border);
+      white-space:nowrap;
+    }
+    .table tbody td{
+      padding:10px 10px;
+      border-bottom:1px solid var(--border);
+      font-size:13px;
+      vertical-align:middle;
+    }
+    .table tbody tr:last-child td{border-bottom:none}
+    .center{text-align:center}
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--border);
+      background:var(--soft);
+      color:#0b245c;
+      white-space:nowrap;
+    }
+    .status{
+      margin-top:10px;
+      padding:12px 14px;
+      border-radius:14px;
+      display:none;
+      font-size:13px;
+    }
+    .status.show{display:block}
+    .status.ok{
+      border:1px solid rgba(22,163,74,.20);
+      background:rgba(22,163,74,.08);
+      color:#166534;
+    }
+    .status.err{
+      border:1px solid rgba(220,38,38,.18);
+      background:rgba(220,38,38,.08);
+      color:#991b1b;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap top">
+      <div class="brand">
+        <div class="logo">ADM</div>
+        <div class="title">
+          <b>Painel Admin — Jogos Escolares</b>
+          <span>Mesmo visual da página pública, mas com cadastro simplificado</span>
+        </div>
+      </div>
+      <a class="badge-link" href="index_visual.html">Abrir página pública</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="layout">
+      <section>
+        <div class="card">
+          <div class="card-h">
+            <div>
+              <h2>⚙️ Configurações gerais</h2>
+              <div class="muted">Textos principais da página.</div>
+            </div>
+          </div>
+          <div class="card-b">
+            <div class="fields">
+              <div class="field">
+                <label>Título</label>
+                <input id="generalTitle" />
+              </div>
+              <div class="field">
+                <label>Subtítulo</label>
+                <input id="generalSubtitle" />
+              </div>
+              <div class="field">
+                <label>Rodapé</label>
+                <input id="generalFooter" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h">
+            <div>
+              <h2>🏫 Adicionar escola</h2>
+              <div class="muted">Cadastro simples.</div>
+            </div>
+          </div>
+          <div class="card-b">
+            <div class="fields">
+              <div class="field">
+                <label>ID</label>
+                <input id="schoolId" placeholder="Ex: jr" />
+              </div>
+              <div class="field">
+                <label>Nome</label>
+                <input id="schoolName" placeholder="Ex: José Rufino" />
+              </div>
+            </div>
+            <div class="actions" style="margin-top:10px">
+              <button class="btn-primary" id="addSchoolBtn">Adicionar escola</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h">
+            <div>
+              <h2>🏅 Adicionar modalidade</h2>
+              <div class="muted">Pode adicionar novas modalidades mantendo o mesmo visual.</div>
+            </div>
+          </div>
+          <div class="card-b">
+            <div class="fields-3">
+              <div class="field">
+                <label>ID</label>
+                <input id="sportId" placeholder="Ex: futsal" />
+              </div>
+              <div class="field">
+                <label>Nome</label>
+                <input id="sportName" placeholder="Ex: Futsal" />
+              </div>
+              <div class="field">
+                <label>Ícone</label>
+                <input id="sportIcon" placeholder="Ex: ⚽" />
+              </div>
+              <div class="field">
+                <label>Categoria</label>
+                <select id="sportCategory">
+                  <option value="coletivo">Coletivo</option>
+                  <option value="individual">Individual</option>
+                </select>
+              </div>
+            </div>
+            <div class="actions" style="margin-top:10px">
+              <button class="btn-primary" id="addSportBtn">Adicionar modalidade</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h">
+            <div>
+              <h2>⚽ Adicionar jogo</h2>
+              <div class="muted">Use para modalidades normais. Para atletismo, use a área logo abaixo.</div>
+            </div>
+          </div>
+          <div class="card-b">
+            <div class="fields-3">
+              <div class="field">
+                <label>Modalidade</label>
+                <select id="matchSport"></select>
+              </div>
+              <div class="field">
+                <label>Fase</label>
+                <input id="matchPhase" placeholder="Ex: Grupo A" />
+              </div>
+              <div class="field">
+                <label>Status</label>
+                <select id="matchStatus">
+                  <option value="scheduled">Agendado</option>
+                  <option value="live">Ao vivo</option>
+                  <option value="finished">Finalizado</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Mandante</label>
+                <select id="matchHome"></select>
+              </div>
+              <div class="field">
+                <label>Visitante</label>
+                <select id="matchAway"></select>
+              </div>
+              <div class="field">
+                <label>Local</label>
+                <input id="matchPlace" placeholder="Ex: Quadra Central" />
+              </div>
+              <div class="field">
+                <label>Data</label>
+                <input id="matchDate" type="date" />
+              </div>
+              <div class="field">
+                <label>Hora</label>
+                <input id="matchTime" type="time" />
+              </div>
+              <div class="field">
+                <label>Duração em min</label>
+                <input id="matchDuration" type="number" value="40" />
+              </div>
+              <div class="field">
+                <label>Placar mandante</label>
+                <input id="matchHomeScore" type="number" />
+              </div>
+              <div class="field">
+                <label>Placar visitante</label>
+                <input id="matchAwayScore" type="number" />
+              </div>
+            </div>
+            <div class="actions" style="margin-top:10px">
+              <button class="btn-primary" id="addMatchBtn">Adicionar jogo</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h">
+            <div>
+              <h2>🏃 Adicionar atletismo</h2>
+              <div class="muted">Aqui só entra escola, subcategoria e posição.</div>
+            </div>
+          </div>
+          <div class="card-b">
+            <div class="fields-3">
+              <div class="field">
+                <label>Subcategoria</label>
+                <input id="athPhase" placeholder="Ex: 100m rasos" />
+              </div>
+              <div class="field">
+                <label>Escola</label>
+                <select id="athSchool"></select>
+              </div>
+              <div class="field">
+                <label>Posição</label>
+                <input id="athPosition" type="number" placeholder="Ex: 1" />
+              </div>
+            </div>
+            <div class="actions" style="margin-top:10px">
+              <button class="btn-primary" id="addAthBtn">Adicionar resultado</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside>
+        <div class="card">
+          <div class="card-h">
+            <div>
+              <h2>💾 Ações</h2>
+              <div class="muted">Tudo salvo no navegador.</div>
+            </div>
+          </div>
+          <div class="card-b">
+            <div class="actions">
+              <button class="btn-primary" id="saveBtn">Salvar tudo</button>
+              <button class="btn-soft" id="exportBtn">Exportar JSON</button>
+              <button class="btn-soft" id="importBtn">Importar JSON</button>
+              <button class="btn-danger" id="resetBtn">Restaurar padrão</button>
+            </div>
+            <input id="importFile" type="file" accept=".json" style="display:none" />
+            <div id="statusBox" class="status"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><div><h2>🏫 Escolas cadastradas</h2></div></div>
+          <div class="card-b" id="schoolsWrap"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><div><h2>🏅 Modalidades cadastradas</h2></div></div>
+          <div class="card-b" id="sportsWrap"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><div><h2>⚽ Jogos cadastrados</h2></div></div>
+          <div class="card-b" id="matchesWrap"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><div><h2>🏃 Atletismo cadastrado</h2></div></div>
+          <div class="card-b" id="athleticsWrap"></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "jogos_escolares_visual_v1";
+    const defaultData = {
+      general:{
+        title:"Jogos Escolares — Resultados",
+        subtitle:"Secretaria de educação, cultura e esporte • Atualiza conforme os jogos forem lançados",
+        footer:"Desenvolvido por Mayckon Jhônatas • Consulta pública para alunos"
+      },
+      schools:[
+        { id: "jr", name: "José Rufino" },
+        { id: "ba", name: "Benjamin Azevedo" },
+        { id: "mc", name: "EURAL" },
+        { id: "se", name: "Comunidade Cristã" }
+      ],
+      sports:[
+        { id:"volei", name:"Vôlei", category:"coletivo", icon:"🏐" },
+        { id:"futsal", name:"Futsal", category:"coletivo", icon:"⚽" },
+        { id:"handebol", name:"Handebol", category:"coletivo", icon:"🤾" },
+        { id:"futebol", name:"Futebol", category:"coletivo", icon:"🥅" },
+        { id:"basquete", name:"Basquete", category:"coletivo", icon:"🏀" },
+        { id:"volei_praia", name:"Vôlei de Praia", category:"coletivo", icon:"🏖️" },
+        { id:"atletismo", name:"Atletismo", category:"individual", icon:"🏃" },
+        { id:"natacao", name:"Natação", category:"individual", icon:"🏊" },
+        { id:"xadrez", name:"Xadrez", category:"individual", icon:"♟️" }
+      ],
+      matches:[
+        { id:"m1", sportId:"futsal", phase:"Grupo A", date:"2026-02-24", time:"08:00", place:"Quadra Central", home:"jr", away:"ba", homeScore:2, awayScore:1, status:"finished" },
+        { id:"m2", sportId:"handebol", phase:"Semifinal", date:"2026-02-26", time:"14:00", place:"Quadra Central", home:"ba", away:"se", homeScore:3, awayScore:2, status:"live", durationMin:40 },
+        { id:"m3", sportId:"basquete", phase:"Final", date:"2026-02-28", time:"15:00", place:"Ginásio", home:"jr", away:"mc", homeScore:null, awayScore:null, status:"scheduled" }
+      ],
+      athletics:[
+        { id:"a1", sportId:"atletismo", phase:"100m rasos", school:"jr", position:1 },
+        { id:"a2", sportId:"atletismo", phase:"100m rasos", school:"ba", position:2 }
+      ]
+    };
+
+    function readData(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : structuredClone(defaultData);
+      }catch(e){
+        return structuredClone(defaultData);
+      }
+    }
+
+    let DATA = readData();
+    const $ = id => document.getElementById(id);
+
+    function setStatus(msg, kind="ok"){
+      const box = $("statusBox");
+      box.textContent = msg;
+      box.className = "status show " + (kind === "err" ? "err" : "ok");
+    }
+
+    function saveStorage(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA, null, 2));
+    }
+
+    function schoolName(id){
+      return (DATA.schools.find(s=>s.id===id) || {name:"—"}).name;
+    }
+    function sportName(id){
+      return (DATA.sports.find(s=>s.id===id) || {name:"—"}).name;
+    }
+
+    function fillGeneral(){
+      $("generalTitle").value = DATA.general.title || "";
+      $("generalSubtitle").value = DATA.general.subtitle || "";
+      $("generalFooter").value = DATA.general.footer || "";
+    }
+
+    function refreshSelects(){
+      const schoolOptions = DATA.schools.map(s=>`<option value="${s.id}">${s.name}</option>`).join("");
+      $("matchHome").innerHTML = schoolOptions;
+      $("matchAway").innerHTML = schoolOptions;
+      $("athSchool").innerHTML = schoolOptions;
+
+      const matchSports = DATA.sports.filter(s=>s.id !== "atletismo");
+      $("matchSport").innerHTML = matchSports.map(s=>`<option value="${s.id}">${s.name}</option>`).join("");
+    }
+
+    function renderSchools(){
+      if(!DATA.schools.length){
+        $("schoolsWrap").innerHTML = `<div class="muted">Nenhuma escola cadastrada.</div>`;
+        return;
+      }
+      $("schoolsWrap").innerHTML = `
+        <div class="table-scroll">
+          <table class="table">
+            <thead><tr><th>ID</th><th>Nome</th><th>Ação</th></tr></thead>
+            <tbody>
+              ${DATA.schools.map((s,i)=>`
+                <tr>
+                  <td class="center">${s.id}</td>
+                  <td>${s.name}</td>
+                  <td class="center"><button class="btn-danger" onclick="removeSchool(${i})">Excluir</button></td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderSports(){
+      if(!DATA.sports.length){
+        $("sportsWrap").innerHTML = `<div class="muted">Nenhuma modalidade cadastrada.</div>`;
+        return;
+      }
+      $("sportsWrap").innerHTML = `
+        <div class="table-scroll">
+          <table class="table">
+            <thead><tr><th>ID</th><th>Modalidade</th><th>Categoria</th><th>Ação</th></tr></thead>
+            <tbody>
+              ${DATA.sports.map((s,i)=>`
+                <tr>
+                  <td class="center">${s.id}</td>
+                  <td><span class="pill">${s.icon || "🏅"} ${s.name}</span></td>
+                  <td class="center">${s.category}</td>
+                  <td class="center"><button class="btn-danger" onclick="removeSport(${i})">Excluir</button></td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderMatches(){
+      if(!DATA.matches.length){
+        $("matchesWrap").innerHTML = `<div class="muted">Nenhum jogo cadastrado.</div>`;
+        return;
+      }
+      $("matchesWrap").innerHTML = `
+        <div class="table-scroll">
+          <table class="table">
+            <thead><tr><th>Modalidade</th><th>Fase</th><th>Mandante</th><th>Placar</th><th>Visitante</th><th>Ação</th></tr></thead>
+            <tbody>
+              ${DATA.matches.map((m,i)=>`
+                <tr>
+                  <td>${sportName(m.sportId)}</td>
+                  <td>${m.phase || "—"}</td>
+                  <td>${schoolName(m.home)}</td>
+                  <td class="center">${m.homeScore ?? "—"} × ${m.awayScore ?? "—"}</td>
+                  <td>${schoolName(m.away)}</td>
+                  <td class="center"><button class="btn-danger" onclick="removeMatch(${i})">Excluir</button></td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderAthletics(){
+      if(!DATA.athletics.length){
+        $("athleticsWrap").innerHTML = `<div class="muted">Nenhum resultado de atletismo cadastrado.</div>`;
+        return;
+      }
+      $("athleticsWrap").innerHTML = `
+        <div class="table-scroll">
+          <table class="table">
+            <thead><tr><th>Subcategoria</th><th>Escola</th><th>Posição</th><th>Ação</th></tr></thead>
+            <tbody>
+              ${DATA.athletics.map((a,i)=>`
+                <tr>
+                  <td>${a.phase}</td>
+                  <td>${schoolName(a.school)}</td>
+                  <td class="center">${a.position}º</td>
+                  <td class="center"><button class="btn-danger" onclick="removeAthletic(${i})">Excluir</button></td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderAll(){
+      fillGeneral();
+      refreshSelects();
+      renderSchools();
+      renderSports();
+      renderMatches();
+      renderAthletics();
+    }
+
+    $("addSchoolBtn").onclick = () => {
+      const id = $("schoolId").value.trim().toLowerCase();
+      const name = $("schoolName").value.trim();
+      if(!id || !name) return setStatus("Preencha ID e nome da escola.", "err");
+      if(DATA.schools.some(s=>s.id===id)) return setStatus("Já existe uma escola com esse ID.", "err");
+      DATA.schools.push({id,name});
+      $("schoolId").value = "";
+      $("schoolName").value = "";
+      renderAll();
+      setStatus("Escola adicionada.");
+    };
+
+    $("addSportBtn").onclick = () => {
+      const id = $("sportId").value.trim().toLowerCase();
+      const name = $("sportName").value.trim();
+      const icon = $("sportIcon").value.trim() || "🏅";
+      const category = $("sportCategory").value;
+      if(!id || !name) return setStatus("Preencha ID e nome da modalidade.", "err");
+      if(DATA.sports.some(s=>s.id===id)) return setStatus("Já existe uma modalidade com esse ID.", "err");
+      DATA.sports.push({id,name,icon,category});
+      $("sportId").value = "";
+      $("sportName").value = "";
+      $("sportIcon").value = "";
+      renderAll();
+      setStatus("Modalidade adicionada.");
+    };
+
+    $("addMatchBtn").onclick = () => {
+      const sportId = $("matchSport").value;
+      const home = $("matchHome").value;
+      const away = $("matchAway").value;
+      if(!sportId || !home || !away) return setStatus("Selecione modalidade e escolas.", "err");
+      if(home === away) return setStatus("Mandante e visitante não podem ser iguais.", "err");
+
+      DATA.matches.push({
+        id:"m"+Date.now(),
+        sportId,
+        phase:$("matchPhase").value.trim(),
+        date:$("matchDate").value,
+        time:$("matchTime").value,
+        place:$("matchPlace").value.trim(),
+        home,
+        away,
+        homeScore:$("matchHomeScore").value === "" ? null : Number($("matchHomeScore").value),
+        awayScore:$("matchAwayScore").value === "" ? null : Number($("matchAwayScore").value),
+        status:$("matchStatus").value,
+        durationMin:$("matchDuration").value === "" ? 40 : Number($("matchDuration").value)
+      });
+
+      $("matchPhase").value = "";
+      $("matchDate").value = "";
+      $("matchTime").value = "";
+      $("matchPlace").value = "";
+      $("matchHomeScore").value = "";
+      $("matchAwayScore").value = "";
+      $("matchDuration").value = "40";
+      renderAll();
+      setStatus("Jogo adicionado.");
+    };
+
+    $("addAthBtn").onclick = () => {
+      const phase = $("athPhase").value.trim();
+      const school = $("athSchool").value;
+      const position = Number($("athPosition").value);
+      if(!phase || !school || !position) return setStatus("Preencha subcategoria, escola e posição.", "err");
+
+      DATA.athletics.push({
+        id:"a"+Date.now(),
+        sportId:"atletismo",
+        phase,
+        school,
+        position
+      });
+
+      $("athPhase").value = "";
+      $("athPosition").value = "";
+      renderAll();
+      setStatus("Resultado de atletismo adicionado.");
+    };
+
+    $("saveBtn").onclick = () => {
+      DATA.general.title = $("generalTitle").value.trim();
+      DATA.general.subtitle = $("generalSubtitle").value.trim();
+      DATA.general.footer = $("generalFooter").value.trim();
+      saveStorage();
+      setStatus("Tudo salvo com sucesso.");
+    };
+
+    $("exportBtn").onclick = () => {
+      DATA.general.title = $("generalTitle").value.trim();
+      DATA.general.subtitle = $("generalSubtitle").value.trim();
+      DATA.general.footer = $("generalFooter").value.trim();
+      const blob = new Blob([JSON.stringify(DATA, null, 2)], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "jogos-escolares-visual.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setStatus("JSON exportado.");
+    };
+
+    $("importBtn").onclick = () => $("importFile").click();
+
+    $("importFile").addEventListener("change", async (e)=>{
+      const file = e.target.files?.[0];
+      if(!file) return;
+      try{
+        const text = await file.text();
+        DATA = JSON.parse(text);
+        saveStorage();
+        renderAll();
+        setStatus("JSON importado com sucesso.");
+      }catch(err){
+        setStatus("Erro ao importar o JSON.", "err");
+      }
+      e.target.value = "";
+    });
+
+    $("resetBtn").onclick = () => {
+      if(!confirm("Deseja restaurar os dados padrão?")) return;
+      DATA = structuredClone(defaultData);
+      saveStorage();
+      renderAll();
+      setStatus("Dados padrão restaurados.");
+    };
+
+    window.removeSchool = (i) => {
+      const id = DATA.schools[i]?.id;
+      DATA.schools.splice(i,1);
+      DATA.matches = DATA.matches.filter(m => m.home !== id && m.away !== id);
+      DATA.athletics = DATA.athletics.filter(a => a.school !== id);
+      renderAll();
+    };
+
+    window.removeSport = (i) => {
+      const id = DATA.sports[i]?.id;
+      DATA.sports.splice(i,1);
+      DATA.matches = DATA.matches.filter(m => m.sportId !== id);
+      if(id === "atletismo") DATA.athletics = [];
+      renderAll();
+    };
+
+    window.removeMatch = (i) => {
+      DATA.matches.splice(i,1);
+      renderAll();
+    };
+
+    window.removeAthletic = (i) => {
+      DATA.athletics.splice(i,1);
+      renderAll();
+    };
+
+    renderAll();
+  </script>
+</body>
+</html>
