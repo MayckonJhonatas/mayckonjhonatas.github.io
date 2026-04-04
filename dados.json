@@ -4,7 +4,16 @@
     "subtitle": "Secretaria de educação, cultura e esporte • Atualiza conforme os jogos forem lançados",
     "footer": "Desenvolvido por Mayckon Jhônatas • Consulta pública para alunos"
   },
-  "schools": [],
+  "schools": [
+    {
+      "id": "jr",
+      "name": "José Rufino"
+    },
+    {
+      "id": "eu",
+      "name": "EURAL"
+    }
+  ],
   "sports": [
     {
       "id": "volei",
@@ -55,6 +64,21 @@
       "category": "coletivo"
     }
   ],
-  "matches": [],
+  "matches": [
+    {
+      "id": "m1775329068972",
+      "sportId": "futsal",
+      "phase": "Grupo A",
+      "date": "2026-04-04",
+      "time": "16:00",
+      "place": "Borracha",
+      "home": "jr",
+      "away": "eu",
+      "homeScore": 0,
+      "awayScore": 0,
+      "status": "scheduled",
+      "durationMin": 40
+    }
+  ],
   "athletics": []
 }
