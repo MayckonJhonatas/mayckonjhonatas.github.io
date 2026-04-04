@@ -76,7 +76,7 @@
       "away": "eu",
       "homeScore": 0,
       "awayScore": 0,
-      "status": "scheduled",
+      "status": "live",
       "durationMin": 40
     }
   ],
