@@ -376,8 +376,10 @@
     Desenvolvido por Mayckon Jhônatas • Consulta pública para alunos
   </footer>
 
+  
   <script>
     const STORAGE_KEY = "jogos_escolares_visual_v1";
+    const DATA_URL = "./dados.json";
 
     const defaultData = {
       general:{
@@ -402,45 +404,44 @@
         { id:"natacao", name:"Natação", category:"individual", icon:"🏊" },
         { id:"xadrez", name:"Xadrez", category:"individual", icon:"♟️" }
       ],
-      matches:[
-        { id:"m1", sportId:"futsal", phase:"Grupo A", date:"2026-02-24", time:"08:00", place:"Quadra Central", home:"jr", away:"ba", homeScore:2, awayScore:1, status:"finished" },
-        { id:"m2", sportId:"handebol", phase:"Semifinal", date:"2026-02-26", time:"14:00", place:"Quadra Central", home:"ba", away:"se", homeScore:3, awayScore:2, status:"live", durationMin:40 },
-        { id:"m3", sportId:"basquete", phase:"Final", date:"2026-02-28", time:"15:00", place:"Ginásio", home:"jr", away:"mc", homeScore:null, awayScore:null, status:"scheduled" },
-        { id:"m4", sportId:"volei", phase:"Grupo Único", date:"2026-02-25", time:"10:00", place:"Ginásio", home:"jr", away:"mc", homeScore:1, awayScore:2, status:"finished" },
-        { id:"m5", sportId:"xadrez", phase:"Rodada 1", date:"2026-02-26", time:"09:30", place:"Sala 02", home:"jr", away:"se", homeScore:1, awayScore:0, status:"finished" }
-      ],
-      athletics:[
-        { id:"a1", sportId:"atletismo", phase:"100m rasos", school:"jr", position:1 },
-        { id:"a2", sportId:"atletismo", phase:"100m rasos", school:"ba", position:2 },
-        { id:"a3", sportId:"atletismo", phase:"100m rasos", school:"se", position:3 },
-        { id:"a4", sportId:"atletismo", phase:"Salto em distância", school:"mc", position:1 },
-        { id:"a5", sportId:"atletismo", phase:"Salto em distância", school:"jr", position:2 }
-      ]
+      matches:[],
+      athletics:[]
     };
 
-    function getData(){
+    function normalizeData(obj){
+      return {
+        general: obj?.general || defaultData.general,
+        schools: Array.isArray(obj?.schools) ? obj.schools : defaultData.schools,
+        sports: Array.isArray(obj?.sports) ? obj.sports : defaultData.sports,
+        matches: Array.isArray(obj?.matches) ? obj.matches : defaultData.matches,
+        athletics: Array.isArray(obj?.athletics) ? obj.athletics : defaultData.athletics
+      };
+    }
+
+    async function getData(){
       try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return structuredClone(defaultData);
-        const obj = JSON.parse(raw);
-        return {
-          general: obj.general || defaultData.general,
-          schools: Array.isArray(obj.schools) ? obj.schools : defaultData.schools,
-          sports: Array.isArray(obj.sports) ? obj.sports : defaultData.sports,
-          matches: Array.isArray(obj.matches) ? obj.matches : defaultData.matches,
-          athletics: Array.isArray(obj.athletics) ? obj.athletics : defaultData.athletics
-        };
-      }catch(e){
+        const resp = await fetch(DATA_URL + "?v=" + Date.now(), { cache: "no-store" });
+        if(!resp.ok) throw new Error("Falha ao carregar dados.json");
+        const obj = await resp.json();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+        return normalizeData(obj);
+      }catch(err){
+        console.warn("Não foi possível carregar dados.json. Usando localStorage ou padrão.", err);
+        try{
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if(raw) return normalizeData(JSON.parse(raw));
+        }catch(e){}
         return structuredClone(defaultData);
       }
     }
 
-    const DATA = getData();
-    const SCHOOLS = DATA.schools;
-    const SPORTS = DATA.sports;
-    const MATCHES = DATA.matches;
-    const ATHLETICS = DATA.athletics;
     const $ = (id) => document.getElementById(id);
+
+    let DATA;
+    let SCHOOLS = [];
+    let SPORTS = [];
+    let MATCHES = [];
+    let ATHLETICS = [];
 
     function fmtDate(iso){
       const parts = (iso || "").split("-");
@@ -472,9 +473,9 @@
     const LIVE_DEFAULT_DURATION_MIN = 60;
 
     function parseLocalDateTime(date, time){
-      const [y,m,d] = date.split("-").map(Number);
+      const [y,m,d] = (date || "").split("-").map(Number);
       const [hh,mm] = (time || "00:00").split(":").map(Number);
-      return new Date(y, m-1, d, hh, mm, 0, 0);
+      return new Date(y, (m || 1)-1, d || 1, hh || 0, mm || 0, 0, 0);
     }
     function isLiveByTime(m){
       if (!m.date || !m.time) return false;
@@ -500,8 +501,8 @@
 
     function uniquePhases(){
       const set = new Set([
-        ...MATCHES.map(m=>m.phase),
-        ...ATHLETICS.map(a=>a.phase)
+        ...MATCHES.map(m=>m.phase).filter(Boolean),
+        ...ATHLETICS.map(a=>a.phase).filter(Boolean)
       ]);
       return Array.from(set).sort((a,b)=>a.localeCompare(b));
     }
@@ -623,8 +624,8 @@
 
         return true;
       }).sort((a,b)=>{
-        const da = a.date + "T" + (a.time || "00:00");
-        const db = b.date + "T" + (b.time || "00:00");
+        const da = (a.date || "") + "T" + (a.time || "00:00");
+        const db = (b.date || "") + "T" + (b.time || "00:00");
         return db.localeCompare(da);
       });
     }
@@ -884,13 +885,23 @@
       $("footerText").textContent = DATA.general.footer || defaultData.general.footer;
     }
 
-    applyGeneral();
-    setupChips();
-    setupFilters();
-    highlightChip("ALL");
-    renderAll();
-    setInterval(renderAll, 20000);
+    async function init(){
+      DATA = await getData();
+      SCHOOLS = DATA.schools;
+      SPORTS = DATA.sports;
+      MATCHES = DATA.matches;
+      ATHLETICS = DATA.athletics;
+
+      applyGeneral();
+      setupChips();
+      setupFilters();
+      highlightChip("ALL");
+      renderAll();
+      setInterval(renderAll, 20000);
+    }
+
     window.addEventListener("storage", ()=>location.reload());
+    init();
   </script>
 </body>
 </html>
