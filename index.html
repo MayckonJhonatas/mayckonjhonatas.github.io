@@ -17,7 +17,9 @@
       --shadow:0 14px 35px rgba(2,6,23,.10);
       --shadow2:0 8px 18px rgba(2,6,23,.08);
     }
+
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -28,33 +30,72 @@
         linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
       min-height:100vh;
     }
+
     header{
-      position:sticky; top:0; z-index:10;
+      position:sticky;
+      top:0;
+      z-index:10;
       background: linear-gradient(90deg, var(--blue) 0%, var(--blue2) 100%);
       color:#fff;
       padding:16px 16px 14px;
       box-shadow: 0 10px 25px rgba(2,6,23,.18);
     }
+
     .wrap{
-      max-width: 1600px;
-      margin: 0 auto;
+      max-width:1600px;
+      margin:0 auto;
     }
+
     .top{
-      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
       flex-wrap:wrap;
     }
-    .brand{display:flex; gap:12px; align-items:center;}
+
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      min-width:0;
+    }
+
     .logo{
-      width:40px;height:40px;border-radius:12px;
+      width:40px;
+      height:40px;
+      border-radius:12px;
       background:rgba(255,255,255,.18);
-      display:grid;place-items:center;
+      display:grid;
+      place-items:center;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.22);
       font-weight:800;
+      flex:0 0 40px;
     }
-    .title{line-height:1.1;}
-    .title b{display:block;font-size:16px}
-    .title span{display:block;font-size:12px; opacity:.9}
-    .badges{display:flex;gap:8px;flex-wrap:wrap}
+
+    .title{
+      line-height:1.1;
+      min-width:0;
+    }
+
+    .title b{
+      display:block;
+      font-size:16px;
+    }
+
+    .title span{
+      display:block;
+      font-size:12px;
+      opacity:.9;
+    }
+
+    .badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
     .badge{
       display:inline-flex;
       align-items:center;
@@ -68,14 +109,19 @@
       white-space:nowrap;
       line-height:1;
     }
+
     .badge-link{
       text-decoration:none;
       color:#fff;
     }
-    main{padding:16px}
+
+    main{
+      padding:16px;
+    }
+
     .grid{
       display:grid;
-      grid-template-columns: 1fr;
+      grid-template-columns:1fr;
       gap:14px;
       align-items:start;
     }
@@ -87,35 +133,57 @@
       box-shadow:var(--shadow2);
       overflow:hidden;
     }
+
     .card-h{
       padding:14px 14px 10px;
       border-bottom:1px solid var(--border);
-      display:flex; align-items:flex-end; justify-content:space-between;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
       gap:10px;
       flex-wrap:wrap;
     }
+
     .card-h h2{
       margin:0;
       font-size:15px;
       letter-spacing:.2px;
     }
-    .muted{color:var(--muted); font-size:12px}
-    .card-b{padding:14px}
+
+    .muted{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .card-b{
+      padding:14px;
+    }
 
     .filters{
       display:grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr 1.2fr;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap:10px;
     }
-    @media (max-width: 980px){
-      .filters{grid-template-columns:1fr 1fr}
+
+    @media (max-width: 1100px){
+      .filters{
+        grid-template-columns:1fr 1fr;
+      }
     }
+
+    @media (max-width: 640px){
+      .filters{
+        grid-template-columns:1fr;
+      }
+    }
+
     .field label{
       display:block;
       font-size:12px;
       color:var(--muted);
       margin:0 0 6px;
     }
+
     select, input{
       width:100%;
       padding:11px 12px;
@@ -125,14 +193,18 @@
       outline:none;
       font-size:14px;
     }
-    input::placeholder{color:#94a3b8}
+
+    input::placeholder{
+      color:#94a3b8;
+    }
 
     .chipbar{
       display:flex;
       gap:8px;
       flex-wrap:wrap;
-      margin: 2px 0 12px;
+      margin:2px 0 12px;
     }
+
     .chip{
       display:inline-flex;
       align-items:center;
@@ -140,22 +212,30 @@
       padding:8px 10px;
       border-radius:999px;
       border:1px solid var(--border);
-      background: #fff;
+      background:#fff;
       font-size:12px;
       cursor:pointer;
       user-select:none;
-      box-shadow: 0 6px 14px rgba(2,6,23,.06);
+      box-shadow:0 6px 14px rgba(2,6,23,.06);
       transition: transform .05s ease;
       white-space:nowrap;
     }
-    .chip:active{ transform: translateY(1px); }
+
+    .chip:active{
+      transform:translateY(1px);
+    }
+
     .chip--strong{
       background: linear-gradient(90deg, rgba(37,99,235,.12), rgba(29,78,216,.10));
       border-color: rgba(37,99,235,.25);
       color:#0b245c;
       font-weight:800;
     }
-    .chip small{color:var(--muted); font-weight:700}
+
+    .chip small{
+      color:var(--muted);
+      font-weight:700;
+    }
 
     .table-scroll{
       width:100%;
@@ -164,6 +244,7 @@
       -webkit-overflow-scrolling:touch;
       padding-bottom:2px;
     }
+
     .table{
       width:100%;
       border-collapse:separate;
@@ -171,8 +252,9 @@
       overflow:hidden;
       border:1px solid var(--border);
       border-radius:16px;
-      min-width: 820px;
+      min-width:820px;
     }
+
     .table thead th{
       text-align:center;
       font-size:12px;
@@ -182,16 +264,22 @@
       border-bottom:1px solid var(--border);
       white-space:nowrap;
     }
+
     .table tbody td{
       padding:10px 10px;
       border-bottom:1px solid var(--border);
       font-size:13px;
       vertical-align:top;
     }
-    .table tbody tr:last-child td{border-bottom:none}
+
+    .table tbody tr:last-child td{
+      border-bottom:none;
+    }
 
     .pill{
-      display:inline-flex; align-items:center; gap:6px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
       padding:6px 10px;
       border-radius:999px;
       font-size:12px;
@@ -202,41 +290,66 @@
     }
 
     .pill--live{
-      background: rgba(239,68,68,.12);
+      background:rgba(239,68,68,.12);
       color:#7f1d1d;
-      border-color: rgba(239,68,68,.35);
+      border-color:rgba(239,68,68,.35);
       font-weight:800;
     }
+
     .pill--live2{
       display:inline-flex;
       align-items:center;
       gap:6px;
       padding:4px 10px;
       border-radius:999px;
-      background: rgba(239,68,68,.12);
-      border-color: rgba(239,68,68,.35);
+      background:rgba(239,68,68,.12);
+      border-color:rgba(239,68,68,.35);
       color:#ffffff;
       font-size:13px;
       font-weight:600;
     }
+
     .dot-live{
-      width:8px;height:8px;border-radius:50%;
+      width:8px;
+      height:8px;
+      border-radius:50%;
       background:#ef4444;
       display:inline-block;
-      box-shadow: 0 0 0 rgba(239,68,68,.35);
-      animation: pulseLive 1s infinite;
+      box-shadow:0 0 0 rgba(239,68,68,.35);
+      animation:pulseLive 1s infinite;
     }
+
     @keyframes pulseLive{
       0%{ box-shadow:0 0 0 0 rgba(239,68,68,.55); }
       70%{ box-shadow:0 0 0 8px rgba(239,68,68,0); }
       100%{ box-shadow:0 0 0 0 rgba(239,68,68,0); }
     }
 
-    .score{font-weight:800;font-size:14px;white-space:nowrap;}
-    .school{font-weight:700;display:block;margin-bottom:2px;}
-    .sub{display:block;font-size:12px;color:var(--muted);}
-    .center{ text-align:center }
-    .nowrap{ white-space:nowrap }
+    .score{
+      font-weight:800;
+      font-size:14px;
+      white-space:nowrap;
+    }
+
+    .school{
+      font-weight:700;
+      display:block;
+      margin-bottom:2px;
+    }
+
+    .sub{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .center{
+      text-align:center;
+    }
+
+    .nowrap{
+      white-space:nowrap;
+    }
 
     .empty{
       padding:14px;
@@ -254,7 +367,152 @@
       text-align:center;
     }
 
-    .section-space{height:12px}
+    .section-space{
+      height:12px;
+    }
+
+    @media (max-width: 768px){
+      header{
+        padding:14px 12px;
+      }
+
+      main{
+        padding:12px;
+      }
+
+      .card-h,
+      .card-b{
+        padding:12px;
+      }
+
+      .top{
+        align-items:flex-start;
+      }
+
+      .brand{
+        width:100%;
+      }
+
+      .badges{
+        width:100%;
+        justify-content:flex-start;
+      }
+
+      .title b{
+        font-size:15px;
+      }
+
+      .title span{
+        font-size:11px;
+      }
+
+      .chipbar{
+        gap:6px;
+      }
+
+      .chip{
+        font-size:11px;
+        padding:7px 9px;
+      }
+
+      select, input{
+        font-size:14px;
+        padding:10px 11px;
+      }
+
+      .table{
+        min-width:680px;
+      }
+
+      .table thead th{
+        font-size:11px;
+        padding:9px 8px;
+      }
+
+      .table tbody td{
+        font-size:12px;
+        padding:9px 8px;
+      }
+
+      .score{
+        font-size:13px;
+      }
+
+      .pill{
+        font-size:11px;
+        padding:5px 8px;
+      }
+
+      .badge{
+        font-size:11px;
+        padding:7px 10px;
+      }
+    }
+
+    @media (max-width: 480px){
+      .wrap{
+        max-width:100%;
+      }
+
+      .logo{
+        width:36px;
+        height:36px;
+        border-radius:10px;
+        flex:0 0 36px;
+      }
+
+      .title b{
+        font-size:14px;
+      }
+
+      .title span{
+        font-size:10px;
+      }
+
+      .card-h h2{
+        font-size:14px;
+      }
+
+      .muted{
+        font-size:11px;
+      }
+
+      .table{
+        min-width:620px;
+      }
+
+      .table thead th{
+        font-size:10px;
+        padding:8px 7px;
+      }
+
+      .table tbody td{
+        font-size:11px;
+        padding:8px 7px;
+      }
+
+      .score{
+        font-size:12px;
+      }
+
+      .sub{
+        font-size:11px;
+      }
+
+      .pill{
+        font-size:10px;
+        padding:4px 7px;
+      }
+
+      .badge{
+        min-height:32px;
+      }
+
+      footer{
+        font-size:11px;
+        padding:12px 12px 22px;
+      }
+    }
   </style>
 </head>
 <body>
