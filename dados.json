@@ -1,0 +1,98 @@
+{
+  "general": {
+    "title": "Jogos Escolares — Resultados",
+    "subtitle": "Secretaria de educação, cultura e esporte • Atualiza conforme os jogos forem lançados",
+    "footer": "Desenvolvido por Mayckon Jhônatas • Consulta pública para alunos"
+  },
+  "schools": [
+    {
+      "id": "jr",
+      "name": "José Rufino"
+    },
+    {
+      "id": "ba",
+      "name": "Benjamin Azevedo"
+    },
+    {
+      "id": "mc",
+      "name": "EURAL"
+    },
+    {
+      "id": "se",
+      "name": "Comunidade Cristã"
+    }
+  ],
+  "sports": [
+    {
+      "id": "volei",
+      "name": "Vôlei",
+      "category": "coletivo",
+      "icon": "🏐"
+    },
+    {
+      "id": "futsal",
+      "name": "Futsal",
+      "category": "coletivo",
+      "icon": "⚽"
+    },
+    {
+      "id": "handebol",
+      "name": "Handebol",
+      "category": "coletivo",
+      "icon": "🤾"
+    },
+    {
+      "id": "futebol",
+      "name": "Futebol",
+      "category": "coletivo",
+      "icon": "🥅"
+    },
+    {
+      "id": "basquete",
+      "name": "Basquete",
+      "category": "coletivo",
+      "icon": "🏀"
+    },
+    {
+      "id": "volei_praia",
+      "name": "Vôlei de Praia",
+      "category": "coletivo",
+      "icon": "🏖️"
+    },
+    {
+      "id": "atletismo",
+      "name": "Atletismo",
+      "category": "individual",
+      "icon": "🏃"
+    },
+    {
+      "id": "natacao",
+      "name": "Natação",
+      "category": "individual",
+      "icon": "🏊"
+    },
+    {
+      "id": "xadrez",
+      "name": "Xadrez",
+      "category": "individual",
+      "icon": "♟️"
+    }
+  ],
+  "matches": [],
+  "athletics": [
+    {
+      "id": "a1",
+      "sportId": "atletismo",
+      "phase": "100m rasos",
+      "school": "jr",
+      "position": 1
+    },
+    {
+      "id": "a2",
+      "sportId": "atletismo",
+      "phase": "100m rasos",
+      "school": "ba",
+      "position": 2
+    }
+  ]
+}
