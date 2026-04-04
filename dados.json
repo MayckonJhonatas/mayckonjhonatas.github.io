@@ -80,6 +80,20 @@
       "awayScore": 0,
       "status": "scheduled",
       "durationMin": 40
+    },
+    {
+      "id": "m1775328663152",
+      "sportId": "futsal",
+      "phase": "b",
+      "date": "2026-04-05",
+      "time": "20:25",
+      "place": "a",
+      "home": "jr",
+      "away": "mc",
+      "homeScore": 0,
+      "awayScore": 0,
+      "status": "scheduled",
+      "durationMin": 40
     }
   ],
   "athletics": [
@@ -96,6 +110,13 @@
       "phase": "100m rasos",
       "school": "ba",
       "position": 2
+    },
+    {
+      "id": "a1775328777330",
+      "sportId": "atletismo",
+      "phase": "nata",
+      "school": "jr",
+      "position": 1
     }
   ]
 }
