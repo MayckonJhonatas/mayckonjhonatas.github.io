@@ -75,12 +75,9 @@
     main{padding:16px}
     .grid{
       display:grid;
-      grid-template-columns: 1.15fr .85fr;
+      grid-template-columns: 1fr;
       gap:14px;
       align-items:start;
-    }
-    @media (max-width: 900px){
-      .grid{grid-template-columns:1fr}
     }
 
     .card{
@@ -250,41 +247,6 @@
       font-size:13px;
     }
 
-    .rank{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      overflow:hidden;
-      border:1px solid var(--border);
-      border-radius:16px;
-      min-width: 500px;
-    }
-    .rank-scroll{
-      width:100%;
-      overflow-x:auto;
-      overflow-y:hidden;
-      -webkit-overflow-scrolling:touch;
-      padding-bottom:2px;
-    }
-    .rank thead th{
-      text-align:center;
-      font-size:12px;
-      color:#0b245c;
-      background:linear-gradient(180deg, rgba(37,99,235,.13), rgba(37,99,235,.07));
-      padding:10px 10px;
-      border-bottom:1px solid var(--border);
-      white-space:nowrap;
-    }
-    .rank tbody td{
-      padding:10px 10px;
-      border-bottom:1px solid var(--border);
-      font-size:13px;
-      vertical-align:middle;
-    }
-    .rank tbody tr:last-child td{border-bottom:none}
-    .pos{width:38px;font-weight:900;}
-    .trophy{font-size:14px;margin-right:6px;}
-
     footer{
       padding:14px 16px 26px;
       color:var(--muted);
@@ -353,22 +315,6 @@
           <div id="matchesWrap"></div>
         </div>
       </section>
-
-      <aside class="card">
-        <div class="card-h">
-          <div>
-            <h2>🏆 Ranking</h2>
-            <div class="muted">Calculado automaticamente pelos resultados filtrados.</div>
-          </div>
-          <div class="pill" id="rankMode">Padrão: Vitória=3 • Empate=1</div>
-        </div>
-        <div class="card-b">
-          <div id="rankWrap"></div>
-          <div class="muted" style="margin-top:10px">
-            Critérios: <b>Pontos</b>, depois <b>Saldo</b>, depois <b>Gols Pró</b>.
-          </div>
-        </div>
-      </aside>
     </div>
   </main>
 
@@ -376,7 +322,6 @@
     Desenvolvido por Mayckon Jhônatas • Consulta pública para alunos
   </footer>
 
-  
   <script>
     const STORAGE_KEY = "jogos_escolares_visual_v1";
     const DATA_URL = "./dados.json";
@@ -449,12 +394,15 @@
       const [y,m,d] = parts;
       return `${d}/${m}/${y}`;
     }
+
     function schoolName(id){
       return (SCHOOLS.find(s=>s.id===id) || {name:"—"}).name;
     }
+
     function sportObj(id){
       return (SPORTS.find(s=>s.id===id) || null);
     }
+
     function sportName(id){
       return (sportObj(id) || {name:"—"}).name;
     }
@@ -477,6 +425,7 @@
       const [hh,mm] = (time || "00:00").split(":").map(Number);
       return new Date(y, (m || 1)-1, d || 1, hh || 0, mm || 0, 0, 0);
     }
+
     function isLiveByTime(m){
       if (!m.date || !m.time) return false;
       const start = parseLocalDateTime(m.date, m.time);
@@ -485,6 +434,7 @@
       const now = new Date();
       return now >= start && now <= end;
     }
+
     function isLiveMatch(m){
       if (m.status === "live") return true;
       if (m.status === "finished") return false;
@@ -756,96 +706,6 @@
       }).join("");
     }
 
-    function computeRanking(list){
-      const stats = {};
-      SCHOOLS.forEach(s=>{
-        stats[s.id] = { id:s.id, name:s.name, pts:0, j:0, v:0, e:0, d:0, gp:0, gc:0, sg:0 };
-      });
-
-      list.forEach(m=>{
-        const isFinished = m.status === "finished" && Number.isFinite(m.homeScore) && Number.isFinite(m.awayScore);
-        if (!isFinished) return;
-
-        const A = stats[m.home];
-        const B = stats[m.away];
-        if (!A || !B) return;
-
-        A.j++; B.j++;
-        A.gp += m.homeScore; A.gc += m.awayScore;
-        B.gp += m.awayScore; B.gc += m.homeScore;
-
-        if (m.homeScore > m.awayScore){
-          A.v++; B.d++;
-          A.pts += 3;
-        } else if (m.homeScore < m.awayScore){
-          B.v++; A.d++;
-          B.pts += 3;
-        } else {
-          A.e++; B.e++;
-          A.pts += 1; B.pts += 1;
-        }
-      });
-
-      Object.values(stats).forEach(s=> s.sg = s.gp - s.gc);
-
-      return Object.values(stats)
-        .filter(s => s.j > 0)
-        .sort((a,b)=>{
-          if (b.pts !== a.pts) return b.pts - a.pts;
-          if (b.sg !== a.sg) return b.sg - a.sg;
-          if (b.gp !== a.gp) return b.gp - a.gp;
-          return a.name.localeCompare(b.name);
-        });
-    }
-
-    function renderRanking(list){
-      const rank = computeRanking(list);
-      if (!rank.length){
-        $("rankWrap").innerHTML = `<div class="empty">Sem jogos finalizados neste filtro.</div>`;
-        return;
-      }
-
-      const rows = rank.map((t, idx)=>{
-        const medal = idx===0 ? "🥇" : idx===1 ? "🥈" : idx===2 ? "🥉" : "•";
-        return `
-          <tr>
-            <td class="pos center">${idx+1}</td>
-            <td><span class="trophy">${medal}</span><b>${t.name}</b></td>
-            <td class="center"><b>${t.pts}</b></td>
-            <td class="center">${t.j}</td>
-            <td class="center">${t.v}</td>
-            <td class="center">${t.e}</td>
-            <td class="center">${t.d}</td>
-            <td class="center">${t.gp}</td>
-            <td class="center">${t.gc}</td>
-            <td class="center"><b>${t.sg}</b></td>
-          </tr>
-        `;
-      }).join("");
-
-      $("rankWrap").innerHTML = `
-        <div class="rank-scroll">
-          <table class="rank">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Escola</th>
-                <th class="center">PTS</th>
-                <th class="center">J</th>
-                <th class="center">V</th>
-                <th class="center">E</th>
-                <th class="center">D</th>
-                <th class="center">GP</th>
-                <th class="center">GC</th>
-                <th class="center">SG</th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-        </div>
-      `;
-    }
-
     function renderAll(){
       const matches = filteredMatches();
       const athletics = filteredAthletics();
@@ -864,7 +724,6 @@
       }
 
       $("matchesWrap").innerHTML = html;
-      renderRanking(matches);
 
       const liveCount = matches.filter(m => isLiveMatch(m)).length;
       const totalCount = matches.length + athletics.length;
