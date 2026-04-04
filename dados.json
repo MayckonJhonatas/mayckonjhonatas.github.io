@@ -4,24 +4,7 @@
     "subtitle": "Secretaria de educação, cultura e esporte • Atualiza conforme os jogos forem lançados",
     "footer": "Desenvolvido por Mayckon Jhônatas • Consulta pública para alunos"
   },
-  "schools": [
-    {
-      "id": "jr",
-      "name": "José Rufino"
-    },
-    {
-      "id": "ba",
-      "name": "Benjamin Azevedo"
-    },
-    {
-      "id": "mc",
-      "name": "EURAL"
-    },
-    {
-      "id": "se",
-      "name": "Comunidade Cristã"
-    }
-  ],
+  "schools": [],
   "sports": [
     {
       "id": "volei",
@@ -64,59 +47,14 @@
       "name": "Atletismo",
       "category": "individual",
       "icon": "🏃"
+    },
+    {
+      "id": "xadrez",
+      "name": "Xadrez",
+      "icon": "♟️",
+      "category": "coletivo"
     }
   ],
-  "matches": [
-    {
-      "id": "m1775327348039",
-      "sportId": "volei",
-      "phase": "a",
-      "date": "2026-04-04",
-      "time": "15:28",
-      "place": "borracha",
-      "home": "jr",
-      "away": "ba",
-      "homeScore": 2,
-      "awayScore": 0,
-      "status": "scheduled",
-      "durationMin": 40
-    },
-    {
-      "id": "m1775328663152",
-      "sportId": "futsal",
-      "phase": "b",
-      "date": "2026-04-05",
-      "time": "20:25",
-      "place": "a",
-      "home": "jr",
-      "away": "mc",
-      "homeScore": 0,
-      "awayScore": 0,
-      "status": "scheduled",
-      "durationMin": 40
-    }
-  ],
-  "athletics": [
-    {
-      "id": "a1",
-      "sportId": "atletismo",
-      "phase": "100m rasos",
-      "school": "jr",
-      "position": 1
-    },
-    {
-      "id": "a2",
-      "sportId": "atletismo",
-      "phase": "100m rasos",
-      "school": "ba",
-      "position": 2
-    },
-    {
-      "id": "a1775328777330",
-      "sportId": "atletismo",
-      "phase": "nata",
-      "school": "jr",
-      "position": 1
-    }
-  ]
+  "matches": [],
+  "athletics": []
 }
