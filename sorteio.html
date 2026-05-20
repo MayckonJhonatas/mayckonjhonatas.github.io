@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1d4ed8" />
+  <title>Sorteio SME/PMV</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #173ca8;
+      --secondary: #0ea5e9;
+      --white: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #dbe4f0;
+      --soft: #eff6ff;
+      --success: #16a34a;
+      --error: #dc2626;
+      --shadow-lg: 0 28px 90px rgba(15, 23, 42, 0.24);
+      --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 12%, rgba(255,255,255,0.26), transparent 28%),
+        radial-gradient(circle at 88% 85%, rgba(255,255,255,0.18), transparent 26%),
+        linear-gradient(135deg, #153fae 0%, #2563eb 52%, #0ea5e9 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 18px;
+      overflow-x: hidden;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 999px;
+      pointer-events: none;
+      filter: blur(1px);
+      opacity: 0.55;
+    }
+
+    .orb.one {
+      width: 320px;
+      height: 320px;
+      left: -120px;
+      top: -110px;
+      background: rgba(255,255,255,0.26);
+    }
+
+    .orb.two {
+      width: 420px;
+      height: 420px;
+      right: -170px;
+      bottom: -180px;
+      background: rgba(255,255,255,0.17);
+    }
+
+    .page {
+      width: min(1160px, 100%);
+      display: grid;
+      grid-template-columns: minmax(320px, 0.92fr) minmax(390px, 1fr);
+      gap: 28px;
+      position: relative;
+      z-index: 1;
+      align-items: stretch;
+    }
+
+    .hero,
+    .card {
+      border-radius: 32px;
+      border: 1px solid rgba(255,255,255,0.28);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+
+    .hero {
+      min-height: 680px;
+      color: var(--white);
+      padding: 34px;
+      background: rgba(255,255,255,0.14);
+      box-shadow: 0 22px 62px rgba(15, 23, 42, 0.18);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      right: -120px;
+      bottom: 85px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.11);
+    }
+
+    .logos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-box {
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      border-radius: 24px;
+      background: var(--white);
+      box-shadow: var(--shadow-md);
+    }
+
+    .logo-box img {
+      max-width: 100%;
+      max-height: 74px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      margin-top: 30px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 15px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.18);
+      font-size: 0.86rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .hero h1 {
+      margin: 18px 0 0;
+      font-size: clamp(2.2rem, 4.4vw, 3.65rem);
+      line-height: 1.06;
+      letter-spacing: -0.05em;
+    }
+
+    .hero p {
+      margin: 18px 0 0;
+      color: rgba(255,255,255,0.92);
+      font-size: 1.03rem;
+      line-height: 1.72;
+      max-width: 530px;
+    }
+
+    .features {
+      display: grid;
+      gap: 14px;
+      margin-top: 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .feature-icon {
+      flex: 0 0 auto;
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.96);
+      color: var(--primary-dark);
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .feature strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 0.97rem;
+    }
+
+    .feature span {
+      display: block;
+      color: rgba(255,255,255,0.86);
+      font-size: 0.89rem;
+      line-height: 1.5;
+    }
+
+    .card {
+      min-height: 680px;
+      padding: 38px;
+      background: rgba(255,255,255,0.97);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .card-header {
+      margin-bottom: 26px;
+    }
+
+    .badge {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: var(--primary-dark);
+      font-size: 0.86rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: clamp(1.85rem, 3vw, 2.5rem);
+      line-height: 1.14;
+      letter-spacing: -0.04em;
+    }
+
+    .card p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.7;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    label {
+      color: #334155;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 58px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 0 18px;
+      background: #f8fbff;
+      color: var(--text);
+      font: inherit;
+      outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input::placeholder {
+      color: #94a3b8;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--primary);
+      background: var(--white);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    .select-wrap {
+      position: relative;
+    }
+
+    .select-wrap::after {
+      content: "⌄";
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-56%);
+      color: var(--primary-dark);
+      font-size: 1.35rem;
+      font-weight: 800;
+      pointer-events: none;
+    }
+
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      padding-right: 52px;
+      cursor: pointer;
+    }
+
+    select:invalid,
+    select option[value=""] {
+      color: #64748b;
+    }
+
+    select option {
+      color: var(--text);
+    }
+
+    button {
+      margin-top: 8px;
+      width: 100%;
+      min-height: 60px;
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: var(--white);
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 20px 34px rgba(37, 99, 235, 0.28);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 24px 40px rgba(37, 99, 235, 0.34);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.78;
+      cursor: wait;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translate(-50%, 28px);
+      min-width: min(450px, calc(100vw - 32px));
+      max-width: calc(100vw - 32px);
+      padding: 17px 20px;
+      border-radius: 20px;
+      color: var(--white);
+      font-size: 0.95rem;
+      font-weight: 700;
+      box-shadow: 0 20px 46px rgba(15, 23, 42, 0.3);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 30;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .toast.success {
+      background: var(--success);
+    }
+
+    .toast.error {
+      background: var(--error);
+    }
+
+    @media (max-width: 1000px) {
+      body {
+        padding: 18px;
+      }
+
+      .page {
+        grid-template-columns: 1fr;
+      }
+
+      .hero,
+      .card {
+        min-height: auto;
+      }
+
+      .hero {
+        padding: 28px;
+      }
+
+      .card {
+        padding: 28px;
+      }
+    }
+
+    @media (max-width: 590px) {
+      body {
+        padding: 14px;
+      }
+
+      .hero,
+      .card {
+        padding: 20px;
+        border-radius: 26px;
+      }
+
+      .logo-box {
+        min-height: 80px;
+        border-radius: 19px;
+      }
+
+      .logo-box img {
+        max-height: 56px;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .feature {
+        padding: 14px;
+        border-radius: 18px;
+      }
+
+      input,
+      button {
+        border-radius: 16px;
+      }
+
+      .toast {
+        bottom: 16px;
+      }
+    }
+
+    /* Ajuste de escala geral: página cerca de 15% mais compacta */
+    .page {
+      width: min(986px, 100%);
+      grid-template-columns: minmax(272px, 0.92fr) minmax(332px, 1fr);
+      gap: 24px;
+    }
+
+    .hero,
+    .card {
+      border-radius: 27px;
+    }
+
+    .hero {
+      min-height: 578px;
+      padding: 29px;
+    }
+
+    .card {
+      min-height: 578px;
+      padding: 32px;
+    }
+
+    .logos { gap: 12px; }
+    .logo-box { min-height: 85px; padding: 12px; border-radius: 20px; }
+    .logo-box img { max-height: 63px; }
+
+    .hero-content { margin-top: 25px; }
+    .pill { padding: 8px 13px; font-size: 0.78rem; }
+    .hero h1 { font-size: clamp(1.9rem, 3.8vw, 3.1rem); }
+    .hero p { margin-top: 15px; font-size: 0.9rem; line-height: 1.62; }
+
+    .features { gap: 12px; margin-top: 27px; }
+    .feature { gap: 11px; padding: 14px; border-radius: 19px; }
+    .feature-icon { width: 36px; height: 36px; border-radius: 13px; font-size: 1rem; }
+    .feature strong { font-size: 0.86rem; }
+    .feature span { font-size: 0.79rem; }
+
+    .card-header { margin-bottom: 22px; }
+    .badge { padding: 7px 12px; font-size: 0.78rem; margin-bottom: 14px; }
+    .card h2 { font-size: clamp(1.6rem, 2.55vw, 2.12rem); }
+    .card p { margin-top: 10px; font-size: 0.88rem; line-height: 1.6; }
+
+    .form-grid { gap: 14px; }
+    .field { gap: 7px; }
+    label { font-size: 0.84rem; }
+
+    input,
+    select {
+      height: 50px;
+      border-radius: 15px;
+      padding: 0 15px;
+      font-size: 0.92rem;
+    }
+
+    button {
+      min-height: 51px;
+      border-radius: 17px;
+      font-size: 0.92rem;
+    }
+
+    .toast {
+      padding: 14px 17px;
+      border-radius: 17px;
+      font-size: 0.87rem;
+    }
+
+    @media (max-width: 1000px) {
+      .page {
+        width: 100%;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .hero,
+      .card {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 590px) {
+      .hero,
+      .card {
+        padding: 18px;
+        border-radius: 23px;
+      }
+
+      .logo-box {
+        min-height: 72px;
+        border-radius: 17px;
+      }
+
+      .logo-box img { max-height: 50px; }
+      .hero h1 { font-size: 1.72rem; }
+      .feature { padding: 12px; border-radius: 16px; }
+      input, select, button { border-radius: 14px; }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+
+  <main class="page">
+    <section class="hero">
+      <div>
+        <div class="logos">
+          <div class="logo-box">
+            <img src="imagens/01.png" alt="Logomarca institucional">
+          </div>
+          <div class="logo-box">
+            <img src="imagens/02.png" alt="Logomarca institucional">
+          </div>
+        </div>
+
+        <div class="hero-content">
+          <div class="pill">🎉 Sorteio SME/PMV</div>
+          <h1>Participe do nosso sorteio.</h1>
+          <p>
+            Preencha seus dados, confirme sua participação e boa sorte!
+          </p>
+        </div>
+
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon">01</div>
+            <div>
+              <strong>Informe seus dados</strong>
+              <span>Nome, WhatsApp, CPF e escola.</span>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon">02</div>
+            <div>
+              <strong>Confirme sua inscrição</strong>
+              <span>O cadastro é realizado em poucos segundos.</span>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon">03</div>
+            <div>
+              <strong>Boa sorte!</strong>
+              <span>Sua participação será registrada para o sorteio.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div class="badge">🎁 Cadastro do participante</div>
+        <h2>Inscrição para o sorteio</h2>
+        <p>Preencha todos os campos abaixo para participar.</p>
+      </div>
+
+      <form class="form-grid" id="formSorteio" autocomplete="on">
+        <div class="field">
+          <label for="nome">Nome completo</label>
+          <input id="nome" type="text" placeholder="Digite seu nome" autocomplete="name">
+        </div>
+
+        <div class="field">
+          <label for="telefone_whats">WhatsApp</label>
+          <input id="telefone_whats" type="tel" inputmode="numeric" maxlength="15" placeholder="(81) 9 9999-9999" autocomplete="tel">
+        </div>
+
+        <div class="field">
+          <label for="cpf">CPF</label>
+          <input id="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+        </div>
+
+        <div class="field">
+          <label for="escola">Escola</label>
+          <div class="select-wrap">
+            <select id="escola" aria-label="Selecione a escola" required>
+              <option value="" selected disabled>Selecione a escola</option>
+                        
+              <option value="Centro de Educação Infantil Afrânio Samuel">Centro de Educação Infantil Afrânio Samuel</option>
+              <option value="Centro de Educação Infantil Monte Belo">Centro de Educação Infantil Monte Belo</option>
+              <option value="Centro Social Educacional Almir Tavares">Centro Social Educacional Almir Tavares</option>
+              <option value="Creche Casulo Tia Luiza">Creche Casulo Tia Luiza</option>
+              <option value="Creche Clotilde Wanderley">Creche Clotilde Wanderley</option>
+              <option value="Creche Maria de Lourdes Monteiro Pontes">Creche Maria de Lourdes Monteiro Pontes</option>
+              <option value="Escola Mun. Alfredo Gomes">Escola Mun. Alfredo Gomes</option>
+              <option value="Escola Mun. Comunidade Cristã">Escola Mun. Comunidade Cristã</option>
+              <option value="Escola Mun. Dr Benjamin Azevedo">Escola Mun. Dr Benjamin Azevedo</option>
+              <option value="Escola Mun. Jacy Estelita">Escola Mun. Jacy Estelita</option>
+              <option value="Escola Mun. José Rufino">Escola Mun. José Rufino</option>
+              <option value="Escola Mun. Juvenato Padre Guedes">Escola Mun. Juvenato Padre Guedes</option>
+              <option value="Escola Mun. Luiz Maranhão">Escola Mun. Luiz Maranhão</option>
+              <option value="Escola Mun. Luiza Coutinho">Escola Mun. Luiza Coutinho</option>
+              <option value="Escola Mun. Manoel de Oliveira">Escola Mun. Manoel de Oliveira</option>
+              <option value="Escola Mun. Maria de Lourdes Pedrosa">Escola Mun. Maria de Lourdes Pedrosa</option>
+              <option value="Escola Mun. Maria José Monteiro">Escola Mun. Maria José Monteiro</option>
+              <option value="Escola Mun. Napoleão Xavier de Morais">Escola Mun. Napoleão Xavier de Morais</option>
+              <option value="Escola Mun. Urbano Ramos">Escola Mun. Urbano Ramos</option>
+              <option value="Grupo Escolar Carlos Pessoa Guerra">Grupo Escolar Carlos Pessoa Guerra</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" id="btnCadastrar">Participar do sorteio</button>
+      </form>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDmp0_HtBH-IQBjM2uSB28038vTdV3GxcI",
+      authDomain: "sme-vicencia.firebaseapp.com",
+      databaseURL: "https://sme-vicencia-default-rtdb.firebaseio.com",
+      projectId: "sme-vicencia",
+      storageBucket: "sme-vicencia.firebasestorage.app",
+      messagingSenderId: "462333369980",
+      appId: "1:462333369980:web:882dafc42ea43139ad33f9",
+      measurementId: "G-DX71XSY6PY"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const form = document.getElementById("formSorteio");
+    const nomeInput = document.getElementById("nome");
+    const telefoneInput = document.getElementById("telefone_whats");
+    const cpfInput = document.getElementById("cpf");
+    const escolaInput = document.getElementById("escola");
+    const btnCadastrar = document.getElementById("btnCadastrar");
+    const toast = document.getElementById("toast");
+
+    const escolasPermitidas = Array.from(document.querySelectorAll("#escola option:not([value=''])"))
+      .map((option, index) => ({
+        id: index + 1,
+        nome: option.value
+      }));
+
+    function mostrarMensagem(mensagem, tipo) {
+      toast.textContent = mensagem;
+      toast.className = `toast ${tipo} show`;
+
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3800);
+    }
+
+    function formatarCPF(valor) {
+      const numeros = valor.replace(/\D/g, "").slice(0, 11);
+      return numeros
+        .replace(/^(\d{3})(\d)/, "$1.$2")
+        .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+        .replace(/\.(\d{3})(\d)/, ".$1-$2");
+    }
+
+    function formatarTelefone(valor) {
+      const numeros = valor.replace(/\D/g, "").slice(0, 11);
+
+      if (numeros.length <= 10) {
+        return numeros
+          .replace(/^(\d{2})(\d)/, "($1) $2")
+          .replace(/(\d{4})(\d)/, "$1-$2");
+      }
+
+      return numeros
+        .replace(/^(\d{2})(\d)/, "($1) $2")
+        .replace(/(\d{5})(\d)/, "$1-$2");
+    }
+
+    function validarCPF(cpf) {
+      cpf = cpf.replace(/\D/g, "");
+
+      if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
+        return false;
+      }
+
+      let soma = 0;
+      for (let i = 0; i < 9; i++) {
+        soma += Number(cpf.charAt(i)) * (10 - i);
+      }
+
+      let resto = (soma * 10) % 11;
+      if (resto === 10 || resto === 11) resto = 0;
+      if (resto !== Number(cpf.charAt(9))) return false;
+
+      soma = 0;
+      for (let i = 0; i < 10; i++) {
+        soma += Number(cpf.charAt(i)) * (11 - i);
+      }
+
+      resto = (soma * 10) % 11;
+      if (resto === 10 || resto === 11) resto = 0;
+
+      return resto === Number(cpf.charAt(10));
+    }
+
+    function normalizarTexto(texto) {
+      return texto.trim().replace(/\s+/g, " ");
+    }
+
+    function definirEstadoBotao(enviando) {
+      btnCadastrar.disabled = enviando;
+      btnCadastrar.textContent = enviando ? "Enviando inscrição..." : "Participar do sorteio";
+    }
+
+    cpfInput.addEventListener("input", () => {
+      cpfInput.value = formatarCPF(cpfInput.value);
+    });
+
+    telefoneInput.addEventListener("input", () => {
+      telefoneInput.value = formatarTelefone(telefoneInput.value);
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const nome = normalizarTexto(nomeInput.value);
+      const telefoneFormatado = telefoneInput.value.trim();
+      const telefoneNumeros = telefoneFormatado.replace(/\D/g, "");
+      const cpfFormatado = cpfInput.value.trim();
+      const cpfLimpo = cpfFormatado.replace(/\D/g, "");
+      const escola = escolaInput.value.trim();
+
+      if (!nome || !telefoneFormatado || !cpfFormatado || !escola) {
+        mostrarMensagem("⚠️ Preencha todos os campos.", "error");
+        return;
+      }
+
+      if (nome.length < 3) {
+        mostrarMensagem("⚠️ Informe um nome válido.", "error");
+        return;
+      }
+
+      if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
+        mostrarMensagem("⚠️ Informe um WhatsApp válido.", "error");
+        return;
+      }
+
+      if (!validarCPF(cpfLimpo)) {
+        mostrarMensagem("⚠️ Informe um CPF válido.", "error");
+        return;
+      }
+
+      const escolaSelecionada = escolasPermitidas.find(item => item.nome === escola);
+
+      if (!escolaSelecionada) {
+        mostrarMensagem("⚠️ Selecione uma escola da lista.", "error");
+        return;
+      }
+
+      definirEstadoBotao(true);
+
+      try {
+        const participanteRef = ref(db, cpfLimpo);
+
+        await set(participanteRef, {
+          cpf: cpfFormatado,
+          escola: escolaSelecionada.id,
+          nome,
+          telefone: telefoneFormatado
+        });
+
+        mostrarMensagem("✅ Inscrição realizada com sucesso. Boa sorte!", "success");
+        form.reset();
+      } catch (erro) {
+        console.error("Erro ao cadastrar participante:", erro);
+
+        if (erro?.code === "PERMISSION_DENIED") {
+          mostrarMensagem("❌ Este CPF já está cadastrado no sorteio.", "error");
+          return;
+        }
+
+        mostrarMensagem("❌ Não foi possível concluir a inscrição. Tente novamente.", "error");
+      } finally {
+        definirEstadoBotao(false);
+      }
+    });
+  </script>
+</body>
+</html>
