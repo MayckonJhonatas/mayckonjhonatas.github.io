@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProfScan+ | Gerador de Gabarito</title>
+
+  <style>
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --blue-light: #eff6ff;
+      --white: #ffffff;
+      --bg: #f4f7fb;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #dbe3ef;
+      --green: #10b981;
+      --red: #ef4444;
+      --orange: #f59e0b;
+      --shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+      --cell: 28px;
+      --cols: 22;
+      --rows: 40;
+      --topbar-height: 76px;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .top-fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      min-height: var(--topbar-height);
+      background: var(--blue);
+      border-bottom: 1px solid var(--blue-dark);
+      box-shadow: 0 6px 22px rgba(29, 78, 216, 0.28);
+      z-index: 1000;
+      display: grid;
+      grid-template-columns: 230px 1fr auto;
+      align-items: center;
+      gap: 18px;
+      padding: 10px 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 210px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: white;
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 23px;
+      color: white;
+      letter-spacing: -0.6px;
+    }
+
+    .brand p {
+      margin: 1px 0 0;
+      font-size: 12px;
+      color: #dbeafe;
+    }
+
+    .top-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .top-label {
+      font-size: 12px;
+      font-weight: 900;
+      color: #dbeafe;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+
+    .tool-strip,
+    .model-strip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      background: var(--blue);
+      color: white;
+      padding: 9px 11px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.18s;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      background: var(--blue-dark);
+      transform: translateY(-1px);
+    }
+
+    button.secondary {
+      background: var(--blue-light);
+      color: var(--blue);
+      border: 1px solid #bfdbfe;
+    }
+
+    button.secondary:hover {
+      background: #dbeafe;
+    }
+
+    button.success {
+      background: var(--green);
+      color: white;
+    }
+
+    button.success:hover {
+      background: #059669;
+    }
+
+    button.danger {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    button.danger:hover {
+      background: #fecaca;
+    }
+
+    .tool {
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--blue);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      padding: 9px 12px;
+    }
+
+    .tool:hover {
+      background: white;
+      color: var(--blue-dark);
+    }
+
+    .tool.active {
+  background: #7c3aed;
+  color: white;
+  border-color: #a78bfa;
+  animation: toolSoftBlink 1.2s ease-in-out infinite;
+}
+
+@keyframes toolSoftBlink {
+  0%, 100% {
+    background: #7c3aed;
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18);
+    opacity: 1;
+  }
+
+  50% {
+    background: #8b5cf6;
+    box-shadow: 0 0 0 5px rgba(139, 92, 246, 0.10);
+    opacity: 0.82;
+  }
+}
+
+    .top-fixed .secondary,
+    .top-fixed .success {
+      background: white;
+      color: var(--blue);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+    }
+
+    .top-fixed .secondary:hover,
+    .top-fixed .success:hover {
+      background: #eff6ff;
+      color: var(--blue-dark);
+    }
+
+    .top-fixed .danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .top-fixed .danger:hover {
+      background: #fecaca;
+    }
+
+    .layout {
+      padding-top: var(--topbar-height);
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: 100vh;
+    }
+
+    aside {
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      padding: 18px 16px;
+      overflow-y: auto;
+      height: calc(100vh - var(--topbar-height));
+      position: sticky;
+      top: var(--topbar-height);
+    }
+
+    main {
+      padding: 22px;
+      overflow: auto;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 13px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);
+    }
+
+    .card-title {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--blue);
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 5px;
+      font-weight: 800;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      background: white;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    textarea {
+      min-height: 170px;
+      resize: vertical;
+      font-family: Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-bottom: 9px;
+    }
+
+    .field {
+      margin-bottom: 9px;
+    }
+
+    .sheet-card {
+      background: #e9edf5;
+      padding: 22px;
+      border-radius: 22px;
+      display: inline-block;
+      min-width: max-content;
+      box-shadow: var(--shadow);
+    }
+
+    .sheet-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .sheet-info strong {
+      color: var(--blue);
+    }
+
+    .sheet {
+      position: relative;
+      width: calc(var(--cols) * var(--cell));
+      height: calc(var(--rows) * var(--cell));
+      background: white;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.14);
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .grid-line {
+      position: absolute;
+      background: #cfcfcf;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .grid-line.h {
+      left: 0;
+      width: 100%;
+      height: 1px;
+    }
+
+    .grid-line.v {
+      top: 0;
+      width: 1px;
+      height: 100%;
+    }
+
+    .placed {
+      position: absolute;
+      outline: 2px solid transparent;
+      z-index: 10;
+      background: transparent;
+    }
+
+    .placed.selected {
+      outline: 2px solid var(--blue);
+      z-index: 20;
+    }
+
+    .placed.move-armed {
+      animation: blinkMove 0.7s infinite;
+      outline: 3px solid var(--orange);
+      z-index: 30;
+    }
+
+    @keyframes blinkMove {
+      0% { opacity: 1; }
+      50% { opacity: 0.35; }
+      100% { opacity: 1; }
+    }
+
+    .auto-marker {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .marker-box {
+      width: 20px;
+      height: 20px;
+      background: #000;
+    }
+
+    .text-label {
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 15px;
+      font-weight: bold;
+      background: transparent;
+      border: 1px dashed #999;
+    }
+
+    .question-block,
+    .legend-block,
+    .student-block {
+      background: transparent;
+    }
+
+    .question-row,
+    .student-row,
+    .legend-row {
+      height: var(--cell);
+      display: grid;
+      grid-template-columns: repeat(6, var(--cell));
+      align-items: center;
+    }
+
+    .qcell,
+    .legend-cell,
+    .student-cell {
+      width: var(--cell);
+      height: var(--cell);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .question-number,
+    .student-number {
+      font-size: 13px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+    }
+
+    .legend-cell {
+      color: #000;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .bubble {
+      width: 19px;
+      height: 19px;
+      border: 2px solid #555;
+      border-radius: 50%;
+      background: white;
+      color: #9ca3af;
+      font-size: 10px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .digit-head {
+      width: 19px;
+      height: 19px;
+      border: 2px solid #555;
+      background: white;
+    }
+
+    .block-menu {
+      position: fixed;
+      display: none;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+      border-radius: 12px;
+      padding: 8px;
+      z-index: 9999;
+    }
+
+    .block-menu button {
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    .block-menu button.delete {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+
+    .modal {
+      width: min(720px, 96vw);
+      max-height: 88vh;
+      background: white;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.3);
+      overflow: hidden;
+    }
+
+    .modal-head {
+      background: var(--blue);
+      color: white;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-head h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .modal-body {
+      padding: 16px;
+      overflow: auto;
+      max-height: 70vh;
+      text-align: center;
+    }
+
+    .qr-box {
+      display: inline-block;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: #f8fafc;
+      margin: 10px auto;
+    }
+
+    .qr-box canvas {
+      display: block;
+      background: white;
+      border-radius: 10px;
+    }
+
+    .qr-actions,
+    .paste-actions {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .compact-preview {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      color: #334155;
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 12px;
+      font-size: 12px;
+      text-align: left;
+      word-break: break-all;
+      max-height: 120px;
+      overflow: auto;
+    }
+
+    @media (max-width: 1120px) {
+      .top-fixed {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .layout {
+        padding-top: 210px;
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        position: relative;
+        top: 0;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="top-fixed">
+    <div class="brand">
+      <div>
+        <h1>ProfScan+</h1>
+        <p>Gerador de gabaritos</p>
+      </div>
+    </div>
+
+    <div class="top-section">
+      <span class="top-label">Ferramenta</span>
+      <div class="tool-strip">
+        <button class="tool active" data-tool="select">Selecionar</button>
+        <button class="tool" data-tool="question">Questão</button>
+        <button class="tool" data-tool="legend">Legenda</button>
+        <button class="tool" data-tool="student">Nº aluno</button>
+        <button class="tool" data-tool="text">Texto</button>
+        <button class="tool" data-tool="erase">Apagar</button>
+      </div>
+    </div>
+
+    <div class="top-section">
+      <span class="top-label">Modelo</span>
+      <div class="model-strip">
+        <button class="success" onclick="exportPNG()">Exportar PNG</button>
+        <button class="secondary" onclick="showQRCode()">QR CODE</button>
+        <button class="secondary" onclick="openJSONFile()">Abrir</button>
+        <!--<button class="secondary" onclick="openPasteModal()">Colar JSON</button> -->
+        <button class="danger" onclick="clearSheet()">Limpar</button>
+      </div>
+    </div>
+  </header>
+
+  <input id="jsonFileInput" type="file" accept=".json,.txt,application/json,text/plain" style="display:none">
+
+  <div class="layout">
+    <aside>
+      <div class="card">
+        <p class="card-title">Grade</p>
+        <div class="row">
+          <div>
+            <label>Retângulos</label>
+            <input id="blockCols" type="number" min="1" max="5" value="3">
+          </div>
+          <div>
+            <label>Altura</label>
+            <input id="heightBlocks" type="number" min="1" max="8" value="3">
+          </div>
+        </div>
+        <button class="secondary" style="width:100%;" onclick="applyGridFromInputs()">Aplicar grade</button>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Questões</p>
+        <div class="row">
+          <div>
+            <label>Inicial</label>
+            <input id="startQuestion" type="number" min="1" value="1">
+          </div>
+          <div>
+            <label>Quantidade</label>
+            <input id="questionCount" type="number" min="1" max="50" value="1">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Alternativas</label>
+          <select id="optionsMode">
+            <option value="VF">V / F</option>
+            <option value="ABCD" selected>A B C D</option>
+            <option value="ABCDE">A B C D E</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Aluno</p>
+        <div class="field">
+          <label>Dígitos do número do aluno</label>
+          <select id="studentDigits">
+            <option value="2" selected>2 dígitos</option>
+            <option value="3">3 dígitos</option>
+            <option value="4">4 dígitos</option>
+            <option value="5">5 dígitos</option>
+          </select>
+        </div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="sheet-card">
+        <div class="sheet-info">
+          <span><strong>Pré-visualização</strong></span>
+          <span id="gridInfo">Grade pronta</span>
+        </div>
+
+        <div id="sheet" class="sheet"></div>
+      </div>
+    </main>
+  </div>
+
+  <div id="blockMenu" class="block-menu">
+    <button onclick="prepareMoveSelected()">Mover</button>
+    <button class="delete" onclick="deleteSelectedFromMenu()">Apagar</button>
+  </div>
+
+  <div id="qrModal" class="modal-bg">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>QR Code</h3>
+        <button onclick="closeModal('qrModal')">Fechar</button>
+      </div>
+      <div class="modal-body">
+        <div class="qr-box">
+          <canvas id="qrCanvas"></canvas>
+        </div>
+
+        <div class="qr-actions">
+          <button class="secondary" onclick="downloadQRImage()">Baixar QR</button>
+          <button class="secondary" onclick="copyCompactText()">Copiar JSON</button>
+          <!--<button class="secondary" onclick="downloadCompactText()">Baixar JSON do QR</button> -->
+          <button class="secondary" onclick="downloadJSONFile()">Baixar JSON</button>
+        </div>
+
+        <div id="jsonPreview" class="compact-preview"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pasteModal" class="modal-bg">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Colar JSON</h3>
+        <button onclick="closeModal('pasteModal')">Fechar</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="pasteBox" placeholder="Cole aqui o JSON completo do modelo..."></textarea>
+        <div class="paste-actions">
+          <button class="secondary" onclick="importFromPaste()">Importar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="qrcode.min.js"></script>
+
+  <script>
+    const sheet = document.getElementById("sheet");
+    const blockMenu = document.getElementById("blockMenu");
+    const gridInfo = document.getElementById("gridInfo");
+    const jsonFileInput = document.getElementById("jsonFileInput");
+    const qrCanvas = document.getElementById("qrCanvas");
+    const jsonPreview = document.getElementById("jsonPreview");
+    const pasteBox = document.getElementById("pasteBox");
+
+    let state = {
+      blockCols: 3,
+      blockWidth: 6,
+      heightBlocks: 3,
+      rowsPerHeight: 13,
+      rows: 40,
+      cell: 28,
+      tool: "select",
+      selectedId: null,
+      nextId: 1,
+      items: []
+    };
+
+    let drag = null;
+    let moveArmedId = null;
+    let lastQRText = "";
+
+    function updateRowsFromHeight() {
+      state.rows = state.heightBlocks * state.rowsPerHeight + 1;
+    }
+
+    function getTotalSmallCols() {
+      return state.blockCols * state.blockWidth + (state.blockCols + 1);
+    }
+
+    function getMarkerColumns() {
+      const cols = [];
+      for (let i = 0; i <= state.blockCols; i++) {
+        cols.push(i * (state.blockWidth + 1));
+      }
+      return cols;
+    }
+
+    function getMarkerRows() {
+      const rows = [];
+      for (let r = 0; r <= state.rows - 1; r += state.rowsPerHeight) {
+        rows.push(r);
+      }
+      if (!rows.includes(state.rows - 1)) {
+        rows.push(state.rows - 1);
+      }
+      return [...new Set(rows)];
+    }
+
+    function getMarkerPositions() {
+      const positions = [];
+      const markerCols = getMarkerColumns();
+      const markerRows = getMarkerRows();
+
+      markerRows.forEach(row => {
+        markerCols.forEach(col => {
+          positions.push([col, row]);
+        });
+      });
+
+      return positions;
+    }
+
+    function isMarkerColumn(smallCol) {
+      return getMarkerColumns().includes(smallCol);
+    }
+
+    function slotLeft(slot) {
+      return (slot * (state.blockWidth + 1) + 1) * state.cell;
+    }
+
+    function slotWidth() {
+      return state.blockWidth * state.cell;
+    }
+
+    function updateInterfaceInfo() {
+      if (gridInfo) {
+        gridInfo.textContent = `${state.blockCols} retângulo(s) • altura ${state.heightBlocks}`;
+      }
+    }
+
+    function setTool(tool) {
+      state.tool = tool;
+
+      if (tool !== "select") {
+        moveArmedId = null;
+      }
+
+      document.querySelectorAll(".tool").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tool === tool);
+      });
+
+      hideBlockMenu();
+      render();
+    }
+
+    document.querySelectorAll(".tool").forEach(btn => {
+      btn.addEventListener("click", () => setTool(btn.dataset.tool));
+    });
+
+    function applyGrid() {
+      updateRowsFromHeight();
+
+      document.documentElement.style.setProperty("--cols", getTotalSmallCols());
+      document.documentElement.style.setProperty("--rows", state.rows);
+      document.documentElement.style.setProperty("--cell", state.cell + "px");
+
+      updateInterfaceInfo();
+      render();
+    }
+
+    function applyGridFromInputs() {
+      state.blockCols = Number(document.getElementById("blockCols").value);
+      state.heightBlocks = Number(document.getElementById("heightBlocks").value);
+
+      updateRowsFromHeight();
+      state.items.forEach(item => clampItem(item));
+
+      hideBlockMenu();
+      applyGrid();
+    }
+
+    function getPointerInfo(e) {
+      const rect = sheet.getBoundingClientRect();
+      const smallCol = Math.floor((e.clientX - rect.left) / state.cell);
+      const row = Math.floor((e.clientY - rect.top) / state.cell);
+      const safeSmallCol = Math.max(0, Math.min(getTotalSmallCols() - 1, smallCol));
+      const safeRow = Math.max(0, Math.min(state.rows - 1, row));
+
+      if (isMarkerColumn(safeSmallCol)) {
+        return { blocked: true, smallCol: safeSmallCol, row: safeRow, slot: null };
+      }
+
+      const slot = Math.floor(safeSmallCol / (state.blockWidth + 1));
+
+      if (slot < 0 || slot >= state.blockCols) {
+        return { blocked: true, smallCol: safeSmallCol, row: safeRow, slot: null };
+      }
+
+      return { blocked: false, smallCol: safeSmallCol, row: safeRow, slot };
+    }
+
+    function getNearestPointerInfo(e) {
+      const rect = sheet.getBoundingClientRect();
+      const smallCol = Math.floor((e.clientX - rect.left) / state.cell);
+      const row = Math.floor((e.clientY - rect.top) / state.cell);
+      let slot = Math.floor(smallCol / (state.blockWidth + 1));
+      slot = Math.max(0, Math.min(state.blockCols - 1, slot));
+      const safeRow = Math.max(0, Math.min(state.rows - 1, row));
+      return { slot, row: safeRow };
+    }
+
+    function getOptionsFromMode(mode) {
+      if (mode === "VF") return ["V", "F"];
+      if (mode === "ABCD") return ["A", "B", "C", "D"];
+      if (mode === "ABCDE") return ["A", "B", "C", "D", "E"];
+      return ["A", "B", "C", "D"];
+    }
+
+    function itemHeight(item) {
+      if (item.type === "question") return item.count;
+      if (item.type === "student") return 11;
+      return 1;
+    }
+
+    function clampItem(item) {
+      const height = itemHeight(item);
+      item.x = Math.max(0, Math.min(state.blockCols - 1, item.x));
+      item.y = Math.max(0, Math.min(state.rows - height, item.y));
+    }
+
+    function addItem(item) {
+      item.id = state.nextId++;
+      clampItem(item);
+      state.items.push(item);
+      state.selectedId = item.id;
+      hideBlockMenu();
+      render();
+    }
+
+    function addQuestion(slot, row) {
+      const start = Number(document.getElementById("startQuestion").value);
+      const count = Number(document.getElementById("questionCount").value);
+      const mode = document.getElementById("optionsMode").value;
+
+      addItem({ type: "question", x: slot, y: row, start, count, mode });
+      document.getElementById("startQuestion").value = start + count;
+    }
+
+    function addLegend(slot, row) {
+      const mode = document.getElementById("optionsMode").value;
+      addItem({ type: "legend", x: slot, y: row, mode });
+    }
+
+    function addStudent(slot, row) {
+      const digits = Number(document.getElementById("studentDigits").value);
+      addItem({ type: "student", x: slot, y: row, digits });
+    }
+
+    function addText(slot, row) {
+      const text = prompt("Digite o texto que deseja inserir:", "NOME:");
+      if (text === null) return;
+      const finalText = text.trim();
+      if (!finalText) return;
+      addItem({ type: "text", x: slot, y: row, text: finalText });
+    }
+
+    function deleteItem(id) {
+      state.items = state.items.filter(item => item.id !== id);
+      if (state.selectedId === id) state.selectedId = null;
+      moveArmedId = null;
+      render();
+    }
+
+    function showBlockMenu(id, clientX, clientY) {
+      state.selectedId = id;
+      moveArmedId = null;
+      render();
+      blockMenu.style.display = "flex";
+      blockMenu.style.left = clientX + 8 + "px";
+      blockMenu.style.top = clientY + 8 + "px";
+    }
+
+    function hideBlockMenu() {
+      blockMenu.style.display = "none";
+    }
+
+    function prepareMoveSelected() {
+      if (!state.selectedId) return;
+      moveArmedId = state.selectedId;
+      state.tool = "select";
+      document.querySelectorAll(".tool").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tool === "select");
+      });
+      hideBlockMenu();
+      render();
+    }
+
+    function deleteSelectedFromMenu() {
+      if (!state.selectedId) return;
+      deleteItem(state.selectedId);
+      hideBlockMenu();
+    }
+
+    function render() {
+      sheet.innerHTML = "";
+      renderGridStructure();
+      renderAutoMarkers();
+
+      state.items.forEach(item => {
+        const el = document.createElement("div");
+        const height = itemHeight(item);
+
+        el.className = "placed";
+        el.dataset.id = item.id;
+        el.style.left = slotLeft(item.x) + "px";
+        el.style.top = item.y * state.cell + "px";
+        el.style.width = slotWidth() + "px";
+        el.style.height = height * state.cell + "px";
+
+        if (item.id === state.selectedId) el.classList.add("selected");
+        if (item.id === moveArmedId) el.classList.add("move-armed");
+
+        if (item.type === "text") {
+          el.classList.add("text-label");
+          el.textContent = item.text;
+        }
+
+        if (item.type === "legend") {
+          const options = getOptionsFromMode(item.mode);
+          el.classList.add("legend-block");
+          const row = document.createElement("div");
+          row.className = "legend-row";
+
+          const blank = document.createElement("div");
+          blank.className = "qcell";
+          row.appendChild(blank);
+
+          options.forEach(option => {
+            const cell = document.createElement("div");
+            cell.className = "legend-cell";
+            cell.textContent = option;
+            row.appendChild(cell);
+          });
+
+          while (row.children.length < state.blockWidth) {
+            const empty = document.createElement("div");
+            empty.className = "qcell";
+            row.appendChild(empty);
+          }
+
+          el.appendChild(row);
+        }
+
+        if (item.type === "question") {
+          const options = getOptionsFromMode(item.mode);
+          el.classList.add("question-block");
+
+          for (let q = 0; q < item.count; q++) {
+            const row = document.createElement("div");
+            row.className = "question-row";
+
+            const number = document.createElement("div");
+            number.className = "qcell question-number";
+            number.textContent = item.start + q;
+            row.appendChild(number);
+
+            options.forEach(option => {
+              const cell = document.createElement("div");
+              cell.className = "qcell";
+
+              const bubble = document.createElement("div");
+              bubble.className = "bubble";
+              bubble.textContent = option;
+
+              cell.appendChild(bubble);
+              row.appendChild(cell);
+            });
+
+            while (row.children.length < state.blockWidth) {
+              const empty = document.createElement("div");
+              empty.className = "qcell";
+              row.appendChild(empty);
+            }
+
+            el.appendChild(row);
+          }
+        }
+
+        if (item.type === "student") {
+          el.classList.add("student-block");
+          const header = document.createElement("div");
+          header.className = "student-row";
+
+          const blank = document.createElement("div");
+          blank.className = "student-cell";
+          header.appendChild(blank);
+
+          for (let d = 0; d < item.digits; d++) {
+            const cell = document.createElement("div");
+            cell.className = "student-cell";
+
+            const head = document.createElement("div");
+            head.className = "digit-head";
+
+            cell.appendChild(head);
+            header.appendChild(cell);
+          }
+
+          while (header.children.length < state.blockWidth) {
+            const empty = document.createElement("div");
+            empty.className = "student-cell";
+            header.appendChild(empty);
+          }
+
+          el.appendChild(header);
+
+          for (let n = 0; n <= 9; n++) {
+            const row = document.createElement("div");
+            row.className = "student-row";
+
+            const number = document.createElement("div");
+            number.className = "student-cell student-number";
+            number.textContent = n;
+            row.appendChild(number);
+
+            for (let d = 0; d < item.digits; d++) {
+              const cell = document.createElement("div");
+              cell.className = "student-cell";
+
+              const bubble = document.createElement("div");
+              bubble.className = "bubble";
+              bubble.textContent = n;
+
+              cell.appendChild(bubble);
+              row.appendChild(cell);
+            }
+
+            while (row.children.length < state.blockWidth) {
+              const empty = document.createElement("div");
+              empty.className = "student-cell";
+              row.appendChild(empty);
+            }
+
+            el.appendChild(row);
+          }
+        }
+
+        sheet.appendChild(el);
+      });
+
+      updateInterfaceInfo();
+    }
+
+    function renderGridStructure() {
+      const totalCols = getTotalSmallCols();
+      const markerCols = getMarkerColumns();
+
+      for (let y = 0; y <= state.rows; y++) {
+        const line = document.createElement("div");
+        line.className = "grid-line h";
+        line.style.top = y * state.cell + "px";
+        sheet.appendChild(line);
+      }
+
+      markerCols.forEach(col => {
+        const leftLine = document.createElement("div");
+        leftLine.className = "grid-line v";
+        leftLine.style.left = col * state.cell + "px";
+        sheet.appendChild(leftLine);
+
+        const rightLine = document.createElement("div");
+        rightLine.className = "grid-line v";
+        rightLine.style.left = (col + 1) * state.cell + "px";
+        sheet.appendChild(rightLine);
+      });
+
+      const endLine = document.createElement("div");
+      endLine.className = "grid-line v";
+      endLine.style.left = totalCols * state.cell + "px";
+      sheet.appendChild(endLine);
+    }
+
+    function renderAutoMarkers() {
+      getMarkerPositions().forEach(([x, y]) => {
+        const el = document.createElement("div");
+        el.className = "auto-marker";
+        el.style.left = x * state.cell + "px";
+        el.style.top = y * state.cell + "px";
+        el.style.width = state.cell + "px";
+        el.style.height = state.cell + "px";
+        el.innerHTML = `<div class="marker-box"></div>`;
+        sheet.appendChild(el);
+      });
+    }
+
+    sheet.addEventListener("pointerdown", e => {
+      const placed = e.target.closest(".placed");
+
+      if (placed) {
+        const id = Number(placed.dataset.id);
+        const item = state.items.find(i => i.id === id);
+        if (!item) return;
+
+        state.selectedId = id;
+
+        if (state.tool === "erase") {
+          deleteItem(id);
+          hideBlockMenu();
+          return;
+        }
+
+        if (moveArmedId === id) {
+          const pos = getNearestPointerInfo(e);
+          drag = {
+            id,
+            offsetX: pos.slot - item.x,
+            offsetY: pos.row - item.y
+          };
+          hideBlockMenu();
+          render();
+          return;
+        }
+
+        showBlockMenu(id, e.clientX, e.clientY);
+        return;
+      }
+
+      const pos = getPointerInfo(e);
+      hideBlockMenu();
+      moveArmedId = null;
+
+      if (pos.blocked) return;
+      if (state.tool === "question") addQuestion(pos.slot, pos.row);
+      if (state.tool === "legend") addLegend(pos.slot, pos.row);
+      if (state.tool === "student") addStudent(pos.slot, pos.row);
+      if (state.tool === "text") addText(pos.slot, pos.row);
+    });
+
+    document.addEventListener("pointermove", e => {
+      if (!drag) return;
+
+      const pos = getNearestPointerInfo(e);
+      const item = state.items.find(i => i.id === drag.id);
+      if (!item) return;
+
+      item.x = pos.slot - drag.offsetX;
+      item.y = pos.row - drag.offsetY;
+      clampItem(item);
+      render();
+    });
+
+    document.addEventListener("pointerup", () => {
+      drag = null;
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Delete" && state.selectedId) {
+        deleteItem(state.selectedId);
+        hideBlockMenu();
+        return;
+      }
+
+      if (!state.selectedId) return;
+      const item = state.items.find(i => i.id === state.selectedId);
+      if (!item) return;
+
+      if (e.key === "ArrowLeft") item.x--;
+      if (e.key === "ArrowRight") item.x++;
+      if (e.key === "ArrowUp") item.y--;
+      if (e.key === "ArrowDown") item.y++;
+
+      clampItem(item);
+      hideBlockMenu();
+      render();
+    });
+
+    document.addEventListener("click", e => {
+      if (!blockMenu.contains(e.target) && !sheet.contains(e.target)) {
+        hideBlockMenu();
+      }
+    });
+
+    function clearSheet() {
+      if (!confirm("Deseja limpar todo o gabarito?")) return;
+      state.items = [];
+      state.selectedId = null;
+      moveArmedId = null;
+      hideBlockMenu();
+      render();
+    }
+
+    function getFullModelData() {
+      return {
+        app: "ProfScan+",
+        version: "1.0",
+        model: {
+          blockCols: state.blockCols,
+          blockWidth: state.blockWidth,
+          heightBlocks: state.heightBlocks,
+          rowsPerHeight: state.rowsPerHeight,
+          rows: state.rows,
+          cell: state.cell,
+          nextId: state.nextId,
+          items: state.items
+        }
+      };
+    }
+
+    function getFullModelJSON() {
+      return JSON.stringify(getFullModelData(), null, 2);
+    }
+
+    function downloadJSONFile() {
+      const json = getFullModelJSON();
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = "profscan-modelo.json";
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function openJSONFile() {
+      jsonFileInput.value = "";
+      jsonFileInput.click();
+    }
+
+    jsonFileInput.addEventListener("change", event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const text = e.target.result;
+        try {
+          const ok = loadModelFromText(text);
+          if (ok) alert("Modelo carregado com sucesso.");
+          else alert("Não foi possível abrir esse arquivo.");
+        } catch (err) {
+          alert("Não foi possível abrir esse arquivo.");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    function loadModelFromText(text) {
+      const clean = text.trim();
+
+      try {
+        const data = JSON.parse(clean);
+
+        if (data.model) {
+          state = {
+            ...state,
+            ...data.model,
+            tool: "select",
+            selectedId: null
+          };
+
+          document.getElementById("blockCols").value = state.blockCols;
+          document.getElementById("heightBlocks").value = state.heightBlocks || 1;
+
+          moveArmedId = null;
+          hideBlockMenu();
+          applyGrid();
+          return true;
+        }
+
+        if (data.items) {
+          state = {
+            ...state,
+            ...data,
+            tool: "select",
+            selectedId: null
+          };
+
+          document.getElementById("blockCols").value = state.blockCols;
+          document.getElementById("heightBlocks").value = state.heightBlocks || 1;
+
+          moveArmedId = null;
+          hideBlockMenu();
+          applyGrid();
+          return true;
+        }
+      } catch (err) {}
+
+      return false;
+    }
+
+    function openPasteModal() {
+      pasteBox.value = "";
+      document.getElementById("pasteModal").style.display = "flex";
+      setTimeout(() => pasteBox.focus(), 100);
+    }
+
+    function importFromPaste() {
+      const text = pasteBox.value.trim();
+      if (!text) {
+        alert("Cole o texto primeiro.");
+        return;
+      }
+
+      const ok = loadModelFromText(text);
+      if (ok) {
+        closeModal("pasteModal");
+        alert("Modelo carregado com sucesso.");
+      } else {
+        alert("Texto inválido.");
+      }
+    }
+
+    function getQRJSONText() {
+      return getFullModelJSON();
+    }
+
+    function getJSONByteLength(text) {
+      if (typeof TextEncoder !== "undefined") {
+        return new TextEncoder().encode(text).length;
+      }
+      return unescape(encodeURIComponent(text)).length;
+    }
+
+    async function showQRCode() {
+      const jsonText = getQRJSONText();
+      lastQRText = jsonText;
+
+      jsonPreview.textContent = jsonText;
+      document.getElementById("qrModal").style.display = "flex";
+
+      try {
+        await drawQRCode(qrCanvas, jsonText, 520);
+      } catch (err) {
+        alert("Não foi possível gerar um QR único com esse JSON. O QR Code tem limite físico de tamanho. Tamanho atual: " + getJSONByteLength(jsonText) + " bytes.");
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
+    }
+
+    function copyCompactText() {
+      const text = lastQRText || getQRJSONText();
+      navigator.clipboard.writeText(text).then(() => {
+        alert("JSON copiado.");
+      }).catch(() => {
+        alert("Não foi possível copiar o JSON.");
+      });
+    }
+
+    function downloadCompactText() {
+      const text = lastQRText || getQRJSONText();
+      const blob = new Blob([text], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = "profscan-modelo-do-qr.json";
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function drawQRCode(canvas, text, pixelSize) {
+      if (!window.QRCode || typeof QRCode.toCanvas !== "function") {
+        throw new Error("Arquivo qrcode.min.js não carregou.");
+      }
+
+      return new Promise((resolve, reject) => {
+        QRCode.toCanvas(canvas, text, {
+          width: pixelSize,
+          margin: 4,
+          errorCorrectionLevel: "L"
+        }, error => {
+          if (error) reject(error);
+          else resolve();
+        });
+      });
+    }
+
+    async function downloadQRImage() {
+      const text = lastQRText || getQRJSONText();
+      const canvas = document.createElement("canvas");
+
+      try {
+        await drawQRCode(canvas, text, 900);
+        const link = document.createElement("a");
+        link.download = "profscan-qr-json.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (err) {
+        alert("Não foi possível gerar um QR único com esse JSON. O QR Code tem limite físico de tamanho. Tamanho atual: " + getJSONByteLength(text) + " bytes.");
+      }
+    }
+
+    async function exportPNG() {
+      hideBlockMenu();
+      downloadJSONFile();
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const scale = 3;
+      const width = getTotalSmallCols() * state.cell;
+      const height = state.rows * state.cell;
+
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+      ctx.scale(scale, scale);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
+      drawAutoMarkersOnCanvas(ctx);
+
+      state.items.forEach(item => {
+        if (item.type === "text") drawTextOnCanvas(ctx, item);
+        if (item.type === "legend") drawLegendOnCanvas(ctx, item);
+        if (item.type === "question") drawQuestionOnCanvas(ctx, item);
+        if (item.type === "student") drawStudentOnCanvas(ctx, item);
+      });
+
+      const link = document.createElement("a");
+      link.download = "profscan-gabarito.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+
+    function drawAutoMarkersOnCanvas(ctx) {
+      getMarkerPositions().forEach(([x, y]) => {
+        const size = 20;
+        const px = x * state.cell + (state.cell - size) / 2;
+        const py = y * state.cell + (state.cell - size) / 2;
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(px, py, size, size);
+      });
+    }
+
+    function drawCircle(ctx, cx, cy, r, text) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#555555";
+      ctx.stroke();
+      ctx.fillStyle = "#9ca3af";
+      ctx.font = "bold 10px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, cx, cy + 0.5);
+    }
+
+    function drawTextOnCanvas(ctx, item) {
+      const x = slotLeft(item.x);
+      const y = item.y * state.cell;
+      ctx.fillStyle = "#000000";
+      ctx.font = "bold 15px Arial";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(item.text, x + 8, y + state.cell / 2);
+    }
+
+    function drawLegendOnCanvas(ctx, item) {
+      const options = getOptionsFromMode(item.mode);
+      const x = slotLeft(item.x);
+      const y = item.y * state.cell;
+      ctx.fillStyle = "#000000";
+      ctx.font = "bold 14px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      options.forEach((option, index) => {
+        const cx = x + (index + 1) * state.cell + state.cell / 2;
+        const cy = y + state.cell / 2;
+        ctx.fillText(option, cx, cy);
+      });
+    }
+
+    function drawQuestionOnCanvas(ctx, item) {
+      const options = getOptionsFromMode(item.mode);
+      const x = slotLeft(item.x);
+      const startY = item.y * state.cell;
+
+      for (let q = 0; q < item.count; q++) {
+        const y = startY + q * state.cell;
+        const cy = y + state.cell / 2;
+        ctx.fillStyle = "#333333";
+        ctx.font = "bold 13px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(item.start + q, x + state.cell / 2, cy);
+
+        options.forEach((option, index) => {
+          const cx = x + (index + 1) * state.cell + state.cell / 2;
+          drawCircle(ctx, cx, cy, 9, option);
+        });
+      }
+    }
+
+    function drawStudentOnCanvas(ctx, item) {
+      const x = slotLeft(item.x);
+      const startY = item.y * state.cell;
+
+      for (let d = 0; d < item.digits; d++) {
+        const cx = x + (d + 1) * state.cell + state.cell / 2;
+        const cy = startY + state.cell / 2;
+        ctx.strokeStyle = "#555555";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(cx - 9.5, cy - 9.5, 19, 19);
+      }
+
+      for (let n = 0; n <= 9; n++) {
+        const y = startY + (n + 1) * state.cell;
+        const cy = y + state.cell / 2;
+        ctx.fillStyle = "#333333";
+        ctx.font = "bold 13px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(n, x + state.cell / 2, cy);
+
+        for (let d = 0; d < item.digits; d++) {
+          const cx = x + (d + 1) * state.cell + state.cell / 2;
+          drawCircle(ctx, cx, cy, 9, n);
+        }
+      }
+    }
+
+    applyGrid();
+  </script>
+</body>
+</html>
