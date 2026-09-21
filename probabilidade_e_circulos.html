@@ -272,6 +272,37 @@ footer{font-size:.88rem;color:#64748b;margin-top:24px}
 }
 .ballDisplay.empty{background:linear-gradient(135deg,#cbd5e1,#94a3b8)}
 
+
+.option.saepe-selected{
+  background:#e0ecff;
+  border-color:#2563eb;
+  box-shadow:0 0 0 3px rgba(37,99,235,.10);
+  font-weight:700;
+}
+.finishMissionBtn{
+  width:100%;
+  margin-top:24px;
+  border:0;
+  border-radius:16px;
+  padding:16px 20px;
+  background:linear-gradient(90deg,#2563eb,#7c3aed);
+  color:#fff;
+  font-size:1.08rem;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(37,99,235,.18);
+}
+.finishMissionBtn:hover{transform:translateY(-1px)}
+.finishMissionBtn:disabled{background:#94a3b8;cursor:not-allowed;transform:none}
+.missionResult{
+  margin-top:18px;
+  padding:18px;
+  border-radius:16px;
+  background:#f8fafc;
+  border:2px solid #e2e8f0;
+  font-weight:700;
+}
+
 </style>
 </head>
 <body>
@@ -539,9 +570,9 @@ footer{font-size:.88rem;color:#64748b;margin-top:24px}
 
 
 <section class="page">
-  <span class="badge">10. Missão final</span>
+  <span class="badge">10. Missão final • estilo SAEPE</span>
   <h2>Resolva as situações-problema</h2>
-  <p class="big">Leia com atenção, identifique os dados importantes e marque uma alternativa. A resposta só aparecerá depois que você escolher.</p>
+  <p class="big">Leia com atenção, identifique os dados importantes e marque uma alternativa. Durante a missão, você não verá se acertou ou errou. A correção aparecerá somente ao final.</p>
 
   <div class="card azul">
     <h3>Questão 1</h3>
@@ -603,8 +634,10 @@ footer{font-size:.88rem;color:#64748b;margin-top:24px}
     <div class="feedback" id="s6"></div>
   </div>
 
+  <button class="finishMissionBtn" id="finishMissionBtn" onclick="finalizarMissao()">Finalizar missão e ver resultado</button>
+
   <div class="tip" id="scoreBox" style="margin-top:24px">
-    <b>Seu desempenho:</b> responda às 6 questões para ver o resultado.
+    <b>Seu desempenho:</b> responda às 6 questões e clique em <b>Finalizar missão</b>.
   </div>
 
   <footer>Desenvolvido por Mayckon Jhonatas • Matemática — revisão de habilidades</footer>
@@ -655,15 +688,134 @@ function quiz(btn,correct,fb){
     document.getElementById(fb).style.color='#b91c1c';
   }
 }
-function checkFinal(){
-  const v=parseFloat(document.getElementById('finalAnswer').value.replace?.(',','.') || document.getElementById('finalAnswer').value);
-  const fb=document.getElementById('finalFb');
-  if(Math.abs(v-62.8)<0.01){
-    fb.textContent='✅ Certo! A volta completa mede aproximadamente 62,8 m.';
-    fb.style.color='#15803d';
+
+// =====================================================
+// MISSÃO FINAL - ESTILO SAEPE
+// O aluno escolhe as respostas sem receber correção imediata.
+// A correção completa aparece apenas ao clicar em "Finalizar missão".
+// =====================================================
+const respostasMissao = {};
+let missaoFinalizada = false;
+
+function saepe(btn, correta, idFeedback){
+  if(missaoFinalizada) return;
+
+  const card = btn.closest('.card');
+  if(!card) return;
+
+  // Remove a seleção anterior desta mesma questão.
+  card.querySelectorAll('.option').forEach(op => {
+    op.classList.remove('saepe-selected');
+  });
+
+  // Marca apenas a alternativa escolhida, sem dizer se está certa ou errada.
+  btn.classList.add('saepe-selected');
+
+  respostasMissao[idFeedback] = {
+    botao: btn,
+    correta: correta,
+    card: card
+  };
+
+  const fb = document.getElementById(idFeedback);
+  if(fb){
+    fb.textContent = 'Alternativa marcada.';
+    fb.style.color = '#2563eb';
+  }
+
+  const respondidas = Object.keys(respostasMissao).length;
+  const scoreBox = document.getElementById('scoreBox');
+  if(scoreBox){
+    scoreBox.innerHTML = `<b>Seu desempenho:</b> ${respondidas} de 6 questões respondidas. A correção será mostrada somente ao final.`;
+  }
+}
+
+function finalizarMissao(){
+  const totalQuestoes = 6;
+  const respondidas = Object.keys(respostasMissao).length;
+  const scoreBox = document.getElementById('scoreBox');
+
+  if(respondidas < totalQuestoes){
+    if(scoreBox){
+      scoreBox.innerHTML = `<b>Ainda faltam questões.</b> Você respondeu ${respondidas} de ${totalQuestoes}. Responda todas antes de finalizar.`;
+      scoreBox.style.borderLeftColor = '#f59e0b';
+    }
+    return;
+  }
+
+  missaoFinalizada = true;
+  let acertos = 0;
+
+  for(let i = 1; i <= totalQuestoes; i++){
+    const id = 's' + i;
+    const resposta = respostasMissao[id];
+    const card = resposta.card;
+    const fb = document.getElementById(id);
+    const opcoes = [...card.querySelectorAll('.option')];
+
+    opcoes.forEach(op => {
+      op.disabled = true;
+      op.classList.remove('saepe-selected');
+    });
+
+    const escolhida = resposta.botao;
+    const acertou = resposta.correta === true;
+
+    // Localiza a alternativa correta a partir do onclick original.
+    const corretaBtn = opcoes.find(op => {
+      const click = op.getAttribute('onclick') || '';
+      return click.includes("saepe(this,true");
+    });
+
+    if(acertou){
+      acertos++;
+      escolhida.classList.add('correct');
+      if(fb){
+        fb.textContent = '✅ Você acertou esta questão.';
+        fb.style.color = '#15803d';
+      }
+    }else{
+      escolhida.classList.add('wrong');
+      if(corretaBtn) corretaBtn.classList.add('correct');
+      if(fb){
+        fb.textContent = '❌ Você errou esta questão. A alternativa correta está destacada em verde.';
+        fb.style.color = '#b91c1c';
+      }
+    }
+  }
+
+  const percentual = Math.round((acertos / totalQuestoes) * 100);
+  let mensagem = '';
+
+  if(acertos === 6){
+    mensagem = 'Excelente! Você acertou todas as questões.';
+  }else if(acertos >= 4){
+    mensagem = 'Muito bom! Revise apenas as questões que errou.';
+  }else if(acertos >= 2){
+    mensagem = 'Bom esforço. Revise os exemplos da apostila e observe as questões destacadas.';
   }else{
-    fb.textContent='❌ Revise: C = 2 · π · r.';
-    fb.style.color='#b91c1c';
+    mensagem = 'Vamos revisar os exemplos e tentar novamente depois.';
+  }
+
+  if(scoreBox){
+    scoreBox.innerHTML =
+      `<div class="missionResult">
+        <div style="font-size:1.35rem;margin-bottom:8px">Resultado final: <b>${acertos} de ${totalQuestoes}</b></div>
+        <div>Aproveitamento: <b>${percentual}%</b></div>
+        <div style="margin-top:8px">${mensagem}</div>
+      </div>`;
+    scoreBox.style.borderLeftColor = acertos >= 4 ? '#16a34a' : '#f59e0b';
+  }
+
+  const finishBtn = document.getElementById('finishMissionBtn');
+  if(finishBtn){
+    finishBtn.disabled = true;
+    finishBtn.textContent = 'Missão finalizada';
+  }
+
+  // Leva o aluno suavemente até o resultado.
+  if(scoreBox){
+    setTimeout(() => scoreBox.scrollIntoView({behavior:'smooth', block:'center'}), 150);
   }
 }
 
