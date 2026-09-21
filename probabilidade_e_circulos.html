@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Apostila Animada — Probabilidade e Círculos</title>
+<style>
+:root{
+  --azul:#2563eb;
+  --azul2:#0ea5e9;
+  --roxo:#7c3aed;
+  --verde:#16a34a;
+  --amarelo:#f59e0b;
+  --vermelho:#ef4444;
+  --fundo:#f7fbff;
+  --texto:#183153;
+  --card:#ffffff;
+  --borda:#dbeafe;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#eef7ff,#f8f5ff);color:var(--texto);min-height:100%}
+body{overflow-x:hidden}
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:10px;background:#dbeafe;z-index:50
+}
+.progress{height:100%;width:0;background:linear-gradient(90deg,var(--azul),var(--roxo));transition:.35s}
+.book{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:26px 18px 100px
+}
+.page{
+  width:min(1000px,96vw);
+  min-height:620px;
+  background:rgba(255,255,255,.97);
+  border:2px solid var(--borda);
+  border-radius:28px;
+  box-shadow:0 20px 55px rgba(37,99,235,.13);
+  padding:40px;
+  display:none;
+  position:relative;
+  overflow:hidden;
+  animation:entrar .5s ease both;
+}
+.page.active{display:block}
+@keyframes entrar{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+h1,h2,h3{margin-top:0}
+h1{font-size:clamp(2.3rem,5vw,4.3rem);line-height:1.04}
+h2{font-size:clamp(1.8rem,3.3vw,3rem);color:var(--azul)}
+h3{font-size:1.28rem}
+.subtitle{font-size:1.3rem;color:#475569;max-width:700px}
+.badge{
+  display:inline-block;padding:9px 15px;border-radius:999px;
+  background:#e0ecff;color:var(--azul);font-weight:bold;margin-bottom:15px
+}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.card{
+  background:#fff;border:2px solid #e5edf8;border-radius:22px;padding:22px;
+  box-shadow:0 8px 22px rgba(15,23,42,.05)
+}
+.card.azul{border-color:#bfdbfe;background:#eff6ff}
+.card.verde{border-color:#bbf7d0;background:#f0fdf4}
+.card.amarelo{border-color:#fde68a;background:#fffbeb}
+.card.roxo{border-color:#ddd6fe;background:#f5f3ff}
+.formula{
+  font-size:clamp(2rem,4vw,3.4rem);font-weight:800;text-align:center;
+  background:linear-gradient(90deg,#eff6ff,#f5f3ff);border:2px dashed #93c5fd;
+  border-radius:20px;padding:20px;margin:18px 0;color:#1e3a8a
+}
+.big{
+  font-size:1.35rem;line-height:1.55
+}
+.step{
+  display:flex;gap:14px;align-items:flex-start;margin:14px 0;
+}
+.step .n{
+  flex:0 0 38px;height:38px;border-radius:50%;
+  display:grid;place-items:center;background:var(--azul);color:white;font-weight:bold
+}
+.option{
+  display:block;width:100%;text-align:left;border:2px solid #dbeafe;background:#fff;
+  padding:14px 16px;border-radius:14px;margin:10px 0;font-size:1rem;cursor:pointer;
+  transition:.2s
+}
+.option:hover{transform:translateX(4px);border-color:#93c5fd}
+.option.correct{background:#dcfce7;border-color:#22c55e}
+.option.wrong{background:#fee2e2;border-color:#ef4444}
+.feedback{min-height:26px;font-weight:bold;margin-top:8px}
+.tip{
+  border-left:6px solid var(--amarelo);background:#fff7ed;padding:15px 18px;border-radius:14px;margin:18px 0
+}
+.circleBox{
+  display:flex;align-items:center;justify-content:center;min-height:250px;position:relative
+}
+.circle{
+  width:210px;height:210px;border-radius:50%;border:10px solid var(--azul2);position:relative;
+  animation:pulse 2.8s ease-in-out infinite;background:radial-gradient(circle at 35% 30%,#dff6ff,#bfdbfe)
+}
+@keyframes pulse{50%{transform:scale(1.045)}}
+.radius{
+  position:absolute;left:50%;top:50%;height:4px;width:100px;background:var(--vermelho);
+  transform-origin:left center;transform:rotate(-25deg)
+}
+.radius::after{content:"r";position:absolute;right:42px;top:-28px;font-weight:bold;color:var(--vermelho);font-size:1.2rem}
+.diameter{
+  position:absolute;left:0;right:0;top:50%;height:4px;background:var(--roxo)
+}
+.diameter::after{content:"d";position:absolute;left:48%;top:8px;color:var(--roxo);font-weight:bold;font-size:1.2rem}
+.dice{
+  width:95px;height:95px;border-radius:20px;background:white;border:4px solid #1e3a8a;
+  display:grid;place-items:center;font-size:3rem;box-shadow:0 12px 25px rgba(30,58,138,.2);
+  animation:float 2.2s ease-in-out infinite
+}
+@keyframes float{50%{transform:translateY(-10px) rotate(3deg)}}
+.hero{
+  min-height:540px;display:flex;align-items:center;justify-content:space-between;gap:40px
+}
+.heroText{max-width:620px}
+.floating{
+  position:absolute;border-radius:50%;opacity:.15;filter:blur(0px)
+}
+.f1{width:180px;height:180px;background:#60a5fa;right:-50px;top:-40px;animation:drift 7s infinite alternate}
+.f2{width:120px;height:120px;background:#a78bfa;left:-40px;bottom:-20px;animation:drift 6s infinite alternate-reverse}
+@keyframes drift{to{transform:translate(25px,18px) scale(1.12)}}
+.nav{
+  position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.94);
+  border:1px solid #dbeafe;border-radius:999px;padding:9px 13px;
+  box-shadow:0 10px 30px rgba(15,23,42,.12);z-index:100
+}
+.nav button{
+  border:0;border-radius:999px;background:var(--azul);color:white;font-weight:bold;
+  padding:12px 18px;cursor:pointer
+}
+.nav button:disabled{background:#cbd5e1;cursor:not-allowed}
+.counter{min-width:80px;text-align:center;font-weight:bold}
+.miniGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.mini{
+  border:2px solid #e2e8f0;border-radius:18px;padding:18px;text-align:center;background:white
+}
+.answerBox{
+  width:120px;padding:12px;font-size:1.1rem;border:2px solid #bfdbfe;border-radius:12px
+}
+.checkBtn{
+  border:0;background:var(--verde);color:white;font-weight:bold;border-radius:12px;padding:12px 18px;cursor:pointer
+}
+footer{font-size:.88rem;color:#64748b;margin-top:24px}
+@media(max-width:760px){
+  .page{padding:24px;min-height:680px}
+  .grid,.miniGrid{grid-template-columns:1fr}
+  .hero{flex-direction:column;justify-content:center;text-align:center}
+  .circle{width:170px;height:170px}
+  .radius{width:80px}
+  .nav{width:94%;justify-content:space-between}
+}
+
+.inputRow{
+  display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin:16px 0 10px
+}
+.inputGroup{
+  display:flex;flex-direction:column;gap:6px;min-width:120px
+}
+.inputGroup label{font-weight:700;color:#334155}
+.smallInput{
+  width:100%;padding:12px 14px;border:2px solid #bfdbfe;border-radius:12px;
+  font-size:1rem;background:white
+}
+.actionBtn{
+  border:0;background:var(--roxo);color:white;font-weight:bold;border-radius:12px;
+  padding:12px 18px;cursor:pointer
+}
+.actionBtn.secondary{background:var(--azul)}
+.ballMachine{
+  background:linear-gradient(180deg,#eff6ff,#ffffff);border:2px solid #bfdbfe;
+  border-radius:22px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:320px
+}
+.ballDisplay{
+  width:130px;height:130px;border-radius:50%;border:6px solid white;box-shadow:0 12px 30px rgba(15,23,42,.18);
+  display:grid;place-items:center;font-size:1.25rem;font-weight:800;color:white;transition:.25s
+}
+.ballDisplay.empty{
+  background:linear-gradient(135deg,#cbd5e1,#94a3b8)
+}
+.ballInfo{
+  margin-top:15px;font-size:1.05rem;text-align:center
+}
+.statsList{
+  margin:12px 0 0;padding-left:20px;line-height:1.7
+}
+.calcGrid{
+  display:grid;grid-template-columns:1.2fr .8fr;gap:22px;align-items:center
+}
+.calcPanel{
+  background:#fff;border:2px solid #ddd6fe;border-radius:22px;padding:20px;
+  box-shadow:0 8px 22px rgba(15,23,42,.05)
+}
+.rangeWrap{margin:12px 0 18px}
+.rangeWrap input[type=range]{width:100%}
+.liveRow{
+  display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed #cbd5e1;font-size:1.08rem
+}
+.liveRow:last-child{border-bottom:0}
+.liveVal{font-weight:800;color:#1d4ed8}
+.circleStage{
+  min-height:340px;display:flex;align-items:center;justify-content:center;position:relative;
+  background:linear-gradient(180deg,#f8fafc,#eff6ff);border:2px solid #bfdbfe;border-radius:22px
+}
+.circleLive{
+  width:120px;height:120px;border-radius:50%;border:8px solid #0ea5e9;background:radial-gradient(circle at 35% 30%,#dff6ff,#bfdbfe);
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:#0f172a;transition:.25s
+}
+.centerDot{
+  position:absolute;width:12px;height:12px;border-radius:50%;background:#ef4444
+}
+.radiusLive{
+  position:absolute;height:4px;background:#ef4444;transform-origin:left center
+}
+.resultNote{
+  margin-top:14px;font-size:.98rem;color:#475569
+}
+@media(max-width:760px){
+  .calcGrid{grid-template-columns:1fr}
+}
+
+
+.urnaWrap{
+  display:flex;flex-direction:column;gap:16px;width:100%;
+}
+.ballMachine{
+  background:linear-gradient(180deg,#eff6ff,#ffffff);
+  border:2px solid #bfdbfe;border-radius:22px;padding:18px;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  min-height:360px
+}
+.ballBox{
+  width:100%;max-width:340px;height:240px;position:relative;overflow:hidden;
+  border:3px solid #93c5fd;border-radius:24px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,.7), rgba(255,255,255,0) 40%),
+    linear-gradient(180deg,#dbeafe 0%,#eff6ff 55%,#ffffff 100%);
+  box-shadow: inset 0 0 0 6px rgba(255,255,255,.45), inset 0 -16px 24px rgba(37,99,235,.08);
+}
+.ballBox::before{
+  content:"";position:absolute;left:18px;right:18px;top:14px;height:16px;border-radius:999px;
+  background:rgba(255,255,255,.38)
+}
+.machineLabel{
+  font-weight:800;color:#1d4ed8;margin-bottom:10px
+}
+.movingBall{
+  position:absolute;width:32px;height:32px;border-radius:50%;
+  border:3px solid rgba(255,255,255,.95);
+  box-shadow:0 6px 14px rgba(15,23,42,.18), inset -5px -7px 10px rgba(0,0,0,.08);
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-size:.78rem;font-weight:800;
+  user-select:none
+}
+.movingBall::after{
+  content:"";position:absolute;width:10px;height:10px;border-radius:50%;
+  background:rgba(255,255,255,.4);top:5px;left:6px
+}
+.movingBall.selected{
+  transform:scale(1.18)!important;
+  box-shadow:0 0 0 5px rgba(250,204,21,.55), 0 8px 18px rgba(15,23,42,.25);
+  z-index:20;
+}
+.sortHint{
+  margin-top:10px;font-size:.95rem;color:#475569;text-align:center
+}
+.ballDisplay{
+  width:120px;height:120px;border-radius:50%;border:6px solid white;box-shadow:0 12px 30px rgba(15,23,42,.18);
+  display:grid;place-items:center;font-size:1.05rem;font-weight:800;color:white;transition:.25s
+}
+.ballDisplay.empty{background:linear-gradient(135deg,#cbd5e1,#94a3b8)}
+
+</style>
+</head>
+<body>
+<div class="topbar"><div class="progress" id="progress"></div></div>
+<div class="book">
+
+<section class="page active">
+  <div class="floating f1"></div><div class="floating f2"></div>
+  <div class="hero">
+    <div class="heroText">
+      <span class="badge">Apostila animada de Matemática</span>
+      <h1>Probabilidade<br><span style="color:#7c3aed">e Círculos</span></h1>
+      <p class="subtitle">Um material rápido para revisar técnicas de contagem, probabilidade, área do círculo, comprimento da circunferência e o valor aproximado de π.</p>
+      <div class="tip"><b>Como usar:</b> leia, clique nas respostas e avance pelas páginas. Use ← e → do teclado se estiver no computador.</div><p style="margin-top:18px;font-weight:700;color:#64748b">Desenvolvido por Mayckon Jhonatas</p>
+    </div>
+    <div class="dice">🎲</div>
+  </div>
+</section>
+
+<section class="page">
+  <span class="badge">1. Probabilidade</span>
+  <h2>Qual é a chance de acontecer?</h2>
+  <p class="big">Quando todos os resultados têm a mesma chance de ocorrer, usamos:</p>
+  <div class="formula">P(E) = casos favoráveis ÷ casos possíveis</div>
+  <div class="grid">
+    <div class="card azul">
+      <h3>Exemplo</h3>
+      <p>Ao lançar um dado comum, qual a probabilidade de sair um número par?</p>
+      <p><b>Possíveis:</b> 1, 2, 3, 4, 5, 6 → 6 resultados</p>
+      <p><b>Favoráveis:</b> 2, 4, 6 → 3 resultados</p>
+      <p><b>P = 3/6 = 1/2 = 50%</b></p>
+    </div>
+    <div class="card amarelo">
+      <h3>Regra de ouro</h3>
+      <p>Antes de calcular a probabilidade, pergunte:</p>
+      <p><b>1.</b> Quantos resultados existem ao todo?</p>
+      <p><b>2.</b> Quantos resultados atendem ao que foi pedido?</p>
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <span class="badge">2. Técnicas de contagem</span>
+  <h2>Às vezes precisamos contar primeiro!</h2>
+  <p class="big">Quando há escolhas sucessivas, podemos usar o <b>Princípio Multiplicativo</b>.</p>
+  <div class="grid">
+    <div class="card roxo">
+      <h3>Exemplo</h3>
+      <p>Uma senha é formada por:</p>
+      <p>• 1 letra entre A, B e C</p>
+      <p>• 1 algarismo entre 1, 2, 3 e 4</p>
+      <div class="formula" style="font-size:2.3rem">3 × 4 = 12</div>
+      <p>Existem <b>12 senhas possíveis</b>.</p>
+    </div>
+    <div class="card verde">
+      <h3>Se o evento for...</h3>
+      <p>“A senha começar com A”</p>
+      <p>Temos:</p>
+      <p>• 1 escolha para a letra A</p>
+      <p>• 4 escolhas para o número</p>
+      <p><b>Favoráveis = 1 × 4 = 4</b></p>
+      <p><b>P = 4/12 = 1/3</b></p>
+    </div>
+  </div>
+
+</section>
+
+<section class="page">
+  <span class="badge">3. Exemplo interativo</span>
+  <h2>Sorteador de bolas coloridas</h2>
+  <p class="big">Imagine uma urna com bolas coloridas. Mudando as quantidades, você pode observar como a <b>probabilidade</b> também muda.</p>
+  <div class="grid">
+    <div class="card azul">
+      <h3>Monte a urna</h3>
+      <div class="inputRow">
+        <div class="inputGroup">
+          <label for="redCount">Vermelhas</label>
+          <input class="smallInput" id="redCount" type="number" min="0" value="3" oninput="updateUrna()">
+        </div>
+        <div class="inputGroup">
+          <label for="blueCount">Azuis</label>
+          <input class="smallInput" id="blueCount" type="number" min="0" value="2" oninput="updateUrna()">
+        </div>
+        <div class="inputGroup">
+          <label for="greenCount">Verdes</label>
+          <input class="smallInput" id="greenCount" type="number" min="0" value="1" oninput="updateUrna()">
+        </div>
+        <div class="inputGroup">
+          <label for="yellowCount">Amarelas</label>
+          <input class="smallInput" id="yellowCount" type="number" min="0" value="2" oninput="updateUrna()">
+        </div>
+      </div>
+      <button class="actionBtn secondary" onclick="sortearBola()">Sortear uma bola</button>
+      <button class="actionBtn" onclick="resetUrna()">Restaurar exemplo</button>
+
+      <div class="tip">
+        <b>Como pensar?</b><br>
+        Probabilidade de uma cor = quantidade daquela cor ÷ total de bolas.
+      </div>
+
+      <ul class="statsList" id="urnaStats"></ul>
+    </div>
+
+    <div class="ballMachine">
+      <div class="urnaWrap">
+        <div class="machineLabel">Urna animada</div>
+        <div class="ballBox" id="ballBox"></div>
+        <div class="sortHint" id="sortHint">As bolinhas ficam na caixa e se movimentam durante o sorteio.</div>
+        <div class="ballDisplay empty" id="ballDisplay">?</div>
+        <div class="ballInfo" id="ballInfo">
+          Clique em <b>Sortear uma bola</b> para ver o resultado.
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>Desenvolvido por Mayckon Jhonatas • Matemática — revisão de habilidades</footer>
+</section>
+
+<section class="page">
+  <span class="badge">3. Agora você</span>
+  <h2>Desafio de probabilidade</h2>
+  <p class="big">Uma sorveteria tem 3 sabores de sorvete e 2 tipos de cobertura. Escolhendo 1 sabor e 1 cobertura ao acaso, quantas combinações diferentes podem ser formadas?</p>
+  <button class="option" onclick="quiz(this,false,'fb1')">A) 3</button>
+  <button class="option" onclick="quiz(this,true,'fb1')">B) 6</button>
+  <button class="option" onclick="quiz(this,false,'fb1')">C) 5</button>
+  <button class="option" onclick="quiz(this,false,'fb1')">D) 8</button>
+  <div class="feedback" id="fb1"></div>
+  <div class="tip">Dica: multiplique o número de escolhas de cada etapa.</div>
+</section>
+
+<section class="page">
+  <span class="badge">4. Área do círculo</span>
+  <h2>Quanto espaço existe dentro do círculo?</h2>
+  <div class="grid">
+    <div>
+      <div class="formula">A = π · r²</div>
+      <div class="step"><div class="n">1</div><div><b>Identifique o raio.</b><br>Raio é a distância do centro até a borda.</div></div>
+      <div class="step"><div class="n">2</div><div><b>Eleve o raio ao quadrado.</b><br>Ex.: 5² = 25</div></div>
+      <div class="step"><div class="n">3</div><div><b>Multiplique por π.</b><br>Na escola, geralmente usamos π ≈ 3,14.</div></div>
+    </div>
+    <div class="circleBox">
+      <div class="circle"><div class="radius"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <span class="badge">5. Problema de área</span>
+  <h2>Exemplo resolvido</h2>
+  <p class="big">Uma praça circular tem raio de <b>4 m</b>. Qual é sua área aproximada?</p>
+  <div class="step"><div class="n">1</div><div>r = 4</div></div>
+  <div class="step"><div class="n">2</div><div>r² = 4² = 16</div></div>
+  <div class="step"><div class="n">3</div><div>A = 3,14 × 16</div></div>
+  <div class="formula">A = 50,24 m²</div>
+  <p class="tip"><b>Atenção:</b> área é medida em unidade quadrada: cm², m², km²...</p>
+</section>
+
+<section class="page">
+  <span class="badge">6. Comprimento da circunferência</span>
+  <h2>Quanto mede a volta completa?</h2>
+  <div class="grid">
+    <div>
+      <div class="formula">C = 2 · π · r</div>
+      <p class="big">Ou, se o problema der o diâmetro:</p>
+      <div class="formula" style="font-size:2.4rem">C = π · d</div>
+      <p><b>Lembre:</b> d = 2r</p>
+    </div>
+    <div class="circleBox">
+      <div class="circle"><div class="diameter"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <span class="badge">7. Por que π ≈ 3,14?</span>
+  <h2>O número π aparece em todos os círculos</h2>
+  <p class="big">Se dividirmos o <b>comprimento da circunferência</b> pelo seu <b>diâmetro</b>, o resultado é sempre aproximadamente o mesmo:</p>
+  <div class="formula">π = C ÷ d ≈ 3,141592...</div>
+  <div class="grid">
+    <div class="card azul">
+      <h3>Exemplo simples</h3>
+      <p>Se um círculo tem diâmetro de 10 cm, sua volta mede aproximadamente:</p>
+      <p><b>C = 3,14 × 10 = 31,4 cm</b></p>
+    </div>
+    <div class="card amarelo">
+      <h3>Então π é 3,14?</h3>
+      <p><b>Não exatamente.</b> π possui infinitas casas decimais.</p>
+      <p>Usamos <b>3,14</b> como uma aproximação prática.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <span class="badge">8. Desafio rápido</span>
+  <h2>Calcule o comprimento</h2>
+  <p class="big">Uma roda tem raio de <b>5 cm</b>. Use π = 3,14. Qual é o comprimento aproximado da circunferência?</p>
+  <button class="option" onclick="quiz(this,false,'fb2')">A) 15,7 cm</button>
+  <button class="option" onclick="quiz(this,true,'fb2')">B) 31,4 cm</button>
+  <button class="option" onclick="quiz(this,false,'fb2')">C) 78,5 cm</button>
+  <button class="option" onclick="quiz(this,false,'fb2')">D) 10 cm</button>
+  <div class="feedback" id="fb2"></div>
+
+</section>
+
+<section class="page">
+  <span class="badge">9. Laboratório interativo</span>
+  <h2>Círculo que calcula sozinho</h2>
+  <p class="big">Altere o valor do <b>raio</b> e observe o círculo mudar. A <b>área</b> e a <b>circunferência</b> são atualizadas automaticamente.</p>
+
+  <div class="calcGrid">
+    <div class="calcPanel">
+      <div class="rangeWrap">
+        <label for="radiusRange"><b>Raio do círculo:</b> <span class="liveVal" id="radiusLabel">5</span> cm</label>
+        <input id="radiusRange" type="range" min="1" max="20" value="5" oninput="updateCircleCalc()">
+      </div>
+      <div class="inputRow">
+        <div class="inputGroup">
+          <label for="radiusNumber">Ou digite o raio</label>
+          <input class="smallInput" id="radiusNumber" type="number" min="1" max="20" step="0.1" value="5" oninput="syncRadiusFromNumber()">
+        </div>
+      </div>
+
+      <div class="liveRow"><span>Raio (r)</span> <span class="liveVal" id="rOut">5 cm</span></div>
+      <div class="liveRow"><span>Diâmetro (d = 2r)</span> <span class="liveVal" id="dOut">10 cm</span></div>
+      <div class="liveRow"><span>Área (A = π · r²)</span> <span class="liveVal" id="aOut">78,50 cm²</span></div>
+      <div class="liveRow"><span>Circunferência (C = 2 · π · r)</span> <span class="liveVal" id="cOut">31,40 cm</span></div>
+
+      <div class="resultNote">
+        <b>Usando:</b> π = 3,14. <br>
+        Assim, o aluno pode perceber que quando o raio aumenta, a área e a circunferência também aumentam.
+      </div>
+    </div>
+
+    <div class="circleStage">
+      <div class="circleLive" id="circleLive">r</div>
+      <div class="centerDot"></div>
+      <div class="radiusLive" id="radiusLive"></div>
+    </div>
+  </div>
+  <footer>Desenvolvido por Mayckon Jhonatas • Matemática — revisão de habilidades</footer>
+</section>
+
+<section class="page">
+  <span class="badge">9. Mini revisão</span>
+  <h2>Complete mentalmente</h2>
+  <div class="miniGrid">
+    <div class="mini">
+      <h3>Probabilidade</h3>
+      <p>favoráveis ÷ ________</p>
+      <p><b>possíveis</b></p>
+    </div>
+    <div class="mini">
+      <h3>Área do círculo</h3>
+      <p>A = π · ________</p>
+      <p><b>r²</b></p>
+    </div>
+    <div class="mini">
+      <h3>Circunferência</h3>
+      <p>C = 2 · π · ________</p>
+      <p><b>r</b></p>
+    </div>
+  </div>
+  <div class="tip" style="margin-top:28px"><b>Estratégia:</b> leia o problema, identifique o que foi dado, escolha a fórmula e só depois faça as contas.</div>
+</section>
+
+
+<section class="page">
+  <span class="badge">10. Missão final • estilo SAEPE</span>
+  <h2>Resolva as situações-problema</h2>
+  <p class="big">Leia com atenção, identifique os dados importantes e marque uma alternativa. A resposta só aparecerá depois que você escolher.</p>
+
+  <div class="card azul">
+    <h3>Questão 1</h3>
+    <p>Uma pista circular possui raio de <b>10 m</b>. Considerando π = 3,14, qual é o comprimento aproximado dessa pista?</p>
+    <button class="option" onclick="saepe(this,false,'s1')">A) 31,4 m</button>
+    <button class="option" onclick="saepe(this,true,'s1')">B) 62,8 m</button>
+    <button class="option" onclick="saepe(this,false,'s1')">C) 100 m</button>
+    <button class="option" onclick="saepe(this,false,'s1')">D) 314 m</button>
+    <div class="feedback" id="s1"></div>
+  </div>
+
+  <div class="card roxo" style="margin-top:18px">
+    <h3>Questão 2</h3>
+    <p>Uma mesa circular tem diâmetro de <b>2 m</b>. Qual é, aproximadamente, o comprimento de sua borda?</p>
+    <button class="option" onclick="saepe(this,true,'s2')">A) 6,28 m</button>
+    <button class="option" onclick="saepe(this,false,'s2')">B) 3,14 m</button>
+    <button class="option" onclick="saepe(this,false,'s2')">C) 12,56 m</button>
+    <button class="option" onclick="saepe(this,false,'s2')">D) 4 m</button>
+    <div class="feedback" id="s2"></div>
+  </div>
+
+  <div class="card verde" style="margin-top:18px">
+    <h3>Questão 3</h3>
+    <p>Um jardim circular tem raio de <b>3 m</b>. Qual é sua área aproximada, considerando π = 3,14?</p>
+    <button class="option" onclick="saepe(this,false,'s3')">A) 9,42 m²</button>
+    <button class="option" onclick="saepe(this,true,'s3')">B) 28,26 m²</button>
+    <button class="option" onclick="saepe(this,false,'s3')">C) 18,84 m²</button>
+    <button class="option" onclick="saepe(this,false,'s3')">D) 56,52 m²</button>
+    <div class="feedback" id="s3"></div>
+  </div>
+
+  <div class="card amarelo" style="margin-top:18px">
+    <h3>Questão 4</h3>
+    <p>Uma lanchonete oferece <b>4 tipos de sanduíche</b> e <b>3 tipos de suco</b>. Escolhendo um sanduíche e um suco, quantos lanches diferentes podem ser formados?</p>
+    <button class="option" onclick="saepe(this,false,'s4')">A) 7</button>
+    <button class="option" onclick="saepe(this,true,'s4')">B) 12</button>
+    <button class="option" onclick="saepe(this,false,'s4')">C) 16</button>
+    <button class="option" onclick="saepe(this,false,'s4')">D) 24</button>
+    <div class="feedback" id="s4"></div>
+  </div>
+
+  <div class="card azul" style="margin-top:18px">
+    <h3>Questão 5</h3>
+    <p>Uma senha é formada por uma letra escolhida entre <b>A, B ou C</b> e um número escolhido entre <b>1, 2, 3 ou 4</b>. Todas as senhas têm a mesma chance de serem escolhidas. Qual é a probabilidade de a senha começar com a letra A?</p>
+    <button class="option" onclick="saepe(this,false,'s5')">A) 1/12</button>
+    <button class="option" onclick="saepe(this,true,'s5')">B) 1/3</button>
+    <button class="option" onclick="saepe(this,false,'s5')">C) 1/4</button>
+    <button class="option" onclick="saepe(this,false,'s5')">D) 3/4</button>
+    <div class="feedback" id="s5"></div>
+  </div>
+
+  <div class="card roxo" style="margin-top:18px">
+    <h3>Questão 6</h3>
+    <p>Uma moeda é lançada e, depois, um dado comum é lançado. Quantos resultados diferentes podem ocorrer nesse experimento?</p>
+    <button class="option" onclick="saepe(this,false,'s6')">A) 6</button>
+    <button class="option" onclick="saepe(this,false,'s6')">B) 8</button>
+    <button class="option" onclick="saepe(this,true,'s6')">C) 12</button>
+    <button class="option" onclick="saepe(this,false,'s6')">D) 36</button>
+    <div class="feedback" id="s6"></div>
+  </div>
+
+  <div class="tip" id="scoreBox" style="margin-top:24px">
+    <b>Seu desempenho:</b> responda às 6 questões para ver o resultado.
+  </div>
+
+  <footer>Desenvolvido por Mayckon Jhonatas • Matemática — revisão de habilidades</footer>
+</section>
+
+
+</div>
+
+<div class="nav">
+  <button id="prev" onclick="changePage(-1)">← Voltar</button>
+  <div class="counter" id="counter">1 / 11</div>
+  <button id="next" onclick="changePage(1)">Avançar →</button>
+</div>
+
+<script>
+let current=0;
+const pages=[...document.querySelectorAll('.page')];
+const counter=document.getElementById('counter');
+const progress=document.getElementById('progress');
+const prev=document.getElementById('prev');
+const next=document.getElementById('next');
+
+function showPage(i){
+  pages[current].classList.remove('active');
+  current=Math.max(0,Math.min(i,pages.length-1));
+  pages[current].classList.add('active');
+  counter.textContent=(current+1)+' / '+pages.length;
+  progress.style.width=((current+1)/pages.length*100)+'%';
+  prev.disabled=current===0;
+  next.disabled=current===pages.length-1;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function changePage(dir){showPage(current+dir)}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight') changePage(1);
+  if(e.key==='ArrowLeft') changePage(-1);
+});
+function quiz(btn,correct,fb){
+  const box=btn.parentElement;
+  box.querySelectorAll('.option').forEach(b=>b.classList.remove('correct','wrong'));
+  if(correct){
+    btn.classList.add('correct');
+    document.getElementById(fb).textContent='✅ Muito bem! Resposta correta.';
+    document.getElementById(fb).style.color='#15803d';
+  }else{
+    btn.classList.add('wrong');
+    document.getElementById(fb).textContent='❌ Tente novamente. Observe a fórmula ou a contagem.';
+    document.getElementById(fb).style.color='#b91c1c';
+  }
+}
+function checkFinal(){
+  const v=parseFloat(document.getElementById('finalAnswer').value.replace?.(',','.') || document.getElementById('finalAnswer').value);
+  const fb=document.getElementById('finalFb');
+  if(Math.abs(v-62.8)<0.01){
+    fb.textContent='✅ Certo! A volta completa mede aproximadamente 62,8 m.';
+    fb.style.color='#15803d';
+  }else{
+    fb.textContent='❌ Revise: C = 2 · π · r.';
+    fb.style.color='#b91c1c';
+  }
+}
+
+function fmtBR(num, casas=2){
+  return Number(num).toFixed(casas).replace('.', ',');
+}
+
+
+function getUrnaData(){
+  const data = [
+    {nome:'Vermelha', cor:'#ef4444', qtd: Math.max(0, parseInt(document.getElementById('redCount').value || 0)), sigla:'V'},
+    {nome:'Azul', cor:'#2563eb', qtd: Math.max(0, parseInt(document.getElementById('blueCount').value || 0)), sigla:'A'},
+    {nome:'Verde', cor:'#16a34a', qtd: Math.max(0, parseInt(document.getElementById('greenCount').value || 0)), sigla:'Ve'},
+    {nome:'Amarela', cor:'#eab308', qtd: Math.max(0, parseInt(document.getElementById('yellowCount').value || 0)), sigla:'Am'}
+  ];
+  return data;
+}
+
+let urnaAnimTimer = null;
+let urnaAnimating = false;
+let urnaBallsData = [];
+
+function buildBallObjects(){
+  const dados = getUrnaData();
+  const box = document.getElementById('ballBox');
+  if(!box) return [];
+  const width = box.clientWidth || 320;
+  const height = box.clientHeight || 240;
+  const balls = [];
+
+  dados.forEach(item => {
+    for(let i = 0; i < item.qtd; i++){
+      balls.push({
+        nome: item.nome,
+        cor: item.cor,
+        sigla: item.sigla,
+        x: Math.random() * Math.max(1, width - 40),
+        y: Math.random() * Math.max(1, height - 40),
+        vx: (Math.random() * 3 + 1.1) * (Math.random() > 0.5 ? 1 : -1),
+        vy: (Math.random() * 3 + 1.1) * (Math.random() > 0.5 ? 1 : -1)
+      });
+    }
+  });
+
+  return balls;
+}
+
+function renderUrnaBalls(){
+  const box = document.getElementById('ballBox');
+  if(!box) return;
+  box.innerHTML = '';
+
+  if(urnaBallsData.length === 0){
+    const empty = document.createElement('div');
+    empty.style.position = 'absolute';
+    empty.style.inset = '0';
+    empty.style.display = 'grid';
+    empty.style.placeItems = 'center';
+    empty.style.color = '#64748b';
+    empty.style.fontWeight = '700';
+    empty.innerHTML = 'Adicione bolinhas para preencher a urna.';
+    box.appendChild(empty);
+    return;
+  }
+
+  urnaBallsData.forEach((ball, idx) => {
+    const el = document.createElement('div');
+    el.className = 'movingBall';
+    el.dataset.index = idx;
+    el.style.left = ball.x + 'px';
+    el.style.top = ball.y + 'px';
+    el.style.background = ball.cor;
+    el.textContent = ball.sigla;
+    box.appendChild(el);
+    ball.el = el;
+  });
+}
+
+function animateUrnaStep(){
+  const box = document.getElementById('ballBox');
+  if(!box) return;
+  const width = box.clientWidth || 320;
+  const height = box.clientHeight || 240;
+  const size = 32;
+
+  urnaBallsData.forEach(ball => {
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+
+    if(ball.x <= 0){ ball.x = 0; ball.vx *= -1; }
+    if(ball.x >= width - size){ ball.x = width - size; ball.vx *= -1; }
+    if(ball.y <= 0){ ball.y = 0; ball.vy *= -1; }
+    if(ball.y >= height - size){ ball.y = height - size; ball.vy *= -1; }
+
+    if(ball.el){
+      ball.el.style.left = ball.x + 'px';
+      ball.el.style.top = ball.y + 'px';
+    }
+  });
+}
+
+function startUrnaAnimation(faster=false){
+  if(urnaAnimTimer) clearInterval(urnaAnimTimer);
+  urnaAnimating = true;
+
+  urnaBallsData.forEach(ball => {
+    const mult = faster ? 1.9 : 1;
+    ball.vx = ((Math.random() * 3 + 1.2) * (Math.random() > 0.5 ? 1 : -1)) * mult;
+    ball.vy = ((Math.random() * 3 + 1.2) * (Math.random() > 0.5 ? 1 : -1)) * mult;
+  });
+
+  urnaAnimTimer = setInterval(animateUrnaStep, 24);
+}
+
+function stopUrnaAnimation(){
+  if(urnaAnimTimer) clearInterval(urnaAnimTimer);
+  urnaAnimTimer = null;
+  urnaAnimating = false;
+}
+
+function updateUrna(){
+  const dados = getUrnaData();
+  const total = dados.reduce((s, item) => s + item.qtd, 0);
+  const stats = document.getElementById('urnaStats');
+  const ballDisplay = document.getElementById('ballDisplay');
+  const ballInfo = document.getElementById('ballInfo');
+  const sortHint = document.getElementById('sortHint');
+  if(!stats) return;
+
+  stopUrnaAnimation();
+
+  if(total === 0){
+    stats.innerHTML = '<li>Adicione pelo menos 1 bola para calcular as probabilidades.</li>';
+    if(ballDisplay){
+      ballDisplay.className = 'ballDisplay empty';
+      ballDisplay.style.background = '';
+      ballDisplay.textContent = '?';
+    }
+    if(ballInfo) ballInfo.innerHTML = 'Clique em <b>Sortear uma bola</b> para ver o resultado.';
+    if(sortHint) sortHint.innerHTML = 'As bolinhas aparecem na caixa e podem ser sorteadas.';
+    urnaBallsData = [];
+    renderUrnaBalls();
+    return;
+  }
+
+  stats.innerHTML = dados.map(item => {
+    const prob = item.qtd > 0 ? (item.qtd/total*100) : 0;
+    return `<li><b>${item.nome}</b>: ${item.qtd} bola(s) → probabilidade = ${item.qtd}/${total} = ${fmtBR(prob)}%</li>`;
+  }).join('');
+
+  if(ballDisplay){
+    ballDisplay.className = 'ballDisplay empty';
+    ballDisplay.style.background = '';
+    ballDisplay.textContent = '?';
+  }
+  if(ballInfo) ballInfo.innerHTML = 'Clique em <b>Sortear uma bola</b> para ver o resultado.';
+  if(sortHint) sortHint.innerHTML = 'Ao clicar em sortear, as bolinhas se movimentam como em uma caixa de sorteio.';
+
+  urnaBallsData = buildBallObjects();
+  renderUrnaBalls();
+  startUrnaAnimation(false);
+}
+
+function escolherCorPorProbabilidade(dados){
+  const total = dados.reduce((s, item) => s + item.qtd, 0);
+  let sorteio = Math.floor(Math.random() * total) + 1;
+  let acumulado = 0;
+  let escolhida = dados[0];
+
+  for(const item of dados){
+    acumulado += item.qtd;
+    if(sorteio <= acumulado){
+      escolhida = item;
+      break;
+    }
+  }
+  return escolhida;
+}
+
+function sortearBola(){
+  const dados = getUrnaData();
+  const total = dados.reduce((s, item) => s + item.qtd, 0);
+  const ballDisplay = document.getElementById('ballDisplay');
+  const ballInfo = document.getElementById('ballInfo');
+  const sortHint = document.getElementById('sortHint');
+
+  if(total === 0){
+    updateUrna();
+    return;
+  }
+
+  if(sortHint) sortHint.innerHTML = 'Sorteando... observe as bolinhas se mexendo na caixa!';
+  if(ballInfo) ballInfo.innerHTML = 'Misturando as bolinhas...';
+  if(ballDisplay){
+    ballDisplay.className = 'ballDisplay empty';
+    ballDisplay.style.background = '';
+    ballDisplay.textContent = '?';
+  }
+
+  startUrnaAnimation(true);
+
+  setTimeout(() => {
+    stopUrnaAnimation();
+    const escolhida = escolherCorPorProbabilidade(dados);
+
+    const candidatas = urnaBallsData.filter(ball => ball.nome === escolhida.nome);
+    if(candidatas.length){
+      const destaque = candidatas[Math.floor(Math.random() * candidatas.length)];
+      urnaBallsData.forEach(ball => ball.el && ball.el.classList.remove('selected'));
+      if(destaque.el) destaque.el.classList.add('selected');
+    }
+
+    ballDisplay.className = 'ballDisplay';
+    ballDisplay.style.background = escolhida.cor;
+    ballDisplay.textContent = escolhida.nome;
+    const prob = escolhida.qtd / total * 100;
+    ballInfo.innerHTML = `Saiu a bola <b style="color:${escolhida.cor}">${escolhida.nome}</b>.<br>Probabilidade dessa cor: <b>${escolhida.qtd}/${total}</b> = <b>${fmtBR(prob)}%</b>`;
+    if(sortHint) sortHint.innerHTML = 'Resultado do sorteio destacado na caixa e no visor.';
+  }, 2400);
+}
+
+function resetUrna(){
+  document.getElementById('redCount').value = 3;
+  document.getElementById('blueCount').value = 2;
+  document.getElementById('greenCount').value = 1;
+  document.getElementById('yellowCount').value = 2;
+  updateUrna();
+}
+
+function updateCircleCalc(){
+
+  const range = document.getElementById('radiusRange');
+  const num = document.getElementById('radiusNumber');
+  if(!range || !num) return;
+  let r = parseFloat(range.value || 1);
+  num.value = r;
+
+  const d = 2 * r;
+  const area = 3.14 * r * r;
+  const circ = 2 * 3.14 * r;
+
+  document.getElementById('radiusLabel').textContent = fmtBR(r, (r % 1 === 0 ? 0 : 1));
+  document.getElementById('rOut').textContent = fmtBR(r, (r % 1 === 0 ? 0 : 1)) + ' cm';
+  document.getElementById('dOut').textContent = fmtBR(d, (d % 1 === 0 ? 0 : 1)) + ' cm';
+  document.getElementById('aOut').textContent = fmtBR(area) + ' cm²';
+  document.getElementById('cOut').textContent = fmtBR(circ) + ' cm';
+
+  const circle = document.getElementById('circleLive');
+  const radiusLive = document.getElementById('radiusLive');
+  const size = 40 + r * 10;  // escala visual
+  circle.style.width = size + 'px';
+  circle.style.height = size + 'px';
+  circle.textContent = 'r = ' + fmtBR(r, (r % 1 === 0 ? 0 : 1));
+
+  radiusLive.style.width = (size/2) + 'px';
+  radiusLive.style.left = '50%';
+  radiusLive.style.top = '50%';
+  radiusLive.style.transform = 'rotate(-25deg)';
+}
+
+function syncRadiusFromNumber(){
+  const num = document.getElementById('radiusNumber');
+  const range = document.getElementById('radiusRange');
+  if(!num || !range) return;
+  let v = parseFloat(num.value || 1);
+  if(isNaN(v)) v = 1;
+  v = Math.max(1, Math.min(20, v));
+  range.value = v;
+  updateCircleCalc();
+}
+
+updateUrna();
+updateCircleCalc();
+showPage(0);
+</script>
+</body>
+</html>
