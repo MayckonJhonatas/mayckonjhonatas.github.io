@@ -160,22 +160,26 @@
     <button class="bottom-btn" data-page="leituras" data-requires-student disabled><span>📖</span><span>Leituras</span></button>
   </nav>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-    import { getAuth, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-    import { getDatabase, ref, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
-
+  <script>
     const CONFIG={
       alunosUrl:"./dados/alunos.json",
       leiturasUrl:"./dados/leituras.json",
-      firebaseConfigUrl:"./dados/firebase.json",
+      avaliacoesUrl:"./dados/avaliacoes.json",
+      // COLE AQUI a URL do Worker depois de publicar, sem barra no final.
+      avaliacoesApiUrl:"COLE_AQUI_A_URL_DO_WORKER",
       cacheBust:true
     };
+
     const $=id=>document.getElementById(id);
     const alunoSelect=$("alunoSelect"), entrarAluno=$("entrarAluno"), estadoSistema=$("estadoSistema"), listaLeituras=$("listaLeituras");
-    let alunos=[], leituras=[], alunoAtual=null, filtroAtual="todas";
-    let firebaseReady=false, auth=null, db=null, firebaseUser=null;
-    let reviewUnsubs=[];
+    let alunos=[], leituras=[], avaliacoes=[], alunoAtual=null, filtroAtual="todas";
+    let meuClientId=localStorage.getItem("leiturafy_avaliador_id")||"";
+    let meuClientHash="";
+
+    if(!meuClientId){
+      meuClientId=(crypto.randomUUID?crypto.randomUUID():`lf_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+      localStorage.setItem("leiturafy_avaliador_id",meuClientId);
+    }
 
     const normalizar=v=>String(v??"").trim();
     const escapar=t=>String(t??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
@@ -191,19 +195,25 @@
     const obsLeitura=l=>normalizar(l.observacao??l.resumo??l.comentario??l.recomendacao);
     const leiturasAluno=id=>leituras.filter(l=>alunoId(l)===String(id)).sort((a,b)=>String(b.data??"").localeCompare(String(a.data??"")));
     function leituraId(l,index=0){const id=normalizar(l.id??l.leituraId??l.leitura_id);if(id)return id;return[alunoId(l),normalizar(l.titulo).toLowerCase(),normalizar(l.autor).toLowerCase(),normalizar(l.data),index].join("|")}
-    function firebaseKey(id){return encodeURIComponent(String(id)).replace(/[.#$\[\]\/]/g,"_")}
     function estrelasTexto(n){n=Math.max(0,Math.min(5,Math.round(Number(n)||0)));return"★".repeat(n)+"☆".repeat(5-n)}
+    function apiConfigurada(){return /^https:\/\//i.test(CONFIG.avaliacoesApiUrl)&&!CONFIG.avaliacoesApiUrl.includes("COLE_AQUI")}
 
-    async function iniciarFirebase(){
+    async function hashTexto(texto){
+      if(!crypto.subtle)return"";
+      const data=new TextEncoder().encode(texto);
+      const digest=await crypto.subtle.digest("SHA-256",data);
+      return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,"0")).join("");
+    }
+
+    async function carregarAvaliacoes(){
       try{
-        const cfg=await fetchJson(CONFIG.firebaseConfigUrl,false);
-        if(!cfg?.apiKey||!cfg?.databaseURL||!cfg?.projectId||!cfg?.appId) throw new Error("Configuração incompleta");
-        const app=initializeApp(cfg);
-        auth=getAuth(app); db=getDatabase(app);
-        await setPersistence(auth,browserLocalPersistence);
-        const cred=await signInAnonymously(auth);
-        firebaseUser=cred.user; firebaseReady=true;
-      }catch(e){console.warn("Avaliações online indisponíveis:",e);firebaseReady=false;}
+        // Depois de configurar o endpoint, ele devolve imediatamente o conteúdo mais recente do GitHub.
+        if(apiConfigurada()){
+          const r=await fetch(`${CONFIG.avaliacoesApiUrl}?v=${Date.now()}`,{cache:"no-store"});
+          if(r.ok){const d=await r.json();if(Array.isArray(d)){avaliacoes=d;return;}}
+        }
+        avaliacoes=await fetchJson(CONFIG.avaliacoesUrl);
+      }catch(e){console.warn("Não foi possível carregar avaliações:",e);avaliacoes=[];}
     }
 
     function preencherDropdown(){
@@ -217,13 +227,15 @@
     function atualizarStats(){const l=leiturasAluno(alunoAtual.id);$("statTotal").textContent=l.length;$("statConcluidas").textContent=l.filter(x=>statusNorm(x)==="concluida").length;$("statAudios").textContent=l.filter(x=>audioLeitura(x)).length}
     function abrirPagina(nome){if(nome!=="inicio"&&!alunoAtual)nome="inicio";document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===`page-${nome}`));document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===nome));history.replaceState(null,"",`#${nome}`);if(nome==="leituras")renderizarLeituras();window.scrollTo({top:0,behavior:"smooth"})}
     function entrarNoAluno(){alunoAtual=alunos.find(a=>String(a.id)===String(alunoSelect.value))||null;if(!alunoAtual)return;setNav(true);atualizarStudentBar();atualizarStats();abrirPagina("leituras")}
-    function trocarAluno(){reviewUnsubs.forEach(fn=>{try{fn()}catch{}});reviewUnsubs=[];alunoAtual=null;alunoSelect.value="";entrarAluno.disabled=true;setNav(false);abrirPagina("inicio")}
+    function trocarAluno(){alunoAtual=null;alunoSelect.value="";entrarAluno.disabled=true;setNav(false);abrirPagina("inicio")}
+
+    function avaliacoesDaLeitura(id){return avaliacoes.filter(a=>String(a.leituraId)===String(id)).sort((a,b)=>String(b.atualizadoEm??"").localeCompare(String(a.atualizadoEm??"")))}
 
     function htmlAvaliacao(id){
-      if(!firebaseReady)return`<div class="firebase-warning">As avaliações compartilhadas ainda não foram configuradas. Configure <strong>dados/firebase.json</strong> para liberar comentários e estrelas para todas as famílias.</div>`;
       const nome=localStorage.getItem("leiturafy_nome_avaliador")||"";
-      return `<div class="public-summary"><div class="public-score"><span class="score-number" data-media>—</span><div><div class="score-stars" data-media-stars>☆☆☆☆☆</div><div class="score-count" data-count>Carregando avaliações...</div></div></div><span class="reviews-status" data-live-status>Atualização em tempo real</span></div>
-      <div class="comments" data-comments><div class="comments-empty">Carregando comentários...</div></div>
+      const aviso=!apiConfigurada()?`<div class="firebase-warning">Para publicar avaliações no GitHub, configure a URL do endpoint seguro no arquivo. As avaliações já existentes em <strong>dados/avaliacoes.json</strong> continuam visíveis.</div>`:"";
+      return `${aviso}<div class="public-summary"><div class="public-score"><span class="score-number" data-media>—</span><div><div class="score-stars" data-media-stars>☆☆☆☆☆</div><div class="score-count" data-count>Carregando avaliações...</div></div></div><span class="reviews-status" data-live-status>Dados salvos no GitHub</span></div>
+      <div class="comments" data-comments></div>
       <div class="rate-box" data-rate-box data-reading-id="${escapar(id)}" data-stars="0">
         <div class="rate-title">⭐ Avalie depois de ouvir</div>
         <div class="privacy-note">Seu nome, estrelas e comentário ficarão visíveis para outras famílias.</div>
@@ -231,16 +243,15 @@
           <div class="rate-field"><label>Seu nome ou identificação</label><input maxlength="80" data-name value="${escapar(nome)}" placeholder="Ex.: Maria, mãe de João"></div>
           <div class="rate-field"><label>Sua avaliação</label><div class="stars-input" aria-label="Escolha de 1 a 5 estrelas">${[1,2,3,4,5].map(n=>`<button type="button" class="star-btn" data-star="${n}" aria-label="${n} estrela${n>1?"s":""}">★</button>`).join("")}</div></div>
           <div class="rate-field"><label>Comentário</label><textarea maxlength="600" data-comment placeholder="Escreva o que achou da leitura ou do áudio."></textarea></div>
-          <button class="save-review" type="button" data-save disabled>Publicar avaliação</button>
+          <button class="save-review" type="button" data-save ${apiConfigurada()?"":"disabled"}>Publicar avaliação</button>
           <div class="review-result" data-result></div>
         </div>
       </div>`;
     }
 
-    function desligarReviews(){reviewUnsubs.forEach(fn=>{try{fn()}catch{}});reviewUnsubs=[]}
-    function formatarMomento(v){if(!v||typeof v!=="number")return"";try{return new Date(v).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"})}catch{return""}}
-    function renderReviews(box,reviews){
-      const vals=Object.values(reviews||{}).filter(Boolean).sort((a,b)=>(b.atualizadoEm||0)-(a.atualizadoEm||0));
+    function formatarMomento(v){if(!v)return"";const d=new Date(v);return Number.isNaN(d.getTime())?"":d.toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"})}
+    function renderReviews(box,id){
+      const vals=avaliacoesDaLeitura(id);
       const media=vals.length?vals.reduce((s,r)=>s+Number(r.estrelas||0),0)/vals.length:0;
       box.querySelector("[data-media]").textContent=vals.length?media.toFixed(1):"—";
       box.querySelector("[data-media-stars]").textContent=vals.length?estrelasTexto(media):"☆☆☆☆☆";
@@ -248,32 +259,37 @@
       const comments=box.querySelector("[data-comments]");
       const comTexto=vals.filter(r=>normalizar(r.comentario));
       comments.innerHTML=comTexto.length?comTexto.map(r=>`<div class="comment"><div class="comment-head"><span class="comment-name">${escapar(r.avaliador||"Família")}</span><span class="comment-stars">${escapar(estrelasTexto(r.estrelas))}</span></div><div class="comment-text">${escapar(r.comentario)}</div>${r.atualizadoEm?`<div class="comment-date">${escapar(formatarMomento(r.atualizadoEm))}</div>`:""}</div>`).join(""):`<div class="comments-empty">Ainda não há comentários. Seja o primeiro a participar.</div>`;
-      if(firebaseUser&&reviews?.[firebaseUser.uid]){
-        const mine=reviews[firebaseUser.uid], rate=box.querySelector("[data-rate-box]");
-        rate.dataset.stars=String(mine.estrelas||0);rate.querySelector("[data-name]").value=mine.avaliador||rate.querySelector("[data-name]").value;rate.querySelector("[data-comment]").value=mine.comentario||"";
-        rate.querySelectorAll("[data-star]").forEach(b=>b.classList.toggle("active",Number(b.dataset.star)<=Number(mine.estrelas||0)));
+      const minha=vals.find(r=>meuClientHash&&r.clientHash===meuClientHash);
+      const rate=box.querySelector("[data-rate-box]");
+      if(minha&&rate){
+        rate.dataset.stars=String(minha.estrelas||0);
+        rate.querySelector("[data-name]").value=minha.avaliador||rate.querySelector("[data-name]").value;
+        rate.querySelector("[data-comment]").value=minha.comentario||"";
+        rate.querySelectorAll("[data-star]").forEach(b=>b.classList.toggle("active",Number(b.dataset.star)<=Number(minha.estrelas||0)));
         const result=rate.querySelector("[data-result]");result.className="review-result ok";result.textContent="Sua avaliação já está publicada. Você pode editar e publicar novamente.";
       }
-      validarForm(box.querySelector("[data-rate-box]"));
+      validarForm(rate);
     }
-    function conectarReviews(card,id){
-      if(!firebaseReady||!db)return;
-      const caminho=`avaliacoes/${firebaseKey(id)}`;
-      const unsub=onValue(ref(db,caminho),snap=>renderReviews(card,snap.val()||{}),err=>{const s=card.querySelector("[data-live-status]");if(s)s.textContent="Não foi possível carregar avaliações";console.error(err)});
-      reviewUnsubs.push(unsub);
-    }
-    function validarForm(rate){if(!rate)return;const ok=normalizar(rate.querySelector("[data-name]")?.value)&&Number(rate.dataset.stars)>0;rate.querySelector("[data-save]").disabled=!ok}
+
+    function validarForm(rate){if(!rate)return;const ok=apiConfigurada()&&normalizar(rate.querySelector("[data-name]")?.value)&&Number(rate.dataset.stars)>0;rate.querySelector("[data-save]").disabled=!ok}
+
     async function salvarReview(rate){
-      if(!firebaseReady||!db||!firebaseUser||!rate)return;
+      if(!apiConfigurada()||!rate)return;
       const id=rate.dataset.readingId,nome=normalizar(rate.querySelector("[data-name]").value),comentario=normalizar(rate.querySelector("[data-comment]").value),estrelas=Number(rate.dataset.stars||0),result=rate.querySelector("[data-result]"),btn=rate.querySelector("[data-save]");
       if(!nome||!estrelas)return;
       btn.disabled=true;btn.textContent="Publicando...";result.className="review-result";result.textContent="";
       try{
-        await set(ref(db,`avaliacoes/${firebaseKey(id)}/${firebaseUser.uid}`),{uid:firebaseUser.uid,avaliador:nome,estrelas,comentario,atualizadoEm:serverTimestamp()});
-        localStorage.setItem("leiturafy_nome_avaliador",nome);result.className="review-result ok";result.textContent="✓ Avaliação publicada para todas as famílias.";
-      }catch(e){console.error(e);result.className="review-result error";result.textContent="Não foi possível publicar. Tente novamente."}
+        const r=await fetch(CONFIG.avaliacoesApiUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({clientId:meuClientId,leituraId:id,alunoId:String(alunoAtual?.id||""),avaliador:nome,estrelas,comentario})});
+        const d=await r.json().catch(()=>({}));
+        if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
+        localStorage.setItem("leiturafy_nome_avaliador",nome);
+        if(Array.isArray(d.avaliacoes))avaliacoes=d.avaliacoes;else await carregarAvaliacoes();
+        const card=rate.closest("[data-card]");if(card)renderReviews(card,id);
+        result.className="review-result ok";result.textContent="✓ Avaliação salva em dados/avaliacoes.json e publicada para todos.";
+      }catch(e){console.error(e);result.className="review-result error";result.textContent=`Não foi possível publicar: ${e.message}`}
       btn.textContent="Publicar avaliação";validarForm(rate);
     }
+
     function ligarFormularios(){
       document.querySelectorAll("[data-rate-box]").forEach(rate=>{
         rate.querySelectorAll("[data-star]").forEach(b=>b.addEventListener("click",()=>{rate.dataset.stars=b.dataset.star;rate.querySelectorAll("[data-star]").forEach(x=>x.classList.toggle("active",Number(x.dataset.star)<=Number(b.dataset.star)));validarForm(rate)}));
@@ -283,7 +299,7 @@
     }
 
     function renderizarLeituras(){
-      if(!alunoAtual)return;desligarReviews();atualizarStats();
+      if(!alunoAtual)return;atualizarStats();
       const todas=leiturasAluno(alunoAtual.id);let filtradas=todas;
       if(filtroAtual==="concluida")filtradas=todas.filter(l=>statusNorm(l)==="concluida");
       if(filtroAtual==="andamento")filtradas=todas.filter(l=>statusNorm(l)==="andamento");
@@ -292,18 +308,19 @@
       listaLeituras.innerHTML=filtradas.map((l,i)=>{
         const titulo=escapar(l.titulo||"Livro sem título"),autor=escapar(l.autor||"Autor não informado"),status=statusNorm(l),data=formatoData(l.data),obs=escapar(obsLeitura(l)),capa=resolverArquivo(l.capa,"dados/capas"),audio=resolverArquivo(audioLeitura(l),"dados/audios"),id=leituraId(l,i);
         const cover=capa?`<img src="${escapar(capa)}" alt="Capa de ${titulo}" onerror="this.remove();this.parentElement.textContent='📘'">`:"📘";
-        const audioHtml=audio?`<div class="audio-box"><div class="audio-title">🎧 Ouvir áudio do estudante</div><audio controls preload="none" src="${escapar(audio)}"></audio><p class="listen-note">Ouça antes de avaliar. As avaliações abaixo são compartilhadas.</p>${htmlAvaliacao(id)}</div>`:`<div class="no-audio">Esta leitura ainda não possui áudio para avaliação.</div>`;
+        const audioHtml=audio?`<div class="audio-box"><div class="audio-title">🎧 Ouvir áudio do estudante</div><audio controls preload="none" src="${escapar(audio)}"></audio><p class="listen-note">Ouça antes de avaliar. As avaliações abaixo ficam registradas no GitHub e são públicas.</p>${htmlAvaliacao(id)}</div>`:`<div class="no-audio">Esta leitura ainda não possui áudio para avaliação.</div>`;
         return`<article class="reading-card" data-card data-id="${escapar(id)}"><div class="reading-main"><div class="cover">${cover}</div><div class="reading-info"><h3>${titulo}</h3><div class="author">${autor}</div><div class="meta"><span class="tag ${status}">${escapar(statusRotulo(l))}</span>${data?`<span class="date">${escapar(data)}</span>`:""}</div></div></div><div class="reading-extra">${obs?`<p class="note">${obs}</p>`:""}${audioHtml}</div></article>`;
       }).join("");
       ligarFormularios();
-      document.querySelectorAll("[data-card]").forEach(card=>{if(card.querySelector("[data-rate-box]"))conectarReviews(card,card.dataset.id)});
+      document.querySelectorAll("[data-card]").forEach(card=>{if(card.querySelector("[data-rate-box]"))renderReviews(card,card.dataset.id)});
     }
 
     async function iniciar(){
       try{
+        meuClientHash=await hashTexto(meuClientId);
         const [a,l]=await Promise.all([fetchJson(CONFIG.alunosUrl),fetchJson(CONFIG.leiturasUrl)]);alunos=a;leituras=l;preencherDropdown();
-        await iniciarFirebase();
-        $("syncBadge").classList.add("ok");$("syncText").textContent=firebaseReady?"Dados e avaliações online":"Leituras atualizadas";
+        await carregarAvaliacoes();
+        $("syncBadge").classList.add("ok");$("syncText").textContent=apiConfigurada()?"Dados e avaliações no GitHub":"Dados atualizados";
         estadoSistema.textContent=alunos.length?"Selecione o estudante para continuar.":"Nenhum estudante cadastrado.";
         if(!alunos.length)estadoSistema.classList.add("error");
       }catch(e){console.error(e);alunoSelect.disabled=true;alunoSelect.innerHTML='<option value="">Dados indisponíveis</option>';$("syncBadge").classList.add("error");$("syncText").textContent="Falha ao carregar";estadoSistema.classList.add("error");estadoSistema.textContent="Não foi possível carregar alunos e leituras. Confira a pasta dados no GitHub."}
