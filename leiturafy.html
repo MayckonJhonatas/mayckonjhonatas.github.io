@@ -285,6 +285,13 @@
     .reading-extra{padding:0 15px 15px}
     .note{margin:0;color:var(--muted);font-size:.9rem;line-height:1.5}
     .audio-box{margin-top:12px;padding:12px;border-radius:14px;background:var(--blue-softer);border:1px solid var(--line)}
+    .reading-actions{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+    .rate-reading-btn{
+      border:0;border-radius:13px;padding:10px 13px;
+      background:var(--blue);color:#fff;font-weight:900;
+      box-shadow:0 7px 18px rgba(6,117,255,.18)
+    }
+    .saved-rating{color:#9a6900;font-size:.8rem;font-weight:900}
     .audio-title{margin-bottom:8px;color:var(--blue-dark);font-size:.82rem;font-weight:900}
     audio{width:100%;height:38px}
     .empty{padding:26px;text-align:center;color:var(--muted);border:1px dashed #b8d9f7;border-radius:18px;background:#fff}
@@ -309,7 +316,25 @@
     }
     .rating-card h3{margin:0;color:#123b61;font-size:1.35rem}
     .rating-card p{margin:8px auto 0;max-width:470px;color:var(--muted);line-height:1.48}
-    .stars-picker{display:flex;justify-content:center;gap:7px;margin:22px 0 12px}
+    .selected-reading{
+      margin:16px 0;padding:14px;text-align:left;border-radius:16px;
+      background:var(--blue-softer);border:1px solid var(--line)
+    }
+    .selected-reading strong{display:block;color:#123b61}
+    .selected-reading small{display:block;margin-top:3px;color:var(--muted)}
+    .review-form{text-align:left;margin-top:18px}
+    .review-form label{display:block;margin:13px 0 6px;color:#123b61;font-size:.88rem;font-weight:900}
+    .review-form input,.review-form textarea{
+      width:100%;border:1px solid var(--line);border-radius:14px;
+      background:#fbfdff;color:var(--text);font:inherit;outline:none
+    }
+    .review-form input{padding:13px 14px}
+    .review-form textarea{min-height:108px;padding:13px 14px;resize:vertical}
+    .review-form input:focus,.review-form textarea:focus{
+      border-color:var(--blue);box-shadow:0 0 0 4px rgba(6,117,255,.10)
+    }
+    .field-help{margin-top:5px!important;font-size:.76rem!important;color:#8a9aaa!important}
+    .stars-picker{display:flex;justify-content:center;gap:7px;margin:18px 0 12px}
     .star-btn{
       width:52px;height:52px;
       border:0;
@@ -323,6 +348,20 @@
     .star-btn.active,.star-btn:hover{color:#ffb51b;transform:scale(1.05)}
     .rating-result{min-height:26px;color:var(--blue-dark);font-weight:900}
     .rating-note{margin-top:13px!important;font-size:.8rem!important;color:#8798a8!important}
+    .rating-chooser{display:grid;gap:10px;margin-top:14px}
+    .rating-choice{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      width:100%;padding:14px;border:1px solid var(--line);border-radius:16px;
+      background:#fff;text-align:left
+    }
+    .rating-choice:hover{border-color:#a9d2ff;background:var(--blue-softer)}
+    .rating-choice strong{display:block;color:#123b61}
+    .rating-choice small{display:block;margin-top:3px;color:var(--muted)}
+    .rating-choice span{color:var(--blue);font-weight:950;white-space:nowrap}
+    .secondary-wide{
+      width:100%;margin-top:10px;border:0;border-radius:14px;padding:12px;
+      background:var(--blue-soft);color:var(--blue-dark);font-weight:900
+    }
 
     .bottom-nav{
       position:fixed;
@@ -398,7 +437,7 @@
       <div class="welcome">
         <div class="welcome-badge">📚 Família e escola juntas</div>
         <h1>Acompanhe a leitura de forma <span>simples.</span></h1>
-        <p>Escolha o nome do estudante para consultar suas leituras, ouvir os áudios e registrar a avaliação da família.</p>
+        <p>Escolha o nome do estudante para consultar suas leituras, ouvir os áudios e avaliar cada livro lido.</p>
       </div>
 
       <div class="select-card">
@@ -435,9 +474,9 @@
         </div>
         <div class="quick-card">
           <div class="quick-icon">⭐</div>
-          <h3>Avaliação da família</h3>
-          <p>Registre uma avaliação de até 5 estrelas para o estudante.</p>
-          <button data-go="avaliar">Avaliar agora</button>
+          <h3>Avaliar uma leitura</h3>
+          <p>Escolha um livro, dê de 1 a 5 estrelas e deixe um comentário.</p>
+          <button data-go="avaliar">Escolher leitura</button>
         </div>
       </div>
     </section>
@@ -460,24 +499,44 @@
     <section class="page" id="page-avaliar">
       <div class="student-bar"></div>
       <div class="page-title">
-        <h2>Avaliação da família</h2>
-        <p>Uma forma simples de registrar como a família percebe o envolvimento do estudante com a leitura.</p>
+        <h2>Avaliar uma leitura</h2>
+        <p>Escolha o livro lido e registre a opinião da família.</p>
       </div>
 
-      <div class="rating-card">
+      <div id="ratingChooseBox" class="rating-card">
+        <div class="rating-icon">📖</div>
+        <h3>Qual leitura você quer avaliar?</h3>
+        <p>Toque em uma leitura para abrir a avaliação.</p>
+        <div class="rating-chooser" id="ratingChooser"></div>
+      </div>
+
+      <div id="ratingFormBox" class="rating-card hidden">
         <div class="rating-icon">⭐</div>
-        <h3 id="ratingTitle">Avaliar estudante</h3>
-        <p>Toque em uma estrela. Você pode escolher de 1 a 5.</p>
-        <div class="stars-picker" id="starsPicker" role="radiogroup" aria-label="Avaliação de 1 a 5 estrelas">
-          <button class="star-btn" data-value="1" aria-label="1 estrela">★</button>
-          <button class="star-btn" data-value="2" aria-label="2 estrelas">★</button>
-          <button class="star-btn" data-value="3" aria-label="3 estrelas">★</button>
-          <button class="star-btn" data-value="4" aria-label="4 estrelas">★</button>
-          <button class="star-btn" data-value="5" aria-label="5 estrelas">★</button>
+        <h3 id="ratingTitle">Avaliar leitura</h3>
+        <div class="selected-reading" id="selectedReading"></div>
+
+        <div class="review-form">
+          <label for="reviewerName">Seu nome</label>
+          <input id="reviewerName" type="text" maxlength="80" autocomplete="name" placeholder="Ex.: Maria da Silva" />
+          <p class="field-help">Informe quem está fazendo a avaliação.</p>
+
+          <label>Avaliação da leitura</label>
+          <div class="stars-picker" id="starsPicker" role="radiogroup" aria-label="Avaliação de 1 a 5 estrelas">
+            <button class="star-btn" data-value="1" aria-label="1 estrela" type="button">★</button>
+            <button class="star-btn" data-value="2" aria-label="2 estrelas" type="button">★</button>
+            <button class="star-btn" data-value="3" aria-label="3 estrelas" type="button">★</button>
+            <button class="star-btn" data-value="4" aria-label="4 estrelas" type="button">★</button>
+            <button class="star-btn" data-value="5" aria-label="5 estrelas" type="button">★</button>
+          </div>
+
+          <label for="reviewComment">Comentário <span style="font-weight:600;color:#8293a4">(opcional)</span></label>
+          <textarea id="reviewComment" maxlength="600" placeholder="Conte o que achou da leitura, do áudio ou da experiência do estudante."></textarea>
         </div>
-        <div class="rating-result" id="ratingResult">Nenhuma avaliação registrada.</div>
+
+        <div class="rating-result" id="ratingResult">Escolha de 1 a 5 estrelas.</div>
         <button class="primary-btn" id="saveRating" disabled>Salvar avaliação</button>
-        <p class="rating-note">Nesta versão, a avaliação fica salva neste aparelho/navegador. Para centralizar todas as avaliações da rede, é necessário ligar esta página a um serviço seguro de gravação.</p>
+        <button class="secondary-wide" id="chooseAnotherReading" type="button">← Escolher outra leitura</button>
+        <p class="rating-note">A avaliação fica salva neste aparelho/navegador. Para reunir avaliações de diferentes famílias em um único painel, será necessário conectar a página a uma gravação segura.</p>
       </div>
     </section>
 
@@ -509,6 +568,7 @@
     let alunoAtual = null;
     let filtroAtual = "todas";
     let avaliacaoSelecionada = 0;
+    let leituraAtual = null;
 
     function normalizarTexto(v){ return String(v ?? "").trim(); }
     function escapar(texto){
@@ -579,6 +639,33 @@
         .sort((a,b)=>String(b.data??"").localeCompare(String(a.data??"")));
     }
 
+    function leituraId(leitura,index=0){
+      const existente = normalizarTexto(leitura.id ?? leitura.leituraId ?? leitura.leitura_id);
+      if(existente) return existente;
+      return [
+        valorAlunoId(leitura),
+        normalizarTexto(leitura.titulo).toLowerCase(),
+        normalizarTexto(leitura.autor).toLowerCase(),
+        normalizarTexto(leitura.data),
+        index
+      ].join("|");
+    }
+    function reviewsKey(){ return "leiturafy_reviews_v2"; }
+    function obterReviews(){
+      try{
+        const lista = JSON.parse(localStorage.getItem(reviewsKey()) || "[]");
+        return Array.isArray(lista) ? lista : [];
+      }catch(e){ return []; }
+    }
+    function salvarReviews(lista){
+      localStorage.setItem(reviewsKey(), JSON.stringify(lista));
+    }
+    function reviewDaLeitura(id){
+      if(!alunoAtual) return null;
+      const lista = obterReviews().filter(r=>String(r.alunoId)===String(alunoAtual.id) && String(r.leituraId)===String(id));
+      return lista.sort((a,b)=>String(b.data??"").localeCompare(String(a.data??"")))[0] || null;
+    }
+
     function preencherDropdown(){
       const ativos = alunos
         .filter(a=>a.ativo!==false)
@@ -637,7 +724,7 @@
         return;
       }
 
-      listaLeituras.innerHTML = filtradas.map(leitura=>{
+      listaLeituras.innerHTML = filtradas.map((leitura,index)=>{
         const titulo = escapar(leitura.titulo || "Livro sem título");
         const autor = escapar(leitura.autor || "Autor não informado");
         const status = statusNormalizado(leitura);
@@ -645,6 +732,8 @@
         const obs = escapar(leituraObservacao(leitura));
         const capa = resolverArquivo(leitura.capa,"dados/capas");
         const audio = resolverArquivo(leituraAudio(leitura),"dados/audios");
+        const id = leituraId(leitura,index);
+        const review = reviewDaLeitura(id);
         const coverInner = capa
           ? `<img src="${escapar(capa)}" alt="Capa de ${titulo}" onerror="this.remove();this.parentElement.textContent='📘';">`
           : "📘";
@@ -664,22 +753,71 @@
                 </div>
               </div>
             </div>
-            ${(obs||audio) ? `<div class="reading-extra">${obs ? `<p class="note">${obs}</p>` : ""}${audioHtml}</div>` : ""}
+            <div class="reading-extra">
+              ${obs ? `<p class="note">${obs}</p>` : ""}
+              ${audioHtml}
+              <div class="reading-actions">
+                <button class="rate-reading-btn" type="button" data-rate-reading="${escapar(id)}">⭐ Avaliar esta leitura</button>
+                ${review ? `<span class="saved-rating">Sua última avaliação: ${"★".repeat(Number(review.estrelas)||0)}</span>` : ""}
+              </div>
+            </div>
           </article>`;
       }).join("");
+
+      document.querySelectorAll("[data-rate-reading]").forEach(btn=>{
+        btn.addEventListener("click",()=>abrirAvaliacaoLeitura(btn.dataset.rateReading));
+      });
     }
 
-    function ratingKey(){ return alunoAtual ? `leiturafy_rating_${alunoAtual.id}` : ""; }
-    function carregarAvaliacao(){
-      avaliacaoSelecionada = Number(localStorage.getItem(ratingKey()) || 0);
-      $("ratingTitle").textContent = alunoAtual ? `Como você avalia ${alunoAtual.nome}?` : "Avaliar estudante";
-      atualizarEstrelas();
-      $("saveRating").disabled = !avaliacaoSelecionada;
-      if(avaliacaoSelecionada){
-        $("ratingResult").textContent = `Sua avaliação atual: ${avaliacaoSelecionada} ${avaliacaoSelecionada===1 ? "estrela" : "estrelas"}.`;
-      }else{
-        $("ratingResult").textContent = "Nenhuma avaliação registrada.";
+    function renderizarEscolhaAvaliacao(){
+      if(!alunoAtual) return;
+      const lista = leiturasDoAluno(alunoAtual.id);
+      $("ratingFormBox").classList.add("hidden");
+      $("ratingChooseBox").classList.remove("hidden");
+      if(!lista.length){
+        $("ratingChooser").innerHTML = '<div class="empty">Ainda não há leituras para avaliar.</div>';
+        return;
       }
+      $("ratingChooser").innerHTML = lista.map((l,index)=>{
+        const id=leituraId(l,index);
+        const review=reviewDaLeitura(id);
+        return `<button class="rating-choice" type="button" data-choose-reading="${escapar(id)}">
+          <div><strong>${escapar(l.titulo||"Livro sem título")}</strong><small>${escapar(l.autor||"Autor não informado")}</small></div>
+          <span>${review ? `${"★".repeat(Number(review.estrelas)||0)} Editar` : "Avaliar →"}</span>
+        </button>`;
+      }).join("");
+      document.querySelectorAll("[data-choose-reading]").forEach(btn=>{
+        btn.addEventListener("click",()=>abrirAvaliacaoLeitura(btn.dataset.chooseReading));
+      });
+    }
+
+    function abrirAvaliacaoLeitura(id){
+      const lista = leiturasDoAluno(alunoAtual.id);
+      leituraAtual = lista.find((l,index)=>String(leituraId(l,index))===String(id)) || null;
+      if(!leituraAtual) return;
+      const idx = lista.indexOf(leituraAtual);
+      const realId = leituraId(leituraAtual,idx);
+      const existente = reviewDaLeitura(realId);
+
+      $("ratingChooseBox").classList.add("hidden");
+      $("ratingFormBox").classList.remove("hidden");
+      $("ratingTitle").textContent = "Avaliar esta leitura";
+      $("selectedReading").innerHTML = `<strong>${escapar(leituraAtual.titulo||"Livro sem título")}</strong><small>${escapar(leituraAtual.autor||"Autor não informado")}</small>`;
+
+      avaliacaoSelecionada = Number(existente?.estrelas || 0);
+      $("reviewerName").value = existente?.avaliador || localStorage.getItem("leiturafy_reviewer_name") || "";
+      $("reviewComment").value = existente?.comentario || "";
+      atualizarEstrelas();
+      $("ratingResult").textContent = avaliacaoSelecionada ? `Avaliação atual: ${avaliacaoSelecionada} ${avaliacaoSelecionada===1?"estrela":"estrelas"}.` : "Escolha de 1 a 5 estrelas.";
+      validarFormularioAvaliacao();
+      abrirPagina("avaliar");
+    }
+
+    function carregarAvaliacao(){
+      leituraAtual = null;
+      avaliacaoSelecionada = 0;
+      atualizarEstrelas();
+      renderizarEscolhaAvaliacao();
     }
     function atualizarEstrelas(){
       document.querySelectorAll(".star-btn").forEach(btn=>{
@@ -692,15 +830,55 @@
       avaliacaoSelecionada = valor;
       atualizarEstrelas();
       $("ratingResult").textContent = `${valor} ${valor===1 ? "estrela selecionada" : "estrelas selecionadas"}.`;
-      $("saveRating").disabled = false;
+      validarFormularioAvaliacao();
+    }
+    function validarFormularioAvaliacao(){
+      const nome = normalizarTexto($("reviewerName")?.value);
+      $("saveRating").disabled = !(leituraAtual && avaliacaoSelecionada && nome);
     }
     function salvarAvaliacao(){
-      if(!alunoAtual || !avaliacaoSelecionada) return;
-      localStorage.setItem(ratingKey(), String(avaliacaoSelecionada));
+      if(!alunoAtual || !leituraAtual || !avaliacaoSelecionada) return;
+      const avaliador = normalizarTexto($("reviewerName").value);
+      if(!avaliador){
+        $("ratingResult").textContent = "Informe seu nome antes de salvar.";
+        $("reviewerName").focus();
+        return;
+      }
+      const listaAluno = leiturasDoAluno(alunoAtual.id);
+      const idx = listaAluno.indexOf(leituraAtual);
+      const idLeitura = leituraId(leituraAtual,idx);
+      const comentario = normalizarTexto($("reviewComment").value);
+      const reviews = obterReviews();
+      const registro = {
+        id: `${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+        alunoId: String(alunoAtual.id),
+        leituraId: String(idLeitura),
+        titulo: normalizarTexto(leituraAtual.titulo),
+        avaliador,
+        estrelas: avaliacaoSelecionada,
+        comentario,
+        data: new Date().toISOString()
+      };
+
+      const indice = reviews.findIndex(r =>
+        String(r.alunoId)===String(alunoAtual.id) &&
+        String(r.leituraId)===String(idLeitura) &&
+        normalizarTexto(r.avaliador).toLowerCase()===avaliador.toLowerCase()
+      );
+      if(indice>=0){
+        registro.id = reviews[indice].id || registro.id;
+        reviews[indice] = registro;
+      }else{
+        reviews.push(registro);
+      }
+      salvarReviews(reviews);
+      localStorage.setItem("leiturafy_reviewer_name",avaliador);
+
       $("ratingResult").textContent = `Avaliação salva: ${avaliacaoSelecionada} ${avaliacaoSelecionada===1 ? "estrela" : "estrelas"}.`;
       const btn = $("saveRating");
       const original = btn.textContent;
       btn.textContent = "✓ Avaliação salva";
+      renderizarLeituras();
       setTimeout(()=>btn.textContent=original,1300);
     }
 
@@ -715,7 +893,7 @@
       if(atualizarHash) history.replaceState(null,"",`#${nome}`);
       if(nome==="resumo") atualizarResumo();
       if(nome==="leituras") renderizarLeituras();
-      if(nome==="avaliar") carregarAvaliacao();
+      if(nome==="avaliar" && !leituraAtual) carregarAvaliacao();
       window.scrollTo({top:0,behavior:"smooth"});
     }
 
@@ -727,13 +905,14 @@
       atualizarStudentBars();
       atualizarResumo();
       renderizarLeituras();
-      carregarAvaliacao();
+      leituraAtual=null;
       abrirPagina("resumo");
     }
 
     function trocarAluno(){
       alunoAtual=null;
       avaliacaoSelecionada=0;
+      leituraAtual=null;
       alunoSelect.value="";
       entrarAluno.disabled=true;
       setNavEnabled(false);
@@ -784,6 +963,13 @@
       btn.addEventListener("click",()=>selecionarEstrela(Number(btn.dataset.value)));
     });
     $("saveRating").addEventListener("click",salvarAvaliacao);
+    $("reviewerName").addEventListener("input",validarFormularioAvaliacao);
+    $("chooseAnotherReading").addEventListener("click",()=>{
+      leituraAtual=null;
+      avaliacaoSelecionada=0;
+      renderizarEscolhaAvaliacao();
+      window.scrollTo({top:0,behavior:"smooth"});
+    });
 
     window.addEventListener("hashchange",()=>{
       const page=(location.hash||"#inicio").slice(1);
