@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LeituraFy • Administração</title>
+<style>
+:root{
+  --azul-950:#082c4c; --azul-900:#0f3c68; --azul-800:#12528d; --azul-700:#1976d2;
+  --azul-600:#2589e8; --azul-100:#eaf5ff; --azul-50:#f5faff; --borda:#d7e8f6;
+  --texto:#1d2b3a; --suave:#62758a; --branco:#fff; --verde:#16875f; --verde-bg:#e9f8f2;
+  --amarelo:#9b6700; --amarelo-bg:#fff5db; --vermelho:#b33a3a; --vermelho-bg:#fff0f0;
+  --sombra:0 16px 40px rgba(16,72,122,.12); --r:20px;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#fff 0,#eff8ff 100%);color:var(--texto);min-height:100vh}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.shell{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,var(--azul-950),var(--azul-900));color:#fff;padding:22px 17px;display:flex;flex-direction:column;z-index:20}
+.brand{display:flex;gap:12px;align-items:center;padding:6px 8px 24px}.brand-icon{width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#2d92ef,#72c8ff);display:grid;place-items:center;font-size:1.15rem;box-shadow:0 10px 22px rgba(0,0,0,.18)}.brand strong{font-size:1.18rem}.brand small{display:block;opacity:.72;margin-top:3px}
+.nav{display:grid;gap:8px}.nav button{border:0;text-align:left;color:rgba(255,255,255,.8);background:transparent;padding:12px 13px;border-radius:14px;font-weight:800;display:flex;align-items:center;gap:10px}.nav button:hover,.nav button.active{color:#fff;background:rgba(255,255,255,.14)}
+.side-status{margin-top:auto;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);border-radius:16px;padding:13px;font-size:.86rem;line-height:1.4}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#f4c15d;margin-right:6px}.dot.ok{background:#4de0a9}.side-status b{display:block;margin-bottom:4px}.side-status span{opacity:.78}
+.main{min-width:0}.topbar{height:76px;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--borda);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:10}.topbar h1{font-size:1.2rem;color:var(--azul-900);margin:0}.top-actions{display:flex;gap:10px;align-items:center}.sync-pill{border:1px solid var(--borda);background:#fff;border-radius:999px;padding:8px 12px;color:var(--suave);font-size:.86rem;font-weight:800}
+.content{width:min(1180px,calc(100% - 40px));margin:26px auto 50px}.page{display:none}.page.active{display:block}.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:20px}.page-head h2{margin:0;color:var(--azul-900);font-size:clamp(1.6rem,3vw,2.2rem)}.page-head p{margin:6px 0 0;color:var(--suave);line-height:1.5}.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:0;border-radius:14px;padding:11px 15px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.18s}.btn:hover{transform:translateY(-1px)}.btn-primary{background:var(--azul-700);color:#fff;box-shadow:0 9px 20px rgba(25,118,210,.2)}.btn-light{background:#fff;color:var(--azul-700);border:1px solid var(--borda)}.btn-danger{background:var(--vermelho-bg);color:var(--vermelho);border:1px solid #ffd1d1}.btn-sm{padding:8px 11px;border-radius:11px;font-size:.85rem}.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.grid-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}.stat{background:#fff;border:1px solid var(--borda);border-radius:var(--r);padding:19px;box-shadow:0 10px 25px rgba(22,92,150,.07)}.stat .kicker{color:var(--suave);font-weight:800;font-size:.83rem}.stat strong{display:block;color:var(--azul-700);font-size:2rem;margin-top:7px}.stat small{color:var(--suave)}
+.card{background:#fff;border:1px solid var(--borda);border-radius:var(--r);box-shadow:0 10px 28px rgba(22,92,150,.08);overflow:hidden}.card-head{padding:18px 20px;border-bottom:1px solid var(--borda);display:flex;align-items:center;justify-content:space-between;gap:15px}.card-head h3{margin:0;color:var(--azul-900)}.card-body{padding:20px}.two-col{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.quick button{text-align:left;border:1px solid var(--borda);background:var(--azul-50);border-radius:16px;padding:16px;color:var(--azul-900)}.quick button b{display:block;margin-bottom:4px}.quick button span{font-size:.84rem;color:var(--suave);line-height:1.4}.quick button:hover{border-color:#a8d2f4;background:#edf7ff}
+.status-list{display:grid;gap:10px}.status-row{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #edf3f8}.status-row:last-child{border-bottom:0}.status-row span{color:var(--suave)}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.full{grid-column:1/-1}.field label{display:block;font-size:.86rem;font-weight:900;color:var(--azul-900);margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--borda);border-radius:13px;padding:11px 12px;background:#fbfdff;color:var(--texto);outline:0}.field textarea{min-height:100px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--azul-700);box-shadow:0 0 0 4px rgba(25,118,210,.11)}.hint{font-size:.78rem;color:var(--suave);margin-top:5px;line-height:1.4}.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.search{min-width:220px;flex:1;position:relative}.search input{width:100%;border:1px solid var(--borda);border-radius:13px;padding:10px 12px 10px 36px;background:#fff}.search span{position:absolute;left:12px;top:9px;color:var(--suave)}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:760px}.table th{font-size:.78rem;text-align:left;color:var(--suave);padding:11px 13px;background:#f8fbfe;border-bottom:1px solid var(--borda)}.table td{padding:12px 13px;border-bottom:1px solid #edf3f8;vertical-align:middle}.table tr:last-child td{border-bottom:0}.table strong{color:var(--azul-900)}.muted{color:var(--suave);font-size:.84rem}.tag{display:inline-flex;align-items:center;border-radius:999px;padding:6px 9px;font-size:.75rem;font-weight:900}.tag.ok{background:var(--verde-bg);color:var(--verde)}.tag.warn{background:var(--amarelo-bg);color:var(--amarelo)}.tag.off{background:#edf1f5;color:#677483}.row-actions{display:flex;gap:6px;flex-wrap:wrap}
+.empty{padding:34px;text-align:center;color:var(--suave)}.empty strong{display:block;color:var(--azul-900);margin-bottom:6px}
+.alert{border-radius:15px;padding:12px 14px;margin-bottom:16px;font-size:.88rem;line-height:1.5;border:1px solid}.alert.info{background:var(--azul-50);border-color:#cfe7fa;color:#265c87}.alert.ok{background:var(--verde-bg);border-color:#bce7d5;color:#176b50}.alert.error{background:var(--vermelho-bg);border-color:#ffd1d1;color:#963838}.alert.warn{background:var(--amarelo-bg);border-color:#f5dfa9;color:#7d5805}.hidden{display:none!important}
+.progress{height:7px;background:#edf3f8;border-radius:999px;overflow:hidden;margin-top:10px}.progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--azul-700),#65b8f4);transition:.25s}.file-preview{display:flex;gap:10px;align-items:center;margin-top:8px;padding:9px 10px;background:var(--azul-50);border-radius:11px;color:var(--suave);font-size:.82rem}.file-preview img{width:44px;height:44px;object-fit:cover;border-radius:9px}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(6,38,65,.65);z-index:100;padding:18px;align-items:center;justify-content:center}.modal-bg.show{display:flex}.modal{background:#fff;width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:24px;box-shadow:0 30px 90px rgba(0,0,0,.3)}.modal-head{padding:20px 22px;background:linear-gradient(135deg,var(--azul-900),var(--azul-700));color:#fff;display:flex;justify-content:space-between;gap:10px;align-items:center}.modal-head h3{margin:0}.close{border:0;background:rgba(255,255,255,.16);color:#fff;border-radius:11px;padding:8px 10px;font-weight:900}.modal-body{padding:20px 22px}
+.mobile-toggle{display:none;border:0;background:var(--azul-100);color:var(--azul-900);border-radius:12px;padding:9px 11px;font-weight:900}
+.toast-wrap{position:fixed;right:18px;bottom:18px;z-index:200;display:grid;gap:8px;max-width:min(380px,calc(100vw - 36px))}.toast{background:#fff;border:1px solid var(--borda);border-radius:14px;padding:12px 14px;box-shadow:var(--sombra);font-size:.88rem;line-height:1.4}.toast.ok{border-left:5px solid var(--verde)}.toast.error{border-left:5px solid var(--vermelho)}
+@media(max-width:980px){.shell{grid-template-columns:1fr}.sidebar{position:fixed;left:-280px;width:260px;transition:.25s}.sidebar.open{left:0}.topbar{padding:0 18px}.mobile-toggle{display:inline-flex}.content{width:min(100% - 28px,1180px)}.grid-stats{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}}
+@media(max-width:640px){.grid-stats,.form-grid,.quick{grid-template-columns:1fr}.full{grid-column:auto}.page-head{align-items:flex-start;flex-direction:column}.top-actions .sync-pill{display:none}.content{width:min(100% - 20px,1180px);margin-top:16px}.card-body{padding:15px}.card-head{padding:15px}.stat{padding:15px}.actions,.form-actions{width:100%}.actions .btn,.form-actions .btn{flex:1}.toolbar{align-items:stretch}.search{min-width:100%}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-icon">▶</div><div><strong>LeituraFy</strong><small>Painel administrativo</small></div></div>
+    <div class="nav">
+      <button class="active" data-page="resumo">⌂ Resumo</button>
+      <button data-page="alunos">👤 Alunos</button>
+      <button data-page="leituras">📚 Leituras</button>
+      <button data-page="github">⚙ GitHub</button>
+    </div>
+    <div class="side-status"><b><span class="dot" id="sideDot"></span><span id="sideTitle">GitHub não conectado</span></b><span id="sideText">Configure o repositório para salvar os dados.</span></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:10px"><button class="mobile-toggle" id="menuBtn">☰</button><h1 id="topTitle">Resumo</h1></div>
+      <div class="top-actions"><span class="sync-pill" id="lastSync">Sem sincronização</span><button class="btn btn-light btn-sm" id="btnRefresh">↻ Atualizar</button></div>
+    </header>
+
+    <div class="content">
+      <section class="page active" id="page-resumo">
+        <div class="page-head"><div><h2>Visão geral</h2><p>Acompanhe os cadastros e o estado dos arquivos da pasta <b>dados</b>.</p></div><div class="actions"><button class="btn btn-primary" onclick="irPara('leituras');novoRegistroLeitura()">+ Nova leitura</button></div></div>
+        <div id="globalAlert"></div>
+        <div class="grid-stats">
+          <div class="stat"><span class="kicker">ALUNOS</span><strong id="statAlunos">0</strong><small>estudantes cadastrados</small></div>
+          <div class="stat"><span class="kicker">ATIVOS</span><strong id="statAtivos">0</strong><small>visíveis aos responsáveis</small></div>
+          <div class="stat"><span class="kicker">LEITURAS</span><strong id="statLeituras">0</strong><small>registros no histórico</small></div>
+          <div class="stat"><span class="kicker">ÁUDIOS</span><strong id="statAudios">0</strong><small>leituras com áudio</small></div>
+        </div>
+        <div class="two-col">
+          <div class="card"><div class="card-head"><h3>Ações rápidas</h3></div><div class="card-body quick">
+            <button onclick="irPara('alunos');novoAluno()"><b>+ Cadastrar aluno</b><span>Adicione um estudante ao arquivo dados/alunos.json.</span></button>
+            <button onclick="irPara('leituras');novoRegistroLeitura()"><b>+ Registrar leitura</b><span>Escolha o aluno e vincule livro, avaliação, áudio e capa.</span></button>
+            <button onclick="irPara('github')"><b>⚙ Configurar GitHub</b><span>Defina usuário, repositório, branch e token de acesso.</span></button>
+            <button onclick="sincronizarTudo()"><b>↻ Sincronizar dados</b><span>Baixe novamente alunos.json e leituras.json do repositório.</span></button>
+          </div></div>
+          <div class="card"><div class="card-head"><h3>Arquivos utilizados</h3></div><div class="card-body status-list">
+            <div class="status-row"><span>dados/alunos.json</span><b id="fileAlunosStatus">—</b></div>
+            <div class="status-row"><span>dados/leituras.json</span><b id="fileLeiturasStatus">—</b></div>
+            <div class="status-row"><span>dados/audios/</span><b>mídias</b></div>
+            <div class="status-row"><span>dados/capas/</span><b>imagens</b></div>
+          </div></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-alunos">
+        <div class="page-head"><div><h2>Alunos</h2><p>Cadastre os estudantes que aparecerão no dropdown da página dos responsáveis.</p></div><div class="actions"><button class="btn btn-primary" onclick="novoAluno()">+ Novo aluno</button></div></div>
+        <div class="card">
+          <div class="card-head"><div class="toolbar" style="width:100%"><div class="search"><span>⌕</span><input id="buscaAluno" placeholder="Buscar por nome, turma ou escola"></div><select id="filtroAlunoAtivo" style="border:1px solid var(--borda);border-radius:13px;padding:10px 12px;background:#fff"><option value="todos">Todos</option><option value="ativos">Ativos</option><option value="inativos">Inativos</option></select></div></div>
+          <div class="table-wrap"><table class="table"><thead><tr><th>ALUNO</th><th>TURMA</th><th>ESCOLA</th><th>STATUS</th><th>AÇÕES</th></tr></thead><tbody id="tabelaAlunos"></tbody></table><div class="empty hidden" id="emptyAlunos"><strong>Nenhum aluno encontrado.</strong>Cadastre o primeiro estudante para começar.</div></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-leituras">
+        <div class="page-head"><div><h2>Leituras</h2><p>Registre as leituras e vincule os áudios produzidos pelos estudantes.</p></div><div class="actions"><button class="btn btn-primary" onclick="novoRegistroLeitura()">+ Nova leitura</button></div></div>
+        <div class="card">
+          <div class="card-head"><div class="toolbar" style="width:100%"><div class="search"><span>⌕</span><input id="buscaLeitura" placeholder="Buscar por aluno, livro ou autor"></div><select id="filtroLeituraAluno" style="border:1px solid var(--borda);border-radius:13px;padding:10px 12px;background:#fff"><option value="todos">Todos os alunos</option></select></div></div>
+          <div class="table-wrap"><table class="table"><thead><tr><th>LIVRO</th><th>ALUNO</th><th>STATUS</th><th>DATA</th><th>MÍDIA</th><th>AÇÕES</th></tr></thead><tbody id="tabelaLeituras"></tbody></table><div class="empty hidden" id="emptyLeituras"><strong>Nenhuma leitura encontrada.</strong>Registre a primeira leitura dos estudantes.</div></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-github">
+        <div class="page-head"><div><h2>Integração com GitHub</h2><p>Todos os dados serão gravados na pasta <b>dados</b> do repositório informado.</p></div></div>
+        <div class="alert warn"><b>Segurança:</b> o token não é escrito dentro deste HTML. Ele fica apenas nesta sessão do navegador. Use de preferência um token refinado limitado a este repositório, com permissão de escrita em <b>Contents</b>.</div>
+        <div class="card"><div class="card-head"><h3>Configuração do repositório</h3></div><div class="card-body">
+          <form id="formGithub" class="form-grid">
+            <div class="field"><label>Usuário ou organização</label><input id="ghOwner" required placeholder="Ex: mayckonjhonatas"></div>
+            <div class="field"><label>Repositório</label><input id="ghRepo" required placeholder="Ex: leiturafy"></div>
+            <div class="field"><label>Branch</label><input id="ghBranch" required value="main"></div>
+            <div class="field"><label>Token do GitHub</label><input id="ghToken" type="password" autocomplete="off" placeholder="github_pat_..."><div class="hint">O token é mantido apenas na sessão atual.</div></div>
+            <div class="full form-actions"><button class="btn btn-primary" type="submit">✓ Salvar e testar conexão</button><button class="btn btn-light" type="button" onclick="limparToken()">Limpar token</button></div>
+          </form>
+          <div id="githubResult" style="margin-top:16px"></div>
+        </div></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="modal-bg" id="modalAluno"><div class="modal"><div class="modal-head"><h3 id="tituloModalAluno">Novo aluno</h3><button class="close" onclick="fecharModal('modalAluno')">✕</button></div><div class="modal-body">
+<form id="formAluno" class="form-grid">
+  <input type="hidden" id="alunoId">
+  <div class="field full"><label>Nome do aluno *</label><input id="alunoNome" required placeholder="Nome completo"></div>
+  <div class="field"><label>Turma *</label><input id="alunoTurma" required placeholder="Ex: 5º ano A"></div>
+  <div class="field"><label>Escola</label><input id="alunoEscola" placeholder="Ex: Escola Municipal José Rufino"></div>
+  <div class="field"><label>Status</label><select id="alunoAtivo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
+  <div class="field"><label>Código interno (opcional)</label><input id="alunoCodigo" placeholder="Ex: 00125"></div>
+  <div class="full form-actions"><button class="btn btn-primary" type="submit">Salvar aluno</button><button class="btn btn-light" type="button" onclick="fecharModal('modalAluno')">Cancelar</button></div>
+</form></div></div></div>
+
+<div class="modal-bg" id="modalLeitura"><div class="modal"><div class="modal-head"><h3 id="tituloModalLeitura">Nova leitura</h3><button class="close" onclick="fecharModal('modalLeitura')">✕</button></div><div class="modal-body">
+<form id="formLeitura" class="form-grid">
+  <input type="hidden" id="leituraId">
+  <div class="field full"><label>Aluno *</label><select id="leituraAluno" required><option value="">Selecione o estudante</option></select></div>
+  <div class="field"><label>Título do livro *</label><input id="leituraTitulo" required placeholder="Ex: O Pequeno Príncipe"></div>
+  <div class="field"><label>Autor</label><input id="leituraAutor" placeholder="Autor da obra"></div>
+  <div class="field"><label>Status *</label><select id="leituraStatus"><option value="Lido">Concluída</option><option value="Lendo">Em andamento</option><option value="Desejado">Desejado</option></select></div>
+  <div class="field"><label>Data</label><input id="leituraData" type="date"></div>
+  <div class="field"><label>Avaliação</label><select id="leituraAvaliacao"><option value="">Sem avaliação</option><option value="5">★★★★★</option><option value="4">★★★★</option><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option></select></div>
+  <div class="field"><label>Áudio do aluno</label><input id="leituraAudio" type="file" accept="audio/*"><div class="hint">MP3, M4A, OGG, WAV ou outro formato aceito pelo navegador.</div><div id="audioAtual" class="file-preview hidden"></div></div>
+  <div class="field"><label>Capa do livro</label><input id="leituraCapa" type="file" accept="image/*"><div class="hint">Opcional. A imagem será salva em dados/capas/.</div><div id="capaAtual" class="file-preview hidden"></div></div>
+  <div class="field full"><label>Observação ou recomendação</label><textarea id="leituraObs" placeholder="Resumo, comentário ou orientação para a família"></textarea></div>
+  <div class="full"><div id="saveProgressBox" class="hidden"><div class="muted" id="saveProgressText">Salvando...</div><div class="progress"><span id="saveProgressBar"></span></div></div></div>
+  <div class="full form-actions"><button class="btn btn-primary" id="btnSalvarLeitura" type="submit">Salvar leitura</button><button class="btn btn-light" type="button" onclick="fecharModal('modalLeitura')">Cancelar</button></div>
+</form></div></div></div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<script>
+const GH_API_VERSION = "2026-03-10";
+const PATH_ALUNOS = "dados/alunos.json";
+const PATH_LEITURAS = "dados/leituras.json";
+let alunos = [];
+let leituras = [];
+let conectado = false;
+
+const $ = id => document.getElementById(id);
+const normal = v => String(v ?? "").trim();
+const hoje = () => new Date().toISOString().slice(0,10);
+
+function toast(msg,tipo="ok"){
+  const e=document.createElement("div"); e.className=`toast ${tipo}`; e.textContent=msg; $("toastWrap").appendChild(e); setTimeout(()=>e.remove(),4200);
+}
+function alertBox(tipo,html){ return `<div class="alert ${tipo}">${html}</div>`; }
+function escapar(v){ return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+function gerarId(prefixo){ return `${prefixo}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,7)}`; }
+function slug(v){ return normal(v).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,45)||"arquivo"; }
+function config(){ return {owner:normal($("ghOwner").value),repo:normal($("ghRepo").value),branch:normal($("ghBranch").value)||"main",token:normal($("ghToken").value)}; }
+function salvarConfigLocal(){ const c=config(); localStorage.setItem("leiturafyGhConfig",JSON.stringify({owner:c.owner,repo:c.repo,branch:c.branch})); if(c.token) sessionStorage.setItem("leiturafyGhToken",c.token); }
+function carregarConfig(){ try{const c=JSON.parse(localStorage.getItem("leiturafyGhConfig")||"{}"); $("ghOwner").value=c.owner||"";$("ghRepo").value=c.repo||"";$("ghBranch").value=c.branch||"main";}catch{} $("ghToken").value=sessionStorage.getItem("leiturafyGhToken")||""; }
+function apiUrl(path){ const c=config(); return `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${path.split("/").map(encodeURIComponent).join("/")}`; }
+function headers(auth=true){ const c=config(); const h={"Accept":"application/vnd.github+json","X-GitHub-Api-Version":GH_API_VERSION}; if(auth&&c.token) h.Authorization=`Bearer ${c.token}`; return h; }
+function utf8ToBase64(str){ const bytes=new TextEncoder().encode(str); let bin=""; const step=0x8000; for(let i=0;i<bytes.length;i+=step) bin+=String.fromCharCode(...bytes.subarray(i,i+step)); return btoa(bin); }
+function base64ToUtf8(b64){ const bin=atob(b64.replace(/\n/g,"")); const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0)); return new TextDecoder().decode(bytes); }
+async function fileToBase64(file){ const buf=await file.arrayBuffer(); const bytes=new Uint8Array(buf); let bin=""; const step=0x8000; for(let i=0;i<bytes.length;i+=step) bin+=String.fromCharCode(...bytes.subarray(i,i+step)); return btoa(bin); }
+function ensureConfig(){ const c=config(); if(!c.owner||!c.repo||!c.branch||!c.token){ irPara("github"); throw new Error("Configure usuário, repositório, branch e token do GitHub antes de salvar."); } return c; }
+async function ghGet(path){ const c=ensureConfig(); const r=await fetch(`${apiUrl(path)}?ref=${encodeURIComponent(c.branch)}`,{headers:headers()}); if(r.status===404) return null; if(!r.ok){ const t=await r.text(); throw new Error(`GitHub respondeu ${r.status}: ${t.slice(0,180)}`); } return r.json(); }
+async function ghPut(path,contentB64,message,sha=null){ const c=ensureConfig(); const body={message,content:contentB64,branch:c.branch}; if(sha) body.sha=sha; const r=await fetch(apiUrl(path),{method:"PUT",headers:{...headers(),"Content-Type":"application/json"},body:JSON.stringify(body)}); if(!r.ok){ const t=await r.text(); throw new Error(`Falha ao salvar ${path} (${r.status}): ${t.slice(0,220)}`); } return r.json(); }
+async function ghDelete(path,message){ const c=ensureConfig(); const atual=await ghGet(path); if(!atual) return; const r=await fetch(apiUrl(path),{method:"DELETE",headers:{...headers(),"Content-Type":"application/json"},body:JSON.stringify({message,sha:atual.sha,branch:c.branch})}); if(!r.ok){const t=await r.text();throw new Error(`Falha ao apagar ${path} (${r.status}): ${t.slice(0,180)}`);} }
+async function lerJsonGh(path){ const f=await ghGet(path); if(!f) return {dados:[],sha:null}; const txt=base64ToUtf8(f.content||""); const dados=JSON.parse(txt||"[]"); if(!Array.isArray(dados)) throw new Error(`${path} precisa conter uma lista JSON.`); return {dados,sha:f.sha}; }
+async function salvarJsonGh(path,dados,message){ const atual=await ghGet(path); return ghPut(path,utf8ToBase64(JSON.stringify(dados,null,2)+"\n"),message,atual?.sha||null); }
+
+function irPara(page){ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); $(`page-${page}`).classList.add("active"); document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page)); const nomes={resumo:"Resumo",alunos:"Alunos",leituras:"Leituras",github:"GitHub"}; $("topTitle").textContent=nomes[page]||"LeituraFy"; $("sidebar").classList.remove("open"); }
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>irPara(b.dataset.page)));
+$("menuBtn").onclick=()=>$("sidebar").classList.toggle("open");
+function abrirModal(id){ $(id).classList.add("show"); }
+function fecharModal(id){ $(id).classList.remove("show"); }
+document.querySelectorAll(".modal-bg").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("show")}));
+
+function atualizarEstadoConexao(ok,texto=""){
+  conectado=ok; $("sideDot").classList.toggle("ok",ok); $("sideTitle").textContent=ok?"GitHub conectado":"GitHub não conectado"; $("sideText").textContent=ok?(texto||"Dados prontos para edição."):"Configure o repositório para salvar os dados.";
+}
+function formatarData(v){ if(!v)return"—"; const m=String(v).match(/^(\d{4})-(\d{2})-(\d{2})/); return m?`${m[3]}/${m[2]}/${m[1]}`:v; }
+function nomeAluno(id){ return alunos.find(a=>String(a.id)===String(id))?.nome||"Aluno não encontrado"; }
+function atualizarStats(){ $("statAlunos").textContent=alunos.length; $("statAtivos").textContent=alunos.filter(a=>a.ativo!==false).length; $("statLeituras").textContent=leituras.length; $("statAudios").textContent=leituras.filter(l=>normal(l.audio)||(l.tipoMidia==="audio"&&normal(l.midia))).length; $("fileAlunosStatus").textContent=`${alunos.length} registros`; $("fileLeiturasStatus").textContent=`${leituras.length} registros`; }
+function preencherSelects(){
+  const opts=alunos.filter(a=>a.ativo!==false).sort((a,b)=>normal(a.nome).localeCompare(normal(b.nome),"pt-BR")).map(a=>`<option value="${escapar(a.id)}">${escapar(a.nome)} — ${escapar(a.turma||"")}</option>`).join("");
+  $("leituraAluno").innerHTML='<option value="">Selecione o estudante</option>'+opts;
+  $("filtroLeituraAluno").innerHTML='<option value="todos">Todos os alunos</option>'+opts;
+}
+function renderAlunos(){
+  const q=normal($("buscaAluno").value).toLowerCase(), f=$("filtroAlunoAtivo").value;
+  const lista=alunos.filter(a=>{const ativo=a.ativo!==false; if(f==="ativos"&&!ativo)return false;if(f==="inativos"&&ativo)return false; return !q||[a.nome,a.turma,a.escola,a.codigo].some(v=>normal(v).toLowerCase().includes(q));}).sort((a,b)=>normal(a.nome).localeCompare(normal(b.nome),"pt-BR"));
+  $("tabelaAlunos").innerHTML=lista.map(a=>`<tr><td><strong>${escapar(a.nome)}</strong><div class="muted">ID: ${escapar(a.id)}</div></td><td>${escapar(a.turma||"—")}</td><td>${escapar(a.escola||"—")}</td><td><span class="tag ${a.ativo!==false?"ok":"off"}">${a.ativo!==false?"Ativo":"Inativo"}</span></td><td><div class="row-actions"><button class="btn btn-light btn-sm" onclick="editarAluno('${escapar(a.id)}')">Editar</button><button class="btn btn-danger btn-sm" onclick="excluirAluno('${escapar(a.id)}')">Excluir</button></div></td></tr>`).join("");
+  $("emptyAlunos").classList.toggle("hidden",lista.length>0);
+}
+function statusTag(l){ const s=normal(l.status).toLowerCase(); if(["lido","concluída","concluida","finalizada"].includes(s))return'<span class="tag ok">Concluída</span>'; if(["lendo","em andamento","andamento"].includes(s))return'<span class="tag warn">Em andamento</span>'; return `<span class="tag off">${escapar(l.status||"Registrada")}</span>`; }
+function renderLeituras(){
+  const q=normal($("buscaLeitura").value).toLowerCase(), fa=$("filtroLeituraAluno").value;
+  const lista=leituras.filter(l=>{if(fa!=="todos"&&String(l.alunoId)!==String(fa))return false; const n=nomeAluno(l.alunoId);return !q||[l.titulo,l.autor,n].some(v=>normal(v).toLowerCase().includes(q));}).sort((a,b)=>normal(b.data).localeCompare(normal(a.data))||normal(b.createdAt).localeCompare(normal(a.createdAt)));
+  $("tabelaLeituras").innerHTML=lista.map(l=>{const aud=normal(l.audio)||(l.tipoMidia==="audio"?normal(l.midia):"");return `<tr><td><strong>${escapar(l.titulo||"Sem título")}</strong><div class="muted">${escapar(l.autor||"Autor não informado")}</div></td><td>${escapar(nomeAluno(l.alunoId))}</td><td>${statusTag(l)}</td><td>${escapar(formatarData(l.data))}</td><td>${aud?"🎧 Áudio":"—"}${normal(l.capa)?" &nbsp;🖼️":""}</td><td><div class="row-actions"><button class="btn btn-light btn-sm" onclick="editarLeitura('${escapar(l.id)}')">Editar</button><button class="btn btn-danger btn-sm" onclick="excluirLeitura('${escapar(l.id)}')">Excluir</button></div></td></tr>`}).join("");
+  $("emptyLeituras").classList.toggle("hidden",lista.length>0);
+}
+function renderTudo(){ atualizarStats(); preencherSelects(); renderAlunos(); renderLeituras(); }
+
+async function sincronizarTudo(silencioso=false){
+  try{ ensureConfig(); if(!silencioso) $("globalAlert").innerHTML=alertBox("info","Sincronizando dados com o GitHub..."); const [a,l]=await Promise.all([lerJsonGh(PATH_ALUNOS),lerJsonGh(PATH_LEITURAS)]); alunos=a.dados; leituras=l.dados; renderTudo(); atualizarEstadoConexao(true,`${config().owner}/${config().repo} • ${config().branch}`); $("lastSync").textContent=`Atualizado ${new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}`; if(!silencioso) $("globalAlert").innerHTML=alertBox("ok","Dados sincronizados com sucesso."); return true;
+  }catch(e){ atualizarEstadoConexao(false); if(!silencioso) $("globalAlert").innerHTML=alertBox("error",escapar(e.message)); return false; }
+}
+$("btnRefresh").onclick=()=>sincronizarTudo();
+
+function novoAluno(){ $("formAluno").reset(); $("alunoId").value=""; $("alunoAtivo").value="true"; $("tituloModalAluno").textContent="Novo aluno"; abrirModal("modalAluno"); }
+function editarAluno(id){ const a=alunos.find(x=>String(x.id)===String(id)); if(!a)return; $("alunoId").value=a.id; $("alunoNome").value=a.nome||""; $("alunoTurma").value=a.turma||""; $("alunoEscola").value=a.escola||""; $("alunoAtivo").value=String(a.ativo!==false); $("alunoCodigo").value=a.codigo||""; $("tituloModalAluno").textContent="Editar aluno"; abrirModal("modalAluno"); }
+$("formAluno").addEventListener("submit",async e=>{
+  e.preventDefault(); try{ ensureConfig(); const id=normal($("alunoId").value)||gerarId("alu"); const reg={id,nome:normal($("alunoNome").value),turma:normal($("alunoTurma").value),escola:normal($("alunoEscola").value),ativo:$("alunoAtivo").value==="true",codigo:normal($("alunoCodigo").value),updatedAt:new Date().toISOString()}; const atual=await lerJsonGh(PATH_ALUNOS); const i=atual.dados.findIndex(a=>String(a.id)===String(id)); if(i>=0) reg.createdAt=atual.dados[i].createdAt||reg.updatedAt; else reg.createdAt=reg.updatedAt; if(i>=0) atual.dados[i]={...atual.dados[i],...reg}; else atual.dados.push(reg); await salvarJsonGh(PATH_ALUNOS,atual.dados,`${i>=0?"Atualiza":"Cadastra"} aluno ${reg.nome}`); alunos=atual.dados; fecharModal("modalAluno"); renderTudo(); toast("Aluno salvo no GitHub.");
+  }catch(err){toast(err.message,"error");}
+});
+async function excluirAluno(id){ const a=alunos.find(x=>String(x.id)===String(id)); if(!a)return; const qtd=leituras.filter(l=>String(l.alunoId)===String(id)).length; const msg=qtd?`O aluno ${a.nome} possui ${qtd} leitura(s). Excluir o aluno não apagará automaticamente essas leituras. Continuar?`:`Excluir ${a.nome}?`; if(!confirm(msg))return; try{const atual=await lerJsonGh(PATH_ALUNOS); const nova=atual.dados.filter(x=>String(x.id)!==String(id)); await salvarJsonGh(PATH_ALUNOS,nova,`Remove aluno ${a.nome}`); alunos=nova;renderTudo();toast("Aluno removido.");}catch(e){toast(e.message,"error");}}
+
+function novoRegistroLeitura(){ $("formLeitura").reset(); $("leituraId").value=""; $("leituraData").value=hoje(); $("tituloModalLeitura").textContent="Nova leitura"; $("audioAtual").classList.add("hidden"); $("capaAtual").classList.add("hidden"); $("saveProgressBox").classList.add("hidden"); abrirModal("modalLeitura"); }
+function editarLeitura(id){ const l=leituras.find(x=>String(x.id)===String(id)); if(!l)return; $("formLeitura").reset(); $("leituraId").value=l.id; $("leituraAluno").value=l.alunoId||""; $("leituraTitulo").value=l.titulo||""; $("leituraAutor").value=l.autor||""; $("leituraStatus").value=l.status||"Lido"; $("leituraData").value=normal(l.data).slice(0,10); $("leituraAvaliacao").value=String(l.avaliacao??l.estrelas??""); $("leituraObs").value=l.observacao??l.resumo??""; const aud=normal(l.audio)||(l.tipoMidia==="audio"?normal(l.midia):""); if(aud){$("audioAtual").innerHTML=`🎧 Arquivo atual: <b>${escapar(aud)}</b>`;$("audioAtual").classList.remove("hidden")}else $("audioAtual").classList.add("hidden"); if(normal(l.capa)){$("capaAtual").innerHTML=`🖼️ Capa atual: <b>${escapar(l.capa)}</b>`;$("capaAtual").classList.remove("hidden")}else $("capaAtual").classList.add("hidden"); $("tituloModalLeitura").textContent="Editar leitura"; $("saveProgressBox").classList.add("hidden"); abrirModal("modalLeitura"); }
+function setProgress(p,text){ $("saveProgressBox").classList.remove("hidden"); $("saveProgressBar").style.width=`${p}%`; $("saveProgressText").textContent=text; }
+async function subirArquivo(file,pasta,alunoId){ if(!file)return""; const ext=(file.name.split(".").pop()||"bin").toLowerCase().replace(/[^a-z0-9]/g,""); const base=file.name.replace(/\.[^.]+$/g,""); const nome=`${slug(alunoId)}_${Date.now()}_${slug(base)}.${ext}`; const path=`${pasta}/${nome}`; const b64=await fileToBase64(file); await ghPut(path,b64,`Adiciona mídia ${nome}`); return nome; }
+$("formLeitura").addEventListener("submit",async e=>{
+  e.preventDefault(); const btn=$("btnSalvarLeitura"); btn.disabled=true;
+  try{
+    ensureConfig(); setProgress(8,"Preparando registro..."); const id=normal($("leituraId").value)||gerarId("lei"); const atual=await lerJsonGh(PATH_LEITURAS); const idx=atual.dados.findIndex(l=>String(l.id)===String(id)); const antigo=idx>=0?atual.dados[idx]:{}; const alunoId=$("leituraAluno").value; let audio=normal(antigo.audio)||(antigo.tipoMidia==="audio"?normal(antigo.midia):""); let capa=normal(antigo.capa);
+    const audioFile=$("leituraAudio").files[0]; const capaFile=$("leituraCapa").files[0];
+    if(audioFile){setProgress(25,"Enviando áudio para dados/audios/..."); audio=await subirArquivo(audioFile,"dados/audios",alunoId);}
+    if(capaFile){setProgress(55,"Enviando capa para dados/capas/..."); capa=await subirArquivo(capaFile,"dados/capas",alunoId);}
+    const agora=new Date().toISOString(); const reg={id,alunoId,titulo:normal($("leituraTitulo").value),autor:normal($("leituraAutor").value),status:$("leituraStatus").value,data:$("leituraData").value,avaliacao:$("leituraAvaliacao").value?Number($("leituraAvaliacao").value):null,observacao:normal($("leituraObs").value),audio,capa,updatedAt:agora,createdAt:antigo.createdAt||agora};
+    if(idx>=0) atual.dados[idx]={...antigo,...reg}; else atual.dados.unshift(reg); setProgress(78,"Atualizando dados/leituras.json..."); await salvarJsonGh(PATH_LEITURAS,atual.dados,`${idx>=0?"Atualiza":"Registra"} leitura ${reg.titulo}`); leituras=atual.dados; setProgress(100,"Concluído."); renderTudo(); setTimeout(()=>fecharModal("modalLeitura"),350); toast("Leitura salva no GitHub.");
+  }catch(err){toast(err.message,"error"); setProgress(0,"Não foi possível concluir o salvamento.");}finally{btn.disabled=false;}
+});
+async function excluirLeitura(id){ const l=leituras.find(x=>String(x.id)===String(id)); if(!l)return; if(!confirm(`Excluir o registro “${l.titulo}” de ${nomeAluno(l.alunoId)}?\n\nOs arquivos de áudio/capa vinculados não serão apagados automaticamente.`))return; try{const atual=await lerJsonGh(PATH_LEITURAS);const nova=atual.dados.filter(x=>String(x.id)!==String(id));await salvarJsonGh(PATH_LEITURAS,nova,`Remove leitura ${l.titulo}`);leituras=nova;renderTudo();toast("Leitura removida.");}catch(e){toast(e.message,"error");}}
+
+$("buscaAluno").addEventListener("input",renderAlunos); $("filtroAlunoAtivo").addEventListener("change",renderAlunos); $("buscaLeitura").addEventListener("input",renderLeituras); $("filtroLeituraAluno").addEventListener("change",renderLeituras);
+$("formGithub").addEventListener("submit",async e=>{ e.preventDefault(); salvarConfigLocal(); $("githubResult").innerHTML=alertBox("info","Testando acesso ao repositório..."); const ok=await sincronizarTudo(true); $("githubResult").innerHTML=ok?alertBox("ok",`Conectado a <b>${escapar(config().owner)}/${escapar(config().repo)}</b> na branch <b>${escapar(config().branch)}</b>.`):alertBox("error","Não foi possível conectar. Confira o token, repositório e permissões."); });
+function limparToken(){ sessionStorage.removeItem("leiturafyGhToken"); $("ghToken").value=""; atualizarEstadoConexao(false); toast("Token removido desta sessão."); }
+
+async function iniciar(){ carregarConfig(); $("leituraData").value=hoje(); const c=config(); if(c.owner&&c.repo&&c.token){await sincronizarTudo(true);} else {$("globalAlert").innerHTML=alertBox("warn",'Configure a integração em <b>GitHub</b> antes de cadastrar ou editar dados.'); renderTudo();} }
+iniciar();
+</script>
+</body>
+</html>
