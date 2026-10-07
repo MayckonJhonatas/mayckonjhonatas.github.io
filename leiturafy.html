@@ -3,458 +3,118 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0675ff" />
+  <meta name="theme-color" content="#006CFF" />
   <title>LeituraFy | Área da Família</title>
   <style>
     :root{
-      --blue:#0675ff;
-      --blue-2:#2c91ff;
-      --blue-dark:#084ea8;
+      --blue:#006cff;
+      --blue2:#28a0ff;
+      --blue-dark:#0047a8;
       --blue-soft:#eaf4ff;
-      --blue-softer:#f6fbff;
-      --text:#18324b;
-      --muted:#6c8094;
+      --bg:#f7fbff;
+      --text:#16324b;
+      --muted:#6a8093;
       --line:#dceafa;
       --white:#fff;
-      --green:#1b9b69;
-      --green-bg:#eaf9f3;
-      --yellow:#f2aa17;
-      --yellow-bg:#fff7df;
-      --shadow:0 12px 34px rgba(6,117,255,.11);
+      --green:#168b5f;
+      --green-bg:#eaf8f2;
+      --yellow:#f4ad16;
+      --yellow-bg:#fff6df;
+      --danger:#b64242;
+      --shadow:0 14px 38px rgba(0,108,255,.12);
       --radius:22px;
     }
-
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      min-height:100vh;
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      color:var(--text);
-      background:#f7fbff;
-    }
-    button,select{font:inherit}
+    body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+    button,input,textarea,select{font:inherit}
     button{cursor:pointer}
     .hidden{display:none!important}
-
-    header{
-      position:sticky;
-      top:0;
-      z-index:30;
-      background:rgba(255,255,255,.96);
-      border-bottom:1px solid var(--line);
-      backdrop-filter:blur(10px);
-    }
-    .topbar{
-      width:min(1080px,94%);
-      min-height:68px;
-      margin:auto;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-    }
-    .brand{display:flex;align-items:center;gap:11px;min-width:0}
-    .brand-icon{
-      width:42px;height:42px;flex:0 0 42px;
-      display:grid;place-items:center;
-      border-radius:14px;
-      color:#fff;font-weight:950;
-      background:linear-gradient(135deg,var(--blue),var(--blue-2));
-      box-shadow:0 9px 24px rgba(6,117,255,.24);
-    }
+    header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .topbar{width:min(1040px,94%);min-height:66px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:10px;min-width:0}
+    .brand-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;font-weight:950;box-shadow:0 9px 24px rgba(0,108,255,.22)}
     .brand strong{display:block;color:var(--blue-dark);font-size:1.15rem}
-    .brand small{display:block;margin-top:2px;color:var(--muted);font-size:.78rem}
-
-    .sync{
-      display:flex;align-items:center;gap:7px;
-      color:var(--muted);font-weight:800;font-size:.77rem;
-      white-space:nowrap;
-    }
-    .sync-dot{width:9px;height:9px;border-radius:50%;background:#a9b7c4}
-    .sync.ok .sync-dot{background:#22a06b}
-    .sync.error .sync-dot{background:#d64545}
-
-    .desktop-nav{
-      width:min(1080px,94%);
-      margin:auto;
-      padding:0 0 10px;
-      display:none;
-      gap:8px;
-    }
-    .nav-btn{
-      border:0;
-      background:transparent;
-      color:var(--muted);
-      padding:9px 13px;
-      border-radius:12px;
-      font-weight:850;
-    }
+    .brand small{display:block;color:var(--muted);font-size:.76rem;margin-top:1px}
+    .sync{display:flex;align-items:center;gap:7px;font-size:.74rem;font-weight:800;color:var(--muted);white-space:nowrap}
+    .sync-dot{width:9px;height:9px;border-radius:50%;background:#aeb9c4}
+    .sync.ok .sync-dot{background:#22a06b}.sync.error .sync-dot{background:#d64545}
+    .desktop-nav{width:min(1040px,94%);margin:auto;padding:0 0 9px;display:none;gap:8px}
+    .nav-btn{border:0;border-radius:12px;padding:9px 14px;background:transparent;color:var(--muted);font-weight:900}
     .nav-btn.active{background:var(--blue-soft);color:var(--blue)}
     .nav-btn:disabled{opacity:.4;cursor:not-allowed}
+    main{width:min(1040px,94%);margin:auto;padding:24px 0 92px}
+    .page{display:none;animation:fade .16s ease}.page.active{display:block}
+    @keyframes fade{from{opacity:.4;transform:translateY(3px)}to{opacity:1;transform:none}}
 
-    main{width:min(1080px,94%);margin:auto;padding:28px 0 100px}
-    .page{display:none;animation:fade .18s ease}
-    .page.active{display:block}
-    @keyframes fade{from{opacity:.35;transform:translateY(3px)}to{opacity:1;transform:none}}
-
-    .welcome{
-      max-width:700px;
-      margin:22px auto 0;
-      text-align:center;
-    }
-    .welcome-badge{
-      display:inline-flex;
-      padding:8px 12px;
-      border-radius:999px;
-      background:var(--blue-soft);
-      color:var(--blue);
-      font-size:.86rem;
-      font-weight:900;
-    }
-    h1{
-      margin:16px 0 10px;
-      color:#11385e;
-      font-size:clamp(2rem,8vw,3.35rem);
-      line-height:1.03;
-      letter-spacing:-1.4px;
-    }
+    .welcome{max-width:700px;margin:18px auto 0;text-align:center}
+    .badge{display:inline-flex;padding:8px 12px;border-radius:999px;background:var(--blue-soft);color:var(--blue);font-weight:900;font-size:.84rem}
+    h1{margin:15px 0 10px;color:#10395f;font-size:clamp(2rem,8vw,3.35rem);line-height:1.02;letter-spacing:-1.4px}
     h1 span{color:var(--blue)}
-    .welcome>p{margin:0 auto;color:var(--muted);line-height:1.55;max-width:620px}
+    .welcome p{margin:0 auto;max-width:620px;color:var(--muted);line-height:1.55}
+    .select-card{max-width:620px;margin:26px auto 0;padding:22px;background:#fff;border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);text-align:left}
+    .select-card h2{margin:0 0 5px;color:#10395f;font-size:1.25rem}.select-card p{margin:0 0 16px;color:var(--muted);font-size:.9rem}
+    label{font-weight:900;color:#173b5d;font-size:.9rem}
+    select,input,textarea{width:100%;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--text);outline:none}
+    select,input{min-height:50px;padding:0 13px} textarea{min-height:95px;padding:12px 13px;resize:vertical}
+    select:focus,input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(0,108,255,.10)}
+    .primary{width:100%;min-height:50px;margin-top:12px;border:0;border-radius:14px;background:var(--blue);color:#fff;font-weight:950;box-shadow:0 9px 22px rgba(0,108,255,.20)}
+    .primary:hover{background:#005edb}.primary:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+    .state{max-width:620px;margin:15px auto 0;padding:13px 15px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--muted);text-align:center;font-size:.86rem}
+    .state.error{border-color:#efcaca;background:#fff8f8;color:#964242}
 
-    .select-card{
-      max-width:620px;
-      margin:28px auto 0;
-      padding:22px;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:26px;
-      box-shadow:var(--shadow);
-      text-align:left;
-    }
-    .select-card h2{margin:0 0 5px;color:#11385e;font-size:1.25rem}
-    .select-card p{margin:0 0 16px;color:var(--muted);font-size:.9rem}
-    .field-label{display:block;margin-bottom:8px;color:#173b5d;font-size:.9rem;font-weight:900}
-    select{
-      width:100%;
-      min-height:52px;
-      border:2px solid var(--line);
-      border-radius:15px;
-      padding:0 14px;
-      outline:none;
-      background:#fff;
-      color:var(--text);
-      font-size:1rem;
-    }
-    select:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(6,117,255,.11)}
+    .student-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;margin-bottom:16px;border:1px solid var(--line);border-radius:19px;background:#fff}
+    .student-mini{display:flex;align-items:center;gap:10px;min-width:0}
+    .avatar{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;font-weight:950}
+    .student-mini strong{display:block;color:#113d63;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:58vw}.student-mini small{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
+    .change{border:0;border-radius:12px;padding:9px 11px;background:var(--blue-soft);color:var(--blue);font-weight:900;white-space:nowrap}
+    .page-title{margin:0 0 14px}.page-title h2{margin:0;color:#113d63;font-size:1.65rem}.page-title p{margin:5px 0 0;color:var(--muted)}
 
-    .primary-btn,.secondary-btn{
-      width:100%;
-      min-height:52px;
-      border:0;
-      border-radius:15px;
-      margin-top:12px;
-      padding:0 18px;
-      font-weight:900;
-    }
-    .primary-btn{background:var(--blue);color:#fff;box-shadow:0 10px 22px rgba(6,117,255,.20)}
-    .primary-btn:hover{background:#0068e8}
-    .primary-btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
-    .secondary-btn{background:var(--blue-soft);color:var(--blue)}
-
-    .state{
-      max-width:620px;
-      margin:16px auto 0;
-      padding:14px 16px;
-      border-radius:15px;
-      background:#fff;
-      border:1px solid var(--line);
-      color:var(--muted);
-      font-size:.88rem;
-      text-align:center;
-    }
-    .state.error{border-color:#efcaca;background:#fff8f8;color:#9b4343}
-
-    .student-bar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:20px;
-      padding:14px 16px;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:20px;
-    }
-    .student-mini{display:flex;align-items:center;gap:11px;min-width:0}
-    .avatar{
-      width:48px;height:48px;flex:0 0 48px;
-      display:grid;place-items:center;
-      border-radius:15px;
-      background:linear-gradient(135deg,var(--blue),var(--blue-2));
-      color:#fff;font-weight:950;
-    }
-    .student-mini strong{display:block;color:#123b61;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:58vw}
-    .student-mini small{display:block;margin-top:2px;color:var(--muted)}
-    .change-btn{border:0;border-radius:12px;padding:10px 12px;background:var(--blue-soft);color:var(--blue);font-weight:900;white-space:nowrap}
-
-    .page-title{margin:0 0 18px}
-    .page-title h2{margin:0;color:#123b61;font-size:1.7rem}
-    .page-title p{margin:5px 0 0;color:var(--muted);line-height:1.45}
-
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:12px;
-      margin-bottom:18px;
-    }
-    .stat{
-      padding:18px;
-      min-height:112px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      border:1px solid var(--line);
-      border-radius:20px;
-      background:#fff;
-    }
-    .stat strong{font-size:2rem;line-height:1;color:var(--blue)}
-    .stat span{margin-top:7px;color:var(--muted);font-size:.84rem;font-weight:800}
-
-    .quick-grid{display:grid;gap:12px}
-    .quick-card{
-      padding:18px;
-      border:1px solid var(--line);
-      border-radius:20px;
-      background:#fff;
-    }
-    .quick-icon{
-      width:42px;height:42px;
-      display:grid;place-items:center;
-      border-radius:13px;
-      background:var(--blue-soft);
-      font-size:1.2rem;
-      margin-bottom:10px;
-    }
-    .quick-card h3{margin:0 0 5px;color:#123b61}
-    .quick-card p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.45}
-    .quick-card button{width:100%;margin-top:13px;border:0;border-radius:13px;min-height:44px;background:var(--blue);color:#fff;font-weight:900}
-
-    .filters{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
-    .filters::-webkit-scrollbar{display:none}
-    .filter{
-      flex:0 0 auto;
-      border:1px solid var(--line);
-      border-radius:999px;
-      background:#fff;
-      color:var(--blue-dark);
-      padding:9px 13px;
-      font-weight:850;
-    }
-    .filter.active{background:var(--blue);border-color:var(--blue);color:#fff}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:16px}
+    .stat{padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff;min-height:98px;display:flex;flex-direction:column;justify-content:center}
+    .stat strong{font-size:1.85rem;line-height:1;color:var(--blue)}.stat span{margin-top:7px;color:var(--muted);font-size:.8rem;font-weight:800}
+    .filters{display:flex;gap:8px;overflow:auto;padding:2px 0 12px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}
+    .filter{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--blue-dark);padding:9px 13px;font-weight:850}.filter.active{background:var(--blue);border-color:var(--blue);color:#fff}
 
     .reading-list{display:grid;gap:14px}
-    .reading-card{
-      overflow:hidden;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:21px;
-    }
-    .reading-main{display:grid;grid-template-columns:96px 1fr;min-height:118px}
-    .cover{
-      min-height:118px;
-      position:relative;
-      display:grid;
-      place-items:center;
-      overflow:hidden;
-      color:#fff;
-      font-size:1.5rem;
-      font-weight:950;
-      background:linear-gradient(145deg,var(--blue),#55a9ff);
-    }
-    .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-    .reading-info{padding:15px 15px 13px;min-width:0}
-    .reading-info h3{margin:0 0 4px;color:#123b61;font-size:1.08rem}
-    .author{color:var(--muted);font-size:.86rem;margin-bottom:9px}
-    .meta-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .tag{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:.74rem;font-weight:900}
-    .tag.concluida{color:var(--green);background:var(--green-bg)}
-    .tag.andamento{color:#9a6900;background:var(--yellow-bg)}
-    .tag.outro{color:var(--blue);background:var(--blue-soft)}
-    .date{color:var(--muted);font-size:.77rem;font-weight:750}
-    .reading-extra{padding:0 15px 15px}
-    .note{margin:0;color:var(--muted);font-size:.9rem;line-height:1.5}
-    .audio-box{margin-top:12px;padding:12px;border-radius:14px;background:var(--blue-softer);border:1px solid var(--line)}
-    .reading-actions{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
-    .rate-reading-btn{
-      border:0;border-radius:13px;padding:10px 13px;
-      background:var(--blue);color:#fff;font-weight:900;
-      box-shadow:0 7px 18px rgba(6,117,255,.18)
-    }
-    .saved-rating{color:#9a6900;font-size:.8rem;font-weight:900}
-    .audio-title{margin-bottom:8px;color:var(--blue-dark);font-size:.82rem;font-weight:900}
-    audio{width:100%;height:38px}
-    .listen-note{margin:9px 0 0;color:var(--muted);font-size:.78rem;line-height:1.4}
-    .audio-rating{
-      margin-top:14px;padding-top:14px;border-top:1px solid #cfe6fb;
-    }
-    .audio-rating-title{display:flex;align-items:center;gap:8px;margin-bottom:5px;color:#123b61;font-weight:950;font-size:.94rem}
-    .audio-rating-sub{margin:0 0 12px;color:var(--muted);font-size:.8rem;line-height:1.4}
-    .inline-review-grid{display:grid;grid-template-columns:1fr;gap:9px}
-    .inline-review-grid label{display:block;color:#123b61;font-size:.78rem;font-weight:900;margin-bottom:5px}
-    .inline-review-grid input,.inline-review-grid textarea{
-      width:100%;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--text);font:inherit;outline:none
-    }
-    .inline-review-grid input{padding:11px 12px}
-    .inline-review-grid textarea{min-height:78px;padding:11px 12px;resize:vertical}
-    .inline-review-grid input:focus,.inline-review-grid textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(6,117,255,.10)}
-    .inline-stars{display:flex;gap:4px;align-items:center;flex-wrap:nowrap}
-    .inline-star{
-      border:0;background:transparent;color:#c8d2dc;padding:1px;font-size:2rem;line-height:1;cursor:pointer;
-      transition:transform .12s ease,color .12s ease
-    }
-    .inline-star:hover{transform:scale(1.08)}
-    .inline-star.active{color:#ffb400}
-    .inline-save{
-      width:100%;border:0;border-radius:12px;padding:11px 14px;background:var(--blue);color:#fff;font-weight:950;
-      box-shadow:0 7px 18px rgba(6,117,255,.16)
-    }
-    .inline-save:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
-    .inline-result{min-height:18px;margin-top:7px;color:var(--muted);font-size:.78rem;font-weight:750}
-    .inline-result.ok{color:var(--green)}
-    .empty{padding:26px;text-align:center;color:var(--muted);border:1px dashed #b8d9f7;border-radius:18px;background:#fff}
+    .reading-card{overflow:hidden;border:1px solid var(--line);border-radius:21px;background:#fff;box-shadow:0 9px 28px rgba(0,91,191,.06)}
+    .reading-main{display:grid;grid-template-columns:84px 1fr;gap:14px;padding:15px}
+    .cover{width:84px;height:110px;display:grid;place-items:center;border-radius:15px;overflow:hidden;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;font-size:2rem}.cover img{width:100%;height:100%;object-fit:cover}
+    .reading-info h3{margin:3px 0 4px;color:#10395f;font-size:1.1rem;line-height:1.2}.author{color:var(--muted);font-size:.88rem}
+    .meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:11px}.tag{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:.74rem;font-weight:900}.tag.concluida{color:var(--green);background:var(--green-bg)}.tag.andamento{color:#9a6700;background:var(--yellow-bg)}.tag.outro{color:var(--blue-dark);background:var(--blue-soft)}.date{color:var(--muted);font-size:.75rem;font-weight:750}
+    .reading-extra{padding:0 15px 15px}.note{margin:0 0 12px;padding:11px 12px;border-radius:13px;background:#f8fbfe;color:var(--muted);font-size:.86rem;line-height:1.45}
+    .no-audio{padding:11px 12px;border-radius:13px;background:#f6f8fa;color:#8796a3;font-size:.83rem}
 
-    .rating-card{
-      max-width:620px;
-      margin:0 auto;
-      padding:24px 20px;
-      text-align:center;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:25px;
-      box-shadow:var(--shadow);
-    }
-    .rating-icon{
-      width:58px;height:58px;
-      display:grid;place-items:center;
-      margin:0 auto 10px;
-      border-radius:18px;
-      background:var(--blue-soft);
-      font-size:1.7rem;
-    }
-    .rating-card h3{margin:0;color:#123b61;font-size:1.35rem}
-    .rating-card p{margin:8px auto 0;max-width:470px;color:var(--muted);line-height:1.48}
-    .selected-reading{
-      margin:16px 0;padding:14px;text-align:left;border-radius:16px;
-      background:var(--blue-softer);border:1px solid var(--line)
-    }
-    .selected-reading strong{display:block;color:#123b61}
-    .selected-reading small{display:block;margin-top:3px;color:var(--muted)}
-    .review-form{text-align:left;margin-top:18px}
-    .review-form label{display:block;margin:13px 0 6px;color:#123b61;font-size:.88rem;font-weight:900}
-    .review-form input,.review-form textarea{
-      width:100%;border:1px solid var(--line);border-radius:14px;
-      background:#fbfdff;color:var(--text);font:inherit;outline:none
-    }
-    .review-form input{padding:13px 14px}
-    .review-form textarea{min-height:108px;padding:13px 14px;resize:vertical}
-    .review-form input:focus,.review-form textarea:focus{
-      border-color:var(--blue);box-shadow:0 0 0 4px rgba(6,117,255,.10)
-    }
-    .field-help{margin-top:5px!important;font-size:.76rem!important;color:#8a9aaa!important}
-    .stars-picker{display:flex;justify-content:center;gap:7px;margin:18px 0 12px}
-    .star-btn{
-      width:52px;height:52px;
-      border:0;
-      background:transparent;
-      color:#c9d3dc;
-      font-size:2.45rem;
-      line-height:1;
-      padding:0;
-      transition:.12s ease;
-    }
-    .star-btn.active,.star-btn:hover{color:#ffb51b;transform:scale(1.05)}
-    .rating-result{min-height:26px;color:var(--blue-dark);font-weight:900}
-    .rating-note{margin-top:13px!important;font-size:.8rem!important;color:#8798a8!important}
-    .rating-chooser{display:grid;gap:10px;margin-top:14px}
-    .rating-choice{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      width:100%;padding:14px;border:1px solid var(--line);border-radius:16px;
-      background:#fff;text-align:left
-    }
-    .rating-choice:hover{border-color:#a9d2ff;background:var(--blue-softer)}
-    .rating-choice strong{display:block;color:#123b61}
-    .rating-choice small{display:block;margin-top:3px;color:var(--muted)}
-    .rating-choice span{color:var(--blue);font-weight:950;white-space:nowrap}
-    .secondary-wide{
-      width:100%;margin-top:10px;border:0;border-radius:14px;padding:12px;
-      background:var(--blue-soft);color:var(--blue-dark);font-weight:900
-    }
+    .audio-box{padding:13px;border:1px solid #cfe5ff;border-radius:17px;background:#f4f9ff}
+    .audio-title{font-weight:950;color:var(--blue-dark);font-size:.9rem;margin-bottom:8px}.listen-note{margin:8px 0 0;color:var(--muted);font-size:.78rem} audio{width:100%;height:40px}
+    .public-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:14px 0 8px;padding-top:12px;border-top:1px solid #d8eafb}
+    .public-score{display:flex;align-items:center;gap:8px}.score-number{font-size:1.55rem;color:#10395f;font-weight:950}.score-stars{color:var(--yellow);letter-spacing:1px;font-size:1.02rem}.score-count{color:var(--muted);font-size:.78rem;font-weight:750}
+    .reviews-status{color:var(--muted);font-size:.8rem}
+    .comments{display:grid;gap:8px;margin:10px 0 13px}
+    .comment{padding:10px 11px;border-radius:13px;background:#fff;border:1px solid #e1edf8}.comment-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.comment-name{font-weight:900;color:#173c60;font-size:.83rem}.comment-stars{color:var(--yellow);font-size:.8rem}.comment-text{margin:5px 0 0;color:#637a8e;font-size:.83rem;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere}.comment-date{margin-top:5px;color:#97a5b1;font-size:.69rem}
+    .comments-empty{padding:10px 11px;border-radius:12px;background:#fff;color:#8595a3;font-size:.8rem;border:1px dashed #cfe0ef}
 
-    .bottom-nav{
-      position:fixed;
-      left:0;right:0;bottom:0;
-      z-index:40;
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      padding:8px 8px max(8px,env(safe-area-inset-bottom));
-      background:rgba(255,255,255,.97);
-      border-top:1px solid var(--line);
-      box-shadow:0 -8px 24px rgba(25,68,112,.07);
-    }
-    .bottom-btn{
-      border:0;background:transparent;
-      min-height:54px;
-      border-radius:13px;
-      color:#8192a3;
-      font-size:.69rem;
-      font-weight:850;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-    }
-    .bottom-btn span:first-child{font-size:1.17rem}
-    .bottom-btn.active{background:var(--blue-soft);color:var(--blue)}
-    .bottom-btn:disabled{opacity:.35}
+    .rate-box{padding-top:12px;border-top:1px solid #d8eafb}.rate-title{margin:0 0 10px;color:#133c61;font-weight:950;font-size:.9rem}.privacy-note{margin:-4px 0 10px;color:var(--muted);font-size:.72rem;line-height:1.35}
+    .rate-grid{display:grid;grid-template-columns:1fr;gap:9px}.rate-field label{display:block;margin-bottom:6px;font-size:.78rem}.stars-input{display:flex;gap:3px;flex-wrap:wrap}.star-btn{width:45px;height:45px;border:0;background:transparent;color:#c6d1dc;font-size:2rem;line-height:1;border-radius:10px}.star-btn.active{color:var(--yellow);transform:scale(1.04)}.star-btn:hover{background:#fff7df}
+    .save-review{width:100%;min-height:46px;border:0;border-radius:13px;background:var(--blue);color:#fff;font-weight:950;margin-top:3px}.save-review:disabled{opacity:.45;cursor:not-allowed}.review-result{min-height:20px;margin-top:7px;color:var(--muted);font-size:.78rem}.review-result.ok{color:var(--green)}.review-result.error{color:var(--danger)}
+    .empty{padding:24px;border:1px dashed #bfd7ed;border-radius:18px;background:#fff;text-align:center;color:var(--muted)}
+    .firebase-warning{margin:0 0 12px;padding:11px 12px;border-radius:13px;background:#fff6df;color:#8b6300;font-size:.8rem;border:1px solid #f3dfaa}
+    footer{padding:22px 0 4px;text-align:center;color:#8091a0;font-size:.78rem}
 
-    footer{padding:20px 0 10px;text-align:center;color:#8798a8;font-size:.8rem}
-
-    @media(min-width:760px){
-      .desktop-nav{display:flex}
-      .bottom-nav{display:none}
-      main{padding-bottom:42px}
-      .stats{grid-template-columns:repeat(3,1fr)}
-      .quick-grid{grid-template-columns:repeat(2,1fr)}
-      .reading-list{grid-template-columns:repeat(2,1fr)}
-      .student-mini strong{max-width:520px}
-    }
-
-    @media(max-width:480px){
-      .brand small{display:none}
-      .sync{font-size:.68rem}
-      main{padding-top:20px}
-      .welcome{margin-top:10px}
-      .select-card{padding:18px}
-      .student-bar{padding:11px 12px}
-      .student-mini strong{max-width:47vw}
-      .change-btn{padding:9px 10px;font-size:.82rem}
-      .star-btn{width:48px;height:48px;font-size:2.2rem}
-    }
+    .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:35;display:grid;grid-template-columns:repeat(2,1fr);background:rgba(255,255,255,.98);border-top:1px solid var(--line);padding:max(7px,env(safe-area-inset-bottom)) 8px 7px}
+    .bottom-btn{border:0;background:transparent;color:#788d9f;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.73rem;font-weight:850;min-height:48px;border-radius:12px}.bottom-btn span:first-child{font-size:1.18rem}.bottom-btn.active{color:var(--blue);background:var(--blue-soft)}.bottom-btn:disabled{opacity:.35}
+    @media(min-width:760px){.desktop-nav{display:flex}.bottom-nav{display:none}main{padding-bottom:40px}.reading-list{grid-template-columns:repeat(2,minmax(0,1fr))}.reading-card{align-self:start}.stats{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:560px){.stats{grid-template-columns:repeat(3,1fr)}.stat{padding:12px 9px;min-height:88px}.stat strong{font-size:1.55rem}.stat span{font-size:.68rem}.reading-main{grid-template-columns:72px 1fr}.cover{width:72px;height:98px}.brand small{display:none}.sync{font-size:.67rem}}
   </style>
 </head>
 <body>
   <header>
     <div class="topbar">
-      <div class="brand">
-        <div class="brand-icon">▶</div>
-        <div>
-          <strong>LeituraFy</strong>
-          <small>Área da Família</small>
-        </div>
-      </div>
+      <div class="brand"><div class="brand-icon">▶</div><div><strong>LeituraFy</strong><small>Área da Família</small></div></div>
       <div class="sync" id="syncBadge"><span class="sync-dot"></span><span id="syncText">Carregando...</span></div>
     </div>
     <nav class="desktop-nav" aria-label="Navegação principal">
       <button class="nav-btn active" data-page="inicio">Início</button>
-      <button class="nav-btn" data-page="resumo" data-requires-student disabled>Resumo</button>
       <button class="nav-btn" data-page="leituras" data-requires-student disabled>Leituras</button>
     </nav>
   </header>
@@ -462,57 +122,27 @@
   <main>
     <section class="page active" id="page-inicio">
       <div class="welcome">
-        <div class="welcome-badge">📚 Família e escola juntas</div>
-        <h1>Acompanhe a leitura de forma <span>simples.</span></h1>
-        <p>Escolha o nome do estudante, abra uma leitura, ouça o áudio e avalie ali mesmo, sem sair da página.</p>
+        <div class="badge">📚 Família e escola juntas</div>
+        <h1>Ouça, acompanhe e <span>participe.</span></h1>
+        <p>Escolha o estudante para ver as leituras. As avaliações e comentários ficam junto ao áudio e podem ser vistos por todas as famílias.</p>
       </div>
-
       <div class="select-card">
         <h2>Quem você quer acompanhar?</h2>
         <p>Selecione o estudante cadastrado.</p>
-        <label class="field-label" for="alunoSelect">Estudante</label>
-        <select id="alunoSelect" disabled>
-          <option value="">Carregando alunos...</option>
-        </select>
-        <button class="primary-btn" id="entrarAluno" disabled>Continuar</button>
+        <label for="alunoSelect">Estudante</label>
+        <select id="alunoSelect" disabled><option value="">Carregando alunos...</option></select>
+        <button class="primary" id="entrarAluno" disabled>Ver leituras</button>
       </div>
       <div class="state" id="estadoSistema">Buscando os dados...</div>
     </section>
 
-    <section class="page" id="page-resumo">
-      <div class="student-bar"></div>
-      <div class="page-title">
-        <h2>Resumo</h2>
-        <p>Veja rapidamente como está o acompanhamento da leitura.</p>
-      </div>
-
-      <div class="stats">
-        <div class="stat"><strong id="statTotal">0</strong><span>leituras registradas</span></div>
-        <div class="stat"><strong id="statConcluidas">0</strong><span>leituras concluídas</span></div>
-        <div class="stat"><strong id="statAudios">0</strong><span>áudios disponíveis</span></div>
-      </div>
-
-      <div class="quick-grid">
-        <div class="quick-card">
-          <div class="quick-icon">📖</div>
-          <h3>Ver leituras</h3>
-          <p>Consulte os livros registrados e ouça os áudios do estudante.</p>
-          <button data-go="leituras">Abrir leituras</button>
-        </div>
-        <div class="quick-card">
-          <div class="quick-icon">🎧</div>
-          <h3>Ouvir e avaliar</h3>
-          <p>Abra as leituras. A avaliação aparece logo abaixo do áudio de cada estudante.</p>
-          <button data-go="leituras">Ouvir áudios</button>
-        </div>
-      </div>
-    </section>
-
     <section class="page" id="page-leituras">
-      <div class="student-bar"></div>
-      <div class="page-title">
-        <h2>Leituras</h2>
-        <p>Livros e áudios registrados para o estudante.</p>
+      <div class="student-bar" id="studentBar"></div>
+      <div class="page-title"><h2>Leituras e áudios</h2><p>Acompanhe o progresso, ouça e veja o que as famílias estão achando.</p></div>
+      <div class="stats">
+        <div class="stat"><strong id="statTotal">0</strong><span>leituras</span></div>
+        <div class="stat"><strong id="statConcluidas">0</strong><span>concluídas</span></div>
+        <div class="stat"><strong id="statAudios">0</strong><span>com áudio</span></div>
       </div>
       <div class="filters" aria-label="Filtros de leitura">
         <button class="filter active" data-filter="todas">Todas</button>
@@ -522,463 +152,167 @@
       </div>
       <div class="reading-list" id="listaLeituras"></div>
     </section>
-
     <footer>LeituraFy — leitura, escola e família conectadas.</footer>
   </main>
 
   <nav class="bottom-nav" aria-label="Navegação inferior">
     <button class="bottom-btn active" data-page="inicio"><span>⌂</span><span>Início</span></button>
-    <button class="bottom-btn" data-page="resumo" data-requires-student disabled><span>▦</span><span>Resumo</span></button>
     <button class="bottom-btn" data-page="leituras" data-requires-student disabled><span>📖</span><span>Leituras</span></button>
   </nav>
 
-  <script>
-    const CONFIG = {
-      alunosUrl: "./dados/alunos.json",
-      leiturasUrl: "./dados/leituras.json",
-      cacheBust: true
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getAuth, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+    import { getDatabase, ref, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+    const CONFIG={
+      alunosUrl:"./dados/alunos.json",
+      leiturasUrl:"./dados/leituras.json",
+      firebaseConfigUrl:"./dados/firebase.json",
+      cacheBust:true
     };
+    const $=id=>document.getElementById(id);
+    const alunoSelect=$("alunoSelect"), entrarAluno=$("entrarAluno"), estadoSistema=$("estadoSistema"), listaLeituras=$("listaLeituras");
+    let alunos=[], leituras=[], alunoAtual=null, filtroAtual="todas";
+    let firebaseReady=false, auth=null, db=null, firebaseUser=null;
+    let reviewUnsubs=[];
 
-    const $ = id => document.getElementById(id);
-    const alunoSelect = $("alunoSelect");
-    const entrarAluno = $("entrarAluno");
-    const estadoSistema = $("estadoSistema");
-    const listaLeituras = $("listaLeituras");
+    const normalizar=v=>String(v??"").trim();
+    const escapar=t=>String(t??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    const urlSemCache=url=>CONFIG.cacheBust?`${url}${url.includes("?")?"&":"?"}v=${Date.now()}`:url;
+    async function fetchJson(url, exigirArray=true){const r=await fetch(urlSemCache(url),{cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);const d=await r.json();if(exigirArray&&!Array.isArray(d))throw new Error("Formato JSON inválido");return d;}
+    const alunoId=l=>normalizar(l.alunoId??l.aluno_id??l.idAluno??l.estudanteId);
+    function iniciais(nome){const p=normalizar(nome).split(/\s+/).filter(Boolean);if(!p.length)return"AL";return p.length===1?p[0].slice(0,2).toUpperCase():`${p[0][0]}${p[p.length-1][0]}`.toUpperCase()}
+    function formatoData(v){if(!v)return"";const s=String(v).trim(),m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return`${m[3]}/${m[2]}/${m[1]}`;const d=new Date(s);return Number.isNaN(d.getTime())?s:d.toLocaleDateString("pt-BR")}
+    function resolverArquivo(c,p=""){const v=normalizar(c);if(!v)return"";if(/^(https?:|data:|blob:)/i.test(v))return v;if(v.startsWith("./")||v.startsWith("../")||v.startsWith("/"))return v;if(v.startsWith("dados/"))return`./${v}`;return p?`./${p}/${v}`:`./${v}`}
+    function statusNorm(l){const s=normalizar(l.status).toLowerCase();if(["lido","concluída","concluida","finalizada","finalizado"].includes(s))return"concluida";if(["lendo","em andamento","andamento","iniciada","iniciado"].includes(s))return"andamento";return"outro"}
+    function statusRotulo(l){const s=statusNorm(l);return s==="concluida"?"✓ Concluída":s==="andamento"?"Em andamento":normalizar(l.status)||"Registrada"}
+    const audioLeitura=l=>normalizar(l.audio??(l.tipoMidia==="audio"?l.midia:""));
+    const obsLeitura=l=>normalizar(l.observacao??l.resumo??l.comentario??l.recomendacao);
+    const leiturasAluno=id=>leituras.filter(l=>alunoId(l)===String(id)).sort((a,b)=>String(b.data??"").localeCompare(String(a.data??"")));
+    function leituraId(l,index=0){const id=normalizar(l.id??l.leituraId??l.leitura_id);if(id)return id;return[alunoId(l),normalizar(l.titulo).toLowerCase(),normalizar(l.autor).toLowerCase(),normalizar(l.data),index].join("|")}
+    function firebaseKey(id){return encodeURIComponent(String(id)).replace(/[.#$\[\]\/]/g,"_")}
+    function estrelasTexto(n){n=Math.max(0,Math.min(5,Math.round(Number(n)||0)));return"★".repeat(n)+"☆".repeat(5-n)}
 
-    let alunos = [];
-    let leituras = [];
-    let alunoAtual = null;
-    let filtroAtual = "todas";
-
-    function normalizarTexto(v){ return String(v ?? "").trim(); }
-    function escapar(texto){
-      return String(texto ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-    function urlSemCache(url){
-      if(!CONFIG.cacheBust) return url;
-      return `${url}${url.includes("?") ? "&" : "?"}v=${Date.now()}`;
-    }
-    async function fetchJson(url){
-      const r = await fetch(urlSemCache(url),{cache:"no-store"});
-      if(!r.ok) throw new Error(`Não foi possível carregar ${url} (HTTP ${r.status}).`);
-      const d = await r.json();
-      if(!Array.isArray(d)) throw new Error(`${url} precisa conter uma lista JSON.`);
-      return d;
-    }
-    function valorAlunoId(registro){
-      return normalizarTexto(registro.alunoId ?? registro.aluno_id ?? registro.idAluno ?? registro.estudanteId);
-    }
-    function iniciais(nome){
-      const p = normalizarTexto(nome).split(/\s+/).filter(Boolean);
-      if(!p.length) return "AL";
-      if(p.length===1) return p[0].slice(0,2).toUpperCase();
-      return `${p[0][0]}${p[p.length-1][0]}`.toUpperCase();
-    }
-    function formatoData(valor){
-      if(!valor) return "";
-      const bruto = String(valor).trim();
-      const m = bruto.match(/^(\d{4})-(\d{2})-(\d{2})/);
-      if(m) return `${m[3]}/${m[2]}/${m[1]}`;
-      const d = new Date(bruto);
-      return Number.isNaN(d.getTime()) ? bruto : d.toLocaleDateString("pt-BR");
-    }
-    function resolverArquivo(caminho,pastaPadrao=""){
-      const valor = normalizarTexto(caminho);
-      if(!valor) return "";
-      if(/^(https?:|data:|blob:)/i.test(valor)) return valor;
-      if(valor.startsWith("./")||valor.startsWith("../")||valor.startsWith("/")) return valor;
-      if(valor.startsWith("dados/")) return `./${valor}`;
-      return pastaPadrao ? `./${pastaPadrao}/${valor}` : `./${valor}`;
-    }
-    function statusNormalizado(leitura){
-      const s = normalizarTexto(leitura.status).toLowerCase();
-      if(["lido","concluída","concluida","finalizada","finalizado"].includes(s)) return "concluida";
-      if(["lendo","em andamento","andamento","iniciada","iniciado"].includes(s)) return "andamento";
-      return "outro";
-    }
-    function statusRotulo(leitura){
-      const s = statusNormalizado(leitura);
-      if(s==="concluida") return "✓ Concluída";
-      if(s==="andamento") return "Em andamento";
-      return normalizarTexto(leitura.status)||"Registrada";
-    }
-    function leituraAudio(leitura){
-      return normalizarTexto(leitura.audio ?? (leitura.tipoMidia==="audio" ? leitura.midia : ""));
-    }
-    function leituraObservacao(leitura){
-      return normalizarTexto(leitura.observacao ?? leitura.resumo ?? leitura.comentario ?? leitura.recomendacao);
-    }
-    function leiturasDoAluno(id){
-      return leituras
-        .filter(l=>valorAlunoId(l)===String(id))
-        .sort((a,b)=>String(b.data??"").localeCompare(String(a.data??"")));
-    }
-
-    function leituraId(leitura,index=0){
-      const existente = normalizarTexto(leitura.id ?? leitura.leituraId ?? leitura.leitura_id);
-      if(existente) return existente;
-      return [
-        valorAlunoId(leitura),
-        normalizarTexto(leitura.titulo).toLowerCase(),
-        normalizarTexto(leitura.autor).toLowerCase(),
-        normalizarTexto(leitura.data),
-        index
-      ].join("|");
-    }
-    function reviewsKey(){ return "leiturafy_reviews_v2"; }
-    function obterReviews(){
+    async function iniciarFirebase(){
       try{
-        const lista = JSON.parse(localStorage.getItem(reviewsKey()) || "[]");
-        return Array.isArray(lista) ? lista : [];
-      }catch(e){ return []; }
-    }
-    function salvarReviews(lista){
-      localStorage.setItem(reviewsKey(), JSON.stringify(lista));
-    }
-    function reviewDaLeitura(id){
-      if(!alunoAtual) return null;
-      const lista = obterReviews().filter(r=>String(r.alunoId)===String(alunoAtual.id) && String(r.leituraId)===String(id));
-      return lista.sort((a,b)=>String(b.data??"").localeCompare(String(a.data??"")))[0] || null;
-    }
-    function reviewDaLeituraPorAvaliador(id,nome){
-      if(!alunoAtual || !normalizarTexto(nome)) return null;
-      const alvo=normalizarTexto(nome).toLowerCase();
-      const lista=obterReviews().filter(r=>
-        String(r.alunoId)===String(alunoAtual.id) &&
-        String(r.leituraId)===String(id) &&
-        normalizarTexto(r.avaliador).toLowerCase()===alvo
-      );
-      return lista.sort((a,b)=>String(b.data??"").localeCompare(String(a.data??"")))[0] || null;
+        const cfg=await fetchJson(CONFIG.firebaseConfigUrl,false);
+        if(!cfg?.apiKey||!cfg?.databaseURL||!cfg?.projectId||!cfg?.appId) throw new Error("Configuração incompleta");
+        const app=initializeApp(cfg);
+        auth=getAuth(app); db=getDatabase(app);
+        await setPersistence(auth,browserLocalPersistence);
+        const cred=await signInAnonymously(auth);
+        firebaseUser=cred.user; firebaseReady=true;
+      }catch(e){console.warn("Avaliações online indisponíveis:",e);firebaseReady=false;}
     }
 
     function preencherDropdown(){
-      const ativos = alunos
-        .filter(a=>a.ativo!==false)
-        .sort((a,b)=>normalizarTexto(a.nome).localeCompare(normalizarTexto(b.nome),"pt-BR"));
-
-      alunoSelect.innerHTML = '<option value="">Selecione o estudante</option>';
-      ativos.forEach(a=>{
-        const opt = document.createElement("option");
-        opt.value = normalizarTexto(a.id);
-        const turma = normalizarTexto(a.turma ?? a.sala);
-        opt.textContent = turma ? `${normalizarTexto(a.nome)} — ${turma}` : normalizarTexto(a.nome);
-        alunoSelect.appendChild(opt);
-      });
-      alunoSelect.disabled = !ativos.length;
-      entrarAluno.disabled = true;
-      if(!ativos.length) alunoSelect.innerHTML = '<option value="">Nenhum estudante cadastrado</option>';
+      const ativos=alunos.filter(a=>a.ativo!==false).sort((a,b)=>normalizar(a.nome).localeCompare(normalizar(b.nome),"pt-BR"));
+      alunoSelect.innerHTML='<option value="">Selecione o estudante</option>';
+      ativos.forEach(a=>{const o=document.createElement("option");o.value=normalizar(a.id);const t=normalizar(a.turma??a.sala);o.textContent=t?`${normalizar(a.nome)} — ${t}`:normalizar(a.nome);alunoSelect.appendChild(o)});
+      alunoSelect.disabled=!ativos.length;
     }
+    function setNav(enabled){document.querySelectorAll("[data-requires-student]").forEach(b=>b.disabled=!enabled)}
+    function atualizarStudentBar(){if(!alunoAtual)return;const turma=normalizar(alunoAtual.turma??alunoAtual.sala);$("studentBar").innerHTML=`<div class="student-mini"><div class="avatar">${escapar(iniciais(alunoAtual.nome))}</div><div><strong>${escapar(alunoAtual.nome)}</strong><small>${escapar(turma||"Turma não informada")}</small></div></div><button class="change" id="trocarAluno">Trocar</button>`;$("trocarAluno").addEventListener("click",trocarAluno)}
+    function atualizarStats(){const l=leiturasAluno(alunoAtual.id);$("statTotal").textContent=l.length;$("statConcluidas").textContent=l.filter(x=>statusNorm(x)==="concluida").length;$("statAudios").textContent=l.filter(x=>audioLeitura(x)).length}
+    function abrirPagina(nome){if(nome!=="inicio"&&!alunoAtual)nome="inicio";document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===`page-${nome}`));document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===nome));history.replaceState(null,"",`#${nome}`);if(nome==="leituras")renderizarLeituras();window.scrollTo({top:0,behavior:"smooth"})}
+    function entrarNoAluno(){alunoAtual=alunos.find(a=>String(a.id)===String(alunoSelect.value))||null;if(!alunoAtual)return;setNav(true);atualizarStudentBar();atualizarStats();abrirPagina("leituras")}
+    function trocarAluno(){reviewUnsubs.forEach(fn=>{try{fn()}catch{}});reviewUnsubs=[];alunoAtual=null;alunoSelect.value="";entrarAluno.disabled=true;setNav(false);abrirPagina("inicio")}
 
-    function studentBarHTML(){
-      if(!alunoAtual) return "";
-      const turma = normalizarTexto(alunoAtual.turma ?? alunoAtual.sala);
-      return `
-        <div class="student-mini">
-          <div class="avatar">${escapar(iniciais(alunoAtual.nome))}</div>
-          <div>
-            <strong>${escapar(alunoAtual.nome || "Estudante")}</strong>
-            <small>${escapar(turma || "Turma não informada")}</small>
-          </div>
+    function htmlAvaliacao(id){
+      if(!firebaseReady)return`<div class="firebase-warning">As avaliações compartilhadas ainda não foram configuradas. Configure <strong>dados/firebase.json</strong> para liberar comentários e estrelas para todas as famílias.</div>`;
+      const nome=localStorage.getItem("leiturafy_nome_avaliador")||"";
+      return `<div class="public-summary"><div class="public-score"><span class="score-number" data-media>—</span><div><div class="score-stars" data-media-stars>☆☆☆☆☆</div><div class="score-count" data-count>Carregando avaliações...</div></div></div><span class="reviews-status" data-live-status>Atualização em tempo real</span></div>
+      <div class="comments" data-comments><div class="comments-empty">Carregando comentários...</div></div>
+      <div class="rate-box" data-rate-box data-reading-id="${escapar(id)}" data-stars="0">
+        <div class="rate-title">⭐ Avalie depois de ouvir</div>
+        <div class="privacy-note">Seu nome, estrelas e comentário ficarão visíveis para outras famílias.</div>
+        <div class="rate-grid">
+          <div class="rate-field"><label>Seu nome ou identificação</label><input maxlength="80" data-name value="${escapar(nome)}" placeholder="Ex.: Maria, mãe de João"></div>
+          <div class="rate-field"><label>Sua avaliação</label><div class="stars-input" aria-label="Escolha de 1 a 5 estrelas">${[1,2,3,4,5].map(n=>`<button type="button" class="star-btn" data-star="${n}" aria-label="${n} estrela${n>1?"s":""}">★</button>`).join("")}</div></div>
+          <div class="rate-field"><label>Comentário</label><textarea maxlength="600" data-comment placeholder="Escreva o que achou da leitura ou do áudio."></textarea></div>
+          <button class="save-review" type="button" data-save disabled>Publicar avaliação</button>
+          <div class="review-result" data-result></div>
         </div>
-        <button class="change-btn" type="button" data-change-student>Trocar</button>`;
+      </div>`;
     }
 
-    function atualizarStudentBars(){
-      document.querySelectorAll(".student-bar").forEach(el=>el.innerHTML=studentBarHTML());
-      document.querySelectorAll("[data-change-student]").forEach(btn=>btn.addEventListener("click",trocarAluno));
-    }
-
-    function atualizarResumo(){
-      if(!alunoAtual) return;
-      const lista = leiturasDoAluno(alunoAtual.id);
-      $("statTotal").textContent = lista.length;
-      $("statConcluidas").textContent = lista.filter(l=>statusNormalizado(l)==="concluida").length;
-      $("statAudios").textContent = lista.filter(l=>leituraAudio(l)).length;
-    }
-
-    function acharLeituraPorId(id){
-      if(!alunoAtual) return null;
-      const lista=leiturasDoAluno(alunoAtual.id);
-      for(let i=0;i<lista.length;i++){
-        if(String(leituraId(lista[i],i))===String(id)) return {leitura:lista[i],index:i};
+    function desligarReviews(){reviewUnsubs.forEach(fn=>{try{fn()}catch{}});reviewUnsubs=[]}
+    function formatarMomento(v){if(!v||typeof v!=="number")return"";try{return new Date(v).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"})}catch{return""}}
+    function renderReviews(box,reviews){
+      const vals=Object.values(reviews||{}).filter(Boolean).sort((a,b)=>(b.atualizadoEm||0)-(a.atualizadoEm||0));
+      const media=vals.length?vals.reduce((s,r)=>s+Number(r.estrelas||0),0)/vals.length:0;
+      box.querySelector("[data-media]").textContent=vals.length?media.toFixed(1):"—";
+      box.querySelector("[data-media-stars]").textContent=vals.length?estrelasTexto(media):"☆☆☆☆☆";
+      box.querySelector("[data-count]").textContent=vals.length?`${vals.length} avaliação${vals.length===1?"":"ões"}`:"Ainda sem avaliações";
+      const comments=box.querySelector("[data-comments]");
+      const comTexto=vals.filter(r=>normalizar(r.comentario));
+      comments.innerHTML=comTexto.length?comTexto.map(r=>`<div class="comment"><div class="comment-head"><span class="comment-name">${escapar(r.avaliador||"Família")}</span><span class="comment-stars">${escapar(estrelasTexto(r.estrelas))}</span></div><div class="comment-text">${escapar(r.comentario)}</div>${r.atualizadoEm?`<div class="comment-date">${escapar(formatarMomento(r.atualizadoEm))}</div>`:""}</div>`).join(""):`<div class="comments-empty">Ainda não há comentários. Seja o primeiro a participar.</div>`;
+      if(firebaseUser&&reviews?.[firebaseUser.uid]){
+        const mine=reviews[firebaseUser.uid], rate=box.querySelector("[data-rate-box]");
+        rate.dataset.stars=String(mine.estrelas||0);rate.querySelector("[data-name]").value=mine.avaliador||rate.querySelector("[data-name]").value;rate.querySelector("[data-comment]").value=mine.comentario||"";
+        rate.querySelectorAll("[data-star]").forEach(b=>b.classList.toggle("active",Number(b.dataset.star)<=Number(mine.estrelas||0)));
+        const result=rate.querySelector("[data-result]");result.className="review-result ok";result.textContent="Sua avaliação já está publicada. Você pode editar e publicar novamente.";
       }
-      return null;
+      validarForm(box.querySelector("[data-rate-box]"));
     }
-
-    function htmlAvaliacaoInline(id,review){
-      const nomeSalvo = review?.avaliador || localStorage.getItem("leiturafy_reviewer_name") || "";
-      const estrelasSalvas = Number(review?.estrelas || 0);
-      const comentario = review?.comentario || "";
-      const estrelas = [1,2,3,4,5].map(v=>
-        `<button class="inline-star ${v<=estrelasSalvas ? "active" : ""}" type="button" data-inline-star data-value="${v}" aria-label="${v} estrela${v>1?"s":""}">★</button>`
-      ).join("");
-      return `
-        <div class="audio-rating" data-inline-rating="${escapar(id)}" data-stars="${estrelasSalvas}">
-          <div class="audio-rating-title">⭐ Depois de ouvir, avalie esta leitura</div>
-          <p class="audio-rating-sub">Sua opinião fica vinculada a este áudio e a este livro.</p>
-          <div class="inline-review-grid">
-            <div>
-              <label>Seu nome</label>
-              <input type="text" maxlength="80" autocomplete="name" data-inline-name placeholder="Ex.: Maria da Silva" value="${escapar(nomeSalvo)}">
-            </div>
-            <div>
-              <label>Sua avaliação</label>
-              <div class="inline-stars" role="radiogroup" aria-label="Avaliação de 1 a 5 estrelas">${estrelas}</div>
-            </div>
-            <div>
-              <label>Comentário <span style="font-weight:600;color:#8293a4">(opcional)</span></label>
-              <textarea maxlength="600" data-inline-comment placeholder="Conte o que achou da leitura ou do áudio.">${escapar(comentario)}</textarea>
-            </div>
-            <button class="inline-save" type="button" data-inline-save ${nomeSalvo && estrelasSalvas ? "" : "disabled"}>Salvar avaliação</button>
-          </div>
-          <div class="inline-result ${review ? "ok" : ""}" data-inline-result>${review ? `Avaliação salva neste aparelho: ${estrelasSalvas} ${estrelasSalvas===1?"estrela":"estrelas"}.` : "Ouça o áudio e registre sua avaliação."}</div>
-        </div>`;
+    function conectarReviews(card,id){
+      if(!firebaseReady||!db)return;
+      const caminho=`avaliacoes/${firebaseKey(id)}`;
+      const unsub=onValue(ref(db,caminho),snap=>renderReviews(card,snap.val()||{}),err=>{const s=card.querySelector("[data-live-status]");if(s)s.textContent="Não foi possível carregar avaliações";console.error(err)});
+      reviewUnsubs.push(unsub);
     }
-
-    function validarAvaliacaoInline(box){
-      if(!box) return;
-      const nome=normalizarTexto(box.querySelector("[data-inline-name]")?.value);
-      const estrelas=Number(box.dataset.stars||0);
-      const btn=box.querySelector("[data-inline-save]");
-      if(btn) btn.disabled=!(nome && estrelas>=1 && estrelas<=5);
+    function validarForm(rate){if(!rate)return;const ok=normalizar(rate.querySelector("[data-name]")?.value)&&Number(rate.dataset.stars)>0;rate.querySelector("[data-save]").disabled=!ok}
+    async function salvarReview(rate){
+      if(!firebaseReady||!db||!firebaseUser||!rate)return;
+      const id=rate.dataset.readingId,nome=normalizar(rate.querySelector("[data-name]").value),comentario=normalizar(rate.querySelector("[data-comment]").value),estrelas=Number(rate.dataset.stars||0),result=rate.querySelector("[data-result]"),btn=rate.querySelector("[data-save]");
+      if(!nome||!estrelas)return;
+      btn.disabled=true;btn.textContent="Publicando...";result.className="review-result";result.textContent="";
+      try{
+        await set(ref(db,`avaliacoes/${firebaseKey(id)}/${firebaseUser.uid}`),{uid:firebaseUser.uid,avaliador:nome,estrelas,comentario,atualizadoEm:serverTimestamp()});
+        localStorage.setItem("leiturafy_nome_avaliador",nome);result.className="review-result ok";result.textContent="✓ Avaliação publicada para todas as famílias.";
+      }catch(e){console.error(e);result.className="review-result error";result.textContent="Não foi possível publicar. Tente novamente."}
+      btn.textContent="Publicar avaliação";validarForm(rate);
     }
-
-    function carregarReviewDoNome(box){
-      if(!box) return;
-      const id=box.dataset.inlineRating;
-      const nome=normalizarTexto(box.querySelector("[data-inline-name]")?.value);
-      if(!nome){ validarAvaliacaoInline(box); return; }
-      const existente=reviewDaLeituraPorAvaliador(id,nome);
-      if(!existente){ validarAvaliacaoInline(box); return; }
-      box.dataset.stars=String(Number(existente.estrelas||0));
-      box.querySelectorAll("[data-inline-star]").forEach(btn=>{
-        btn.classList.toggle("active",Number(btn.dataset.value)<=Number(box.dataset.stars||0));
-      });
-      const comentario=box.querySelector("[data-inline-comment]");
-      if(comentario) comentario.value=existente.comentario||"";
-      const resultado=box.querySelector("[data-inline-result]");
-      if(resultado){
-        resultado.classList.add("ok");
-        resultado.textContent=`Você já avaliou esta leitura com ${existente.estrelas} ${Number(existente.estrelas)===1?"estrela":"estrelas"}. Você pode alterar e salvar novamente.`;
-      }
-      validarAvaliacaoInline(box);
-    }
-
-    function salvarAvaliacaoInline(box){
-      if(!box || !alunoAtual) return;
-      const idLeitura=box.dataset.inlineRating;
-      const achada=acharLeituraPorId(idLeitura);
-      if(!achada) return;
-      const avaliador=normalizarTexto(box.querySelector("[data-inline-name]")?.value);
-      const estrelas=Number(box.dataset.stars||0);
-      const comentario=normalizarTexto(box.querySelector("[data-inline-comment]")?.value);
-      const resultado=box.querySelector("[data-inline-result]");
-      if(!avaliador || !estrelas){
-        if(resultado){ resultado.classList.remove("ok"); resultado.textContent="Informe seu nome e escolha de 1 a 5 estrelas."; }
-        return;
-      }
-
-      const reviews=obterReviews();
-      const registro={
-        id:`${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
-        alunoId:String(alunoAtual.id),
-        leituraId:String(idLeitura),
-        titulo:normalizarTexto(achada.leitura.titulo),
-        avaliador,
-        estrelas,
-        comentario,
-        data:new Date().toISOString()
-      };
-      const indice=reviews.findIndex(r=>
-        String(r.alunoId)===String(alunoAtual.id) &&
-        String(r.leituraId)===String(idLeitura) &&
-        normalizarTexto(r.avaliador).toLowerCase()===avaliador.toLowerCase()
-      );
-      if(indice>=0){
-        registro.id=reviews[indice].id||registro.id;
-        reviews[indice]=registro;
-      }else{
-        reviews.push(registro);
-      }
-      salvarReviews(reviews);
-      localStorage.setItem("leiturafy_reviewer_name",avaliador);
-      if(resultado){
-        resultado.classList.add("ok");
-        resultado.textContent=`✓ Avaliação salva: ${estrelas} ${estrelas===1?"estrela":"estrelas"}.`;
-      }
-      const btn=box.querySelector("[data-inline-save]");
-      if(btn){
-        const antigo=btn.textContent;
-        btn.textContent="✓ Salvo";
-        setTimeout(()=>btn.textContent=antigo,1200);
-      }
-    }
-
-    function ligarAvaliacoesInline(){
-      document.querySelectorAll("[data-inline-rating]").forEach(box=>{
-        box.querySelectorAll("[data-inline-star]").forEach(btn=>{
-          btn.addEventListener("click",()=>{
-            const valor=Number(btn.dataset.value);
-            box.dataset.stars=String(valor);
-            box.querySelectorAll("[data-inline-star]").forEach(star=>{
-              star.classList.toggle("active",Number(star.dataset.value)<=valor);
-            });
-            const resultado=box.querySelector("[data-inline-result]");
-            if(resultado){ resultado.classList.remove("ok"); resultado.textContent=`${valor} ${valor===1?"estrela selecionada":"estrelas selecionadas"}.`; }
-            validarAvaliacaoInline(box);
-          });
-        });
-        const nome=box.querySelector("[data-inline-name]");
-        if(nome){
-          nome.addEventListener("input",()=>validarAvaliacaoInline(box));
-          nome.addEventListener("change",()=>carregarReviewDoNome(box));
-        }
-        box.querySelector("[data-inline-save]")?.addEventListener("click",()=>salvarAvaliacaoInline(box));
-        validarAvaliacaoInline(box);
+    function ligarFormularios(){
+      document.querySelectorAll("[data-rate-box]").forEach(rate=>{
+        rate.querySelectorAll("[data-star]").forEach(b=>b.addEventListener("click",()=>{rate.dataset.stars=b.dataset.star;rate.querySelectorAll("[data-star]").forEach(x=>x.classList.toggle("active",Number(x.dataset.star)<=Number(b.dataset.star)));validarForm(rate)}));
+        rate.querySelector("[data-name]")?.addEventListener("input",()=>validarForm(rate));
+        rate.querySelector("[data-save]")?.addEventListener("click",()=>salvarReview(rate));
       });
     }
 
     function renderizarLeituras(){
-      if(!alunoAtual) return;
-      const todas = leiturasDoAluno(alunoAtual.id);
-      let filtradas = todas;
-      if(filtroAtual==="concluida") filtradas=todas.filter(l=>statusNormalizado(l)==="concluida");
-      if(filtroAtual==="andamento") filtradas=todas.filter(l=>statusNormalizado(l)==="andamento");
-      if(filtroAtual==="audio") filtradas=todas.filter(l=>leituraAudio(l));
-
-      if(!filtradas.length){
-        listaLeituras.innerHTML = `<div class="empty">${todas.length ? "Nenhuma leitura encontrada neste filtro." : "Ainda não há leituras registradas para este estudante."}</div>`;
-        return;
-      }
-
-      listaLeituras.innerHTML = filtradas.map((leitura,index)=>{
-        const titulo = escapar(leitura.titulo || "Livro sem título");
-        const autor = escapar(leitura.autor || "Autor não informado");
-        const status = statusNormalizado(leitura);
-        const data = formatoData(leitura.data);
-        const obs = escapar(leituraObservacao(leitura));
-        const capa = resolverArquivo(leitura.capa,"dados/capas");
-        const audio = resolverArquivo(leituraAudio(leitura),"dados/audios");
-        const id = leituraId(leitura,index);
-        const nomeSalvo=localStorage.getItem("leiturafy_reviewer_name")||"";
-        const review = nomeSalvo ? reviewDaLeituraPorAvaliador(id,nomeSalvo) : null;
-        const coverInner = capa
-          ? `<img src="${escapar(capa)}" alt="Capa de ${titulo}" onerror="this.remove();this.parentElement.textContent='📘';">`
-          : "📘";
-        const audioHtml = audio
-          ? `<div class="audio-box">
-               <div class="audio-title">🎧 Ouvir áudio do estudante</div>
-               <audio controls preload="none" src="${escapar(audio)}"></audio>
-               <p class="listen-note">Depois de ouvir, faça sua avaliação logo abaixo.</p>
-               ${htmlAvaliacaoInline(id,review)}
-             </div>`
-          : `<div class="no-audio">Esta leitura ainda não possui áudio para avaliação.</div>`;
-        return `
-          <article class="reading-card">
-            <div class="reading-main">
-              <div class="cover">${coverInner}</div>
-              <div class="reading-info">
-                <h3>${titulo}</h3>
-                <div class="author">${autor}</div>
-                <div class="meta-row">
-                  <span class="tag ${status}">${escapar(statusRotulo(leitura))}</span>
-                  ${data ? `<span class="date">${escapar(data)}</span>` : ""}
-                </div>
-              </div>
-            </div>
-            <div class="reading-extra">
-              ${obs ? `<p class="note">${obs}</p>` : ""}
-              ${audioHtml}
-            </div>
-          </article>`;
+      if(!alunoAtual)return;desligarReviews();atualizarStats();
+      const todas=leiturasAluno(alunoAtual.id);let filtradas=todas;
+      if(filtroAtual==="concluida")filtradas=todas.filter(l=>statusNorm(l)==="concluida");
+      if(filtroAtual==="andamento")filtradas=todas.filter(l=>statusNorm(l)==="andamento");
+      if(filtroAtual==="audio")filtradas=todas.filter(l=>audioLeitura(l));
+      if(!filtradas.length){listaLeituras.innerHTML=`<div class="empty">${todas.length?"Nenhuma leitura encontrada neste filtro.":"Ainda não há leituras registradas para este estudante."}</div>`;return}
+      listaLeituras.innerHTML=filtradas.map((l,i)=>{
+        const titulo=escapar(l.titulo||"Livro sem título"),autor=escapar(l.autor||"Autor não informado"),status=statusNorm(l),data=formatoData(l.data),obs=escapar(obsLeitura(l)),capa=resolverArquivo(l.capa,"dados/capas"),audio=resolverArquivo(audioLeitura(l),"dados/audios"),id=leituraId(l,i);
+        const cover=capa?`<img src="${escapar(capa)}" alt="Capa de ${titulo}" onerror="this.remove();this.parentElement.textContent='📘'">`:"📘";
+        const audioHtml=audio?`<div class="audio-box"><div class="audio-title">🎧 Ouvir áudio do estudante</div><audio controls preload="none" src="${escapar(audio)}"></audio><p class="listen-note">Ouça antes de avaliar. As avaliações abaixo são compartilhadas.</p>${htmlAvaliacao(id)}</div>`:`<div class="no-audio">Esta leitura ainda não possui áudio para avaliação.</div>`;
+        return`<article class="reading-card" data-card data-id="${escapar(id)}"><div class="reading-main"><div class="cover">${cover}</div><div class="reading-info"><h3>${titulo}</h3><div class="author">${autor}</div><div class="meta"><span class="tag ${status}">${escapar(statusRotulo(l))}</span>${data?`<span class="date">${escapar(data)}</span>`:""}</div></div></div><div class="reading-extra">${obs?`<p class="note">${obs}</p>`:""}${audioHtml}</div></article>`;
       }).join("");
-
-      ligarAvaliacoesInline();
-    }
-
-    function setNavEnabled(enabled){
-      document.querySelectorAll("[data-requires-student]").forEach(btn=>btn.disabled=!enabled);
-    }
-
-    function abrirPagina(nome, atualizarHash=true){
-      if(nome!=="inicio" && !alunoAtual) nome="inicio";
-      document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===`page-${nome}`));
-      document.querySelectorAll("[data-page]").forEach(btn=>btn.classList.toggle("active",btn.dataset.page===nome));
-      if(atualizarHash) history.replaceState(null,"",`#${nome}`);
-      if(nome==="resumo") atualizarResumo();
-      if(nome==="leituras") renderizarLeituras();
-      window.scrollTo({top:0,behavior:"smooth"});
-    }
-
-    function entrarNoAluno(){
-      const id = alunoSelect.value;
-      alunoAtual = alunos.find(a=>String(a.id)===String(id)) || null;
-      if(!alunoAtual) return;
-      setNavEnabled(true);
-      atualizarStudentBars();
-      atualizarResumo();
-      renderizarLeituras();
-      abrirPagina("resumo");
-    }
-
-    function trocarAluno(){
-      alunoAtual=null;
-      alunoSelect.value="";
-      entrarAluno.disabled=true;
-      setNavEnabled(false);
-      abrirPagina("inicio");
-      setTimeout(()=>alunoSelect.focus(),200);
+      ligarFormularios();
+      document.querySelectorAll("[data-card]").forEach(card=>{if(card.querySelector("[data-rate-box]"))conectarReviews(card,card.dataset.id)});
     }
 
     async function iniciar(){
       try{
-        const [a,l] = await Promise.all([fetchJson(CONFIG.alunosUrl),fetchJson(CONFIG.leiturasUrl)]);
-        alunos=a; leituras=l;
-        preencherDropdown();
-        $("syncBadge").classList.add("ok");
-        $("syncText").textContent="Atualizado";
-        estadoSistema.textContent = alunos.length ? "Selecione o estudante para continuar." : "Nenhum estudante cadastrado.";
-        if(!alunos.length) estadoSistema.classList.add("error");
-      }catch(erro){
-        console.error(erro);
-        alunoSelect.disabled=true;
-        alunoSelect.innerHTML='<option value="">Dados indisponíveis</option>';
-        $("syncBadge").classList.add("error");
-        $("syncText").textContent="Falha ao carregar";
-        estadoSistema.classList.add("error");
-        estadoSistema.textContent = "Não foi possível carregar os dados. Confira a pasta dados no GitHub.";
-      }
+        const [a,l]=await Promise.all([fetchJson(CONFIG.alunosUrl),fetchJson(CONFIG.leiturasUrl)]);alunos=a;leituras=l;preencherDropdown();
+        await iniciarFirebase();
+        $("syncBadge").classList.add("ok");$("syncText").textContent=firebaseReady?"Dados e avaliações online":"Leituras atualizadas";
+        estadoSistema.textContent=alunos.length?"Selecione o estudante para continuar.":"Nenhum estudante cadastrado.";
+        if(!alunos.length)estadoSistema.classList.add("error");
+      }catch(e){console.error(e);alunoSelect.disabled=true;alunoSelect.innerHTML='<option value="">Dados indisponíveis</option>';$("syncBadge").classList.add("error");$("syncText").textContent="Falha ao carregar";estadoSistema.classList.add("error");estadoSistema.textContent="Não foi possível carregar alunos e leituras. Confira a pasta dados no GitHub."}
     }
 
-    alunoSelect.addEventListener("change",()=>{
-      entrarAluno.disabled=!alunoSelect.value;
-    });
-    entrarAluno.addEventListener("click",entrarNoAluno);
-
-    document.querySelectorAll("[data-page]").forEach(btn=>{
-      btn.addEventListener("click",()=>abrirPagina(btn.dataset.page));
-    });
-    document.querySelectorAll("[data-go]").forEach(btn=>{
-      btn.addEventListener("click",()=>abrirPagina(btn.dataset.go));
-    });
-    document.querySelectorAll(".filter").forEach(btn=>{
-      btn.addEventListener("click",()=>{
-        filtroAtual=btn.dataset.filter;
-        document.querySelectorAll(".filter").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-        renderizarLeituras();
-      });
-    });
-    window.addEventListener("hashchange",()=>{
-      const page=(location.hash||"#inicio").slice(1);
-      if(["inicio","resumo","leituras"].includes(page)) abrirPagina(page,false);
-    });
-
+    alunoSelect.addEventListener("change",()=>entrarAluno.disabled=!alunoSelect.value);entrarAluno.addEventListener("click",entrarNoAluno);
+    document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>abrirPagina(b.dataset.page)));
+    document.querySelectorAll(".filter").forEach(b=>b.addEventListener("click",()=>{filtroAtual=b.dataset.filter;document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderizarLeituras()}));
+    window.addEventListener("hashchange",()=>{const p=(location.hash||"#inicio").slice(1);if(["inicio","leituras"].includes(p))abrirPagina(p)});
     iniciar();
   </script>
 </body>
