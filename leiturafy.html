@@ -329,7 +329,7 @@
       leiturasUrl:"./dados/leituras.json",
       avaliacoesUrl:"./dados/avaliacoes.json",
       githubOwner:"MayckonJhonatas",
-      githubRepo:"mayckonjhonatas.github.io",
+      githubRepo:"leiturafy-avaliacoes",
       githubBranch:"main",
       githubAvaliacoesPath:"dados/avaliacoes.json",
       githubToken:"COLE_SEU_TOKEN_FINE_GRAINED_AQUI",
@@ -411,8 +411,11 @@
 
 
     async function carregarAvaliacoes(){
-      try{avaliacoes=await fetchJson(CONFIG.avaliacoesUrl)}
-      catch(e){console.warn("Não foi possível carregar avaliações:",e);avaliacoes=[]}
+      if(!apiConfigurada()){avaliacoes=[];return}
+      try{
+        const atual=await lerAvaliacoesDoGitHub();
+        avaliacoes=atual.lista;
+      }catch(e){console.warn("Não foi possível carregar avaliações:",e);avaliacoes=[]}
     }
 
     function preencherDropdown(){
@@ -591,7 +594,7 @@
         const card=rate.closest("[data-card]");if(card)renderReviews(card,id);
         result.className="review-result ok";result.textContent="✓ Avaliação publicada para todos.";
       }catch(e){
-        console.error(e);result.className="review-result error";result.textContent="Não foi possível publicar a avaliação. Verifique a configuração do GitHub.";
+        console.error(e);result.className="review-result error";result.textContent=`Não foi possível publicar: ${e.message||"erro desconhecido"}`;
       }
       btn.textContent="Publicar avaliação";validarForm(rate);
     }
