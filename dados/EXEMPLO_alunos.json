@@ -1,0 +1,9 @@
+[
+  {
+    "id": "JR-0001",
+    "nome": "Aluno de Teste",
+    "turma": "5º ano A",
+    "escola": "Escola Municipal José Rufino",
+    "ativo": true
+  }
+]

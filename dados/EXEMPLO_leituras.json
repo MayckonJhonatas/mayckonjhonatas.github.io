@@ -1,0 +1,14 @@
+[
+  {
+    "id": "LEIT-0001",
+    "alunoId": "JR-0001",
+    "titulo": "O Pequeno Príncipe",
+    "autor": "Antoine de Saint-Exupéry",
+    "status": "Concluída",
+    "avaliacao": 5,
+    "data": "2026-10-07",
+    "observacao": "Registro de exemplo para testar a página.",
+    "audio": "",
+    "capa": ""
+  }
+]
