@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>LeituraFy • Administração</title>
+<title>LeituraFy • Administração (corrigido)</title>
 <style>
 :root{
   --azul-950:#082c4c; --azul-900:#0f3c68; --azul-800:#12528d; --azul-700:#1976d2;
@@ -169,7 +169,11 @@ function detectarRepositorioPages(){
   if(!host.endsWith(".github.io")) return null;
   const owner=host.split(".")[0];
   const partes=location.pathname.split("/").filter(Boolean);
-  const repo=partes.length ? partes[0] : `${owner}.github.io`;
+  const primeiro=(partes[0]||"").toLowerCase();
+  // Em um site de usuário, ex.: mayckonjhonatas.github.io/admin.html,
+  // o primeiro trecho é um arquivo e NÃO o nome do repositório.
+  const pareceArquivo = !primeiro || primeiro.includes(".") || primeiro === "dados";
+  const repo = pareceArquivo ? `${owner}.github.io` : partes[0];
   return {owner,repo,branch:"main"};
 }
 function config(){ return {owner:normal($("ghOwner").value),repo:normal($("ghRepo").value),branch:normal($("ghBranch").value)||"main",token:normal($("ghToken").value)}; }
@@ -178,6 +182,11 @@ function carregarConfig(){
   let c={};
   try{ c=JSON.parse(localStorage.getItem("leiturafyGhConfig")||"{}"); }catch{}
   const auto=detectarRepositorioPages()||{};
+  // Corrige automaticamente configurações antigas criadas pelo bug que salvava
+  // admin.html/leituraadmin.html como nome do repositório.
+  const repoSalvo=normal(c.repo);
+  const repoInvalido=/\.(html?|php|asp|aspx)$/i.test(repoSalvo) || repoSalvo==="admin.html" || repoSalvo==="leituraadmin.html";
+  if(repoInvalido){ c.repo=""; localStorage.removeItem("leiturafyGhConfig"); }
   $("ghOwner").value=c.owner||auto.owner||"";
   $("ghRepo").value=c.repo||auto.repo||"";
   $("ghBranch").value=c.branch||auto.branch||"main";
@@ -190,8 +199,23 @@ function base64ToUtf8(b64){ const bin=atob(b64.replace(/\n/g,"")); const bytes=U
 async function fileToBase64(file){ const buf=await file.arrayBuffer(); const bytes=new Uint8Array(buf); let bin=""; const step=0x8000; for(let i=0;i<bytes.length;i+=step) bin+=String.fromCharCode(...bytes.subarray(i,i+step)); return btoa(bin); }
 function ensureRepoConfig(){ const c=config(); if(!c.owner||!c.repo||!c.branch){ irPara("github"); throw new Error("Informe usuário, repositório e branch do GitHub."); } return c; }
 function ensureWriteConfig(){ const c=ensureRepoConfig(); if(!c.token){ irPara("github"); throw new Error("Informe o token do GitHub para cadastrar, editar ou excluir dados."); } return c; }
+async function diagnosticarGithub(){
+  const c=ensureRepoConfig();
+  const authHeaders=headers(true);
+  const repoUrl=`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}`;
+  const rr=await fetch(repoUrl,{headers:authHeaders,cache:"no-store"});
+  if(rr.status===401) throw new Error("Token inválido ou expirado. Gere um novo token e tente novamente.");
+  if(rr.status===404) throw new Error(`Repositório não encontrado ou token sem acesso: ${c.owner}/${c.repo}. Confira se o token foi liberado especificamente para esse repositório.`);
+  if(!rr.ok){ const t=await rr.text(); throw new Error(`Falha ao acessar o repositório (${rr.status}): ${t.slice(0,180)}`); }
+  const repoInfo=await rr.json();
+  const branchUrl=`${repoUrl}/branches/${encodeURIComponent(c.branch)}`;
+  const rb=await fetch(branchUrl,{headers:authHeaders,cache:"no-store"});
+  if(rb.status===404) throw new Error(`A branch “${c.branch}” não foi encontrada em ${c.owner}/${c.repo}. A branch padrão informada pelo GitHub é “${repoInfo.default_branch||"desconhecida"}”.`);
+  if(!rb.ok){ const t=await rb.text(); throw new Error(`Falha ao verificar a branch (${rb.status}): ${t.slice(0,180)}`); }
+  return repoInfo;
+}
 async function ghGet(path){ const c=ensureRepoConfig(); const r=await fetch(`${apiUrl(path)}?ref=${encodeURIComponent(c.branch)}`,{headers:headers(true),cache:"no-store"}); if(r.status===404) return null; if(!r.ok){ const t=await r.text(); throw new Error(`GitHub respondeu ${r.status}: ${t.slice(0,180)}`); } return r.json(); }
-async function ghPut(path,contentB64,message,sha=null){ const c=ensureWriteConfig(); const body={message,content:contentB64,branch:c.branch}; if(sha) body.sha=sha; const r=await fetch(apiUrl(path),{method:"PUT",headers:{...headers(true),"Content-Type":"application/json"},body:JSON.stringify(body)}); if(!r.ok){ const t=await r.text(); throw new Error(`Falha ao salvar ${path} (${r.status}): ${t.slice(0,220)}`); } return r.json(); }
+async function ghPut(path,contentB64,message,sha=null){ const c=ensureWriteConfig(); await diagnosticarGithub(); const body={message,content:contentB64,branch:c.branch}; if(sha) body.sha=sha; const r=await fetch(apiUrl(path),{method:"PUT",headers:{...headers(true),"Content-Type":"application/json"},body:JSON.stringify(body)}); if(!r.ok){ const t=await r.text(); if(r.status===404) throw new Error(`GitHub não permitiu gravar em ${c.owner}/${c.repo}. Verifique se o token tem acesso a ESTE repositório e permissão “Contents: Read and write”.`); throw new Error(`Falha ao salvar ${path} (${r.status}): ${t.slice(0,220)}`); } return r.json(); }
 async function ghDelete(path,message){ const c=ensureWriteConfig(); const atual=await ghGet(path); if(!atual) return; const r=await fetch(apiUrl(path),{method:"DELETE",headers:{...headers(true),"Content-Type":"application/json"},body:JSON.stringify({message,sha:atual.sha,branch:c.branch})}); if(!r.ok){const t=await r.text();throw new Error(`Falha ao apagar ${path} (${r.status}): ${t.slice(0,180)}`);} }
 async function lerJsonGh(path){ const f=await ghGet(path); if(!f) return {dados:[],sha:null}; const txt=base64ToUtf8(f.content||""); const dados=JSON.parse(txt||"[]"); if(!Array.isArray(dados)) throw new Error(`${path} precisa conter uma lista JSON.`); return {dados,sha:f.sha}; }
 async function lerJsonPublicado(path){
@@ -296,11 +320,23 @@ async function excluirLeitura(id){ const l=leituras.find(x=>String(x.id)===Strin
 
 $("buscaAluno").addEventListener("input",renderAlunos); $("filtroAlunoAtivo").addEventListener("change",renderAlunos); $("buscaLeitura").addEventListener("input",renderLeituras); $("filtroLeituraAluno").addEventListener("change",renderLeituras);
 $("formGithub").addEventListener("submit",async e=>{
-  e.preventDefault(); salvarConfigLocal(); $("githubResult").innerHTML=alertBox("info","Testando acesso ao repositório...");
-  const ok=await sincronizarTudo(true); const c=config();
-  if(ok&&c.token) $("githubResult").innerHTML=alertBox("ok",`Conectado a <b>${escapar(c.owner)}/${escapar(c.repo)}</b> na branch <b>${escapar(c.branch)}</b>. O painel está pronto para editar.`);
-  else if(ok) $("githubResult").innerHTML=alertBox("warn","Os dados foram carregados, mas falta informar o token para salvar alterações.");
-  else $("githubResult").innerHTML=alertBox("error","Não foi possível conectar. Confira repositório, branch, token e as permissões do GitHub Pages.");
+  e.preventDefault(); salvarConfigLocal(); $("githubResult").innerHTML=alertBox("info","Testando repositório, token e branch...");
+  const c=config();
+  try{
+    if(c.token){
+      const info=await diagnosticarGithub();
+      const ok=await sincronizarTudo(true);
+      if(!ok) throw new Error("O repositório foi encontrado, mas não foi possível carregar os arquivos de dados.");
+      $("githubResult").innerHTML=alertBox("ok",`✓ Repositório encontrado: <b>${escapar(c.owner)}/${escapar(c.repo)}</b><br>✓ Branch: <b>${escapar(c.branch)}</b><br>✓ Token aceito<br>✓ dados/alunos.json e dados/leituras.json carregados<br><br><b>Pronto para salvar.</b>`);
+      atualizarEstadoConexao(true,`${c.owner}/${c.repo} • ${c.branch}`);
+    }else{
+      const ok=await sincronizarTudo(true);
+      $("githubResult").innerHTML=ok?alertBox("warn","Dados públicos carregados. Informe o token para salvar alterações."):alertBox("error","Não foi possível carregar os dados publicados.");
+    }
+  }catch(err){
+    atualizarEstadoConexao(false);
+    $("githubResult").innerHTML=alertBox("error",`<b>Falha no teste:</b><br>${escapar(err.message)}`);
+  }
 });
 function limparToken(){ sessionStorage.removeItem("leiturafyGhToken"); $("ghToken").value=""; atualizarEstadoConexao(false); toast("Token removido desta sessão."); }
 
