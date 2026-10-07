@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>LeituraFy • Administração (corrigido)</title>
+<title>LeituraFy • Administração</title>
 <style>
 :root{
   --azul-950:#082c4c; --azul-900:#0f3c68; --azul-800:#12528d; --azul-700:#1976d2;
@@ -70,7 +70,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
         <div class="two-col">
           <div class="card"><div class="card-head"><h3>Ações rápidas</h3></div><div class="card-body quick">
             <button onclick="irPara('alunos');novoAluno()"><b>+ Cadastrar aluno</b><span>Adicione um estudante ao arquivo dados/alunos.json.</span></button>
-            <button onclick="irPara('leituras');novoRegistroLeitura()"><b>+ Registrar leitura</b><span>Escolha o aluno e vincule livro, avaliação, áudio e capa.</span></button>
+            <button onclick="irPara('leituras');novoRegistroLeitura()"><b>+ Registrar leitura</b><span>Escolha o aluno e vincule livro, áudio, capa e observações.</span></button>
             <button onclick="irPara('github')"><b>⚙ Configurar GitHub</b><span>Defina usuário, repositório, branch e token de acesso.</span></button>
             <button onclick="sincronizarTudo()"><b>↻ Sincronizar dados</b><span>Baixe novamente alunos.json e leituras.json do repositório.</span></button>
           </div></div>
@@ -84,10 +84,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
       </section>
 
       <section class="page" id="page-alunos">
-        <div class="page-head"><div><h2>Alunos</h2><p>Cadastre os estudantes que aparecerão no dropdown da página dos responsáveis.</p></div><div class="actions"><button class="btn btn-primary" onclick="novoAluno()">+ Novo aluno</button></div></div>
+        <div class="page-head"><div><h2>Alunos</h2><p>Cadastre os estudantes que aparecerão no dropdown da página dos responsáveis.</p></div><div class="actions"><button class="btn btn-light" onclick="baixarModeloCsv()">↓ Modelo CSV</button><button class="btn btn-light" onclick="$('csvAlunosInput').click()">↑ Importar CSV</button><button class="btn btn-primary" onclick="novoAluno()">+ Novo aluno</button><input id="csvAlunosInput" type="file" accept=".csv,text/csv" class="hidden"></div></div>
         <div class="card">
-          <div class="card-head"><div class="toolbar" style="width:100%"><div class="search"><span>⌕</span><input id="buscaAluno" placeholder="Buscar por nome, turma ou escola"></div><select id="filtroAlunoAtivo" style="border:1px solid var(--borda);border-radius:13px;padding:10px 12px;background:#fff"><option value="todos">Todos</option><option value="ativos">Ativos</option><option value="inativos">Inativos</option></select></div></div>
-          <div class="table-wrap"><table class="table"><thead><tr><th>ALUNO</th><th>TURMA</th><th>ESCOLA</th><th>STATUS</th><th>AÇÕES</th></tr></thead><tbody id="tabelaAlunos"></tbody></table><div class="empty hidden" id="emptyAlunos"><strong>Nenhum aluno encontrado.</strong>Cadastre o primeiro estudante para começar.</div></div>
+          <div class="card-head"><div class="toolbar" style="width:100%"><div class="search"><span>⌕</span><input id="buscaAluno" placeholder="Buscar por nome, sala/turma ou código"></div><select id="filtroAlunoAtivo" style="border:1px solid var(--borda);border-radius:13px;padding:10px 12px;background:#fff"><option value="todos">Todos</option><option value="ativos">Ativos</option><option value="inativos">Inativos</option></select></div></div>
+          <div class="table-wrap"><table class="table"><thead><tr><th>ALUNO</th><th>SALA/TURMA</th><th>STATUS</th><th>AÇÕES</th></tr></thead><tbody id="tabelaAlunos"></tbody></table><div class="empty hidden" id="emptyAlunos"><strong>Nenhum aluno encontrado.</strong>Cadastre o primeiro estudante para começar.</div></div>
         </div>
       </section>
 
@@ -121,8 +121,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 <form id="formAluno" class="form-grid">
   <input type="hidden" id="alunoId">
   <div class="field full"><label>Nome do aluno *</label><input id="alunoNome" required placeholder="Nome completo"></div>
-  <div class="field"><label>Turma *</label><input id="alunoTurma" required placeholder="Ex: 5º ano A"></div>
-  <div class="field"><label>Escola</label><input id="alunoEscola" placeholder="Ex: Escola Municipal José Rufino"></div>
+  <div class="field"><label>Sala / turma *</label><input id="alunoTurma" required placeholder="Ex: 5º ano A"></div>
   <div class="field"><label>Status</label><select id="alunoAtivo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
   <div class="field"><label>Código interno (opcional)</label><input id="alunoCodigo" placeholder="Ex: 00125"></div>
   <div class="full form-actions"><button class="btn btn-primary" type="submit">Salvar aluno</button><button class="btn btn-light" type="button" onclick="fecharModal('modalAluno')">Cancelar</button></div>
@@ -136,7 +135,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
   <div class="field"><label>Autor</label><input id="leituraAutor" placeholder="Autor da obra"></div>
   <div class="field"><label>Status *</label><select id="leituraStatus"><option value="Lido">Concluída</option><option value="Lendo">Em andamento</option><option value="Desejado">Desejado</option></select></div>
   <div class="field"><label>Data</label><input id="leituraData" type="date"></div>
-  <div class="field"><label>Avaliação</label><select id="leituraAvaliacao"><option value="">Sem avaliação</option><option value="5">★★★★★</option><option value="4">★★★★</option><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option></select></div>
   <div class="field"><label>Áudio do aluno</label><input id="leituraAudio" type="file" accept="audio/*"><div class="hint">MP3, M4A, OGG, WAV ou outro formato aceito pelo navegador.</div><div id="audioAtual" class="file-preview hidden"></div></div>
   <div class="field"><label>Capa do livro</label><input id="leituraCapa" type="file" accept="image/*"><div class="hint">Opcional. A imagem será salva em dados/capas/.</div><div id="capaAtual" class="file-preview hidden"></div></div>
   <div class="field full"><label>Observação ou recomendação</label><textarea id="leituraObs" placeholder="Resumo, comentário ou orientação para a família"></textarea></div>
@@ -249,8 +247,8 @@ function preencherSelects(){
 }
 function renderAlunos(){
   const q=normal($("buscaAluno").value).toLowerCase(), f=$("filtroAlunoAtivo").value;
-  const lista=alunos.filter(a=>{const ativo=a.ativo!==false; if(f==="ativos"&&!ativo)return false;if(f==="inativos"&&ativo)return false; return !q||[a.nome,a.turma,a.escola,a.codigo].some(v=>normal(v).toLowerCase().includes(q));}).sort((a,b)=>normal(a.nome).localeCompare(normal(b.nome),"pt-BR"));
-  $("tabelaAlunos").innerHTML=lista.map(a=>`<tr><td><strong>${escapar(a.nome)}</strong><div class="muted">ID: ${escapar(a.id)}</div></td><td>${escapar(a.turma||"—")}</td><td>${escapar(a.escola||"—")}</td><td><span class="tag ${a.ativo!==false?"ok":"off"}">${a.ativo!==false?"Ativo":"Inativo"}</span></td><td><div class="row-actions"><button class="btn btn-light btn-sm" onclick="editarAluno('${escapar(a.id)}')">Editar</button><button class="btn btn-danger btn-sm" onclick="excluirAluno('${escapar(a.id)}')">Excluir</button></div></td></tr>`).join("");
+  const lista=alunos.filter(a=>{const ativo=a.ativo!==false; if(f==="ativos"&&!ativo)return false;if(f==="inativos"&&ativo)return false; return !q||[a.nome,a.turma,a.codigo].some(v=>normal(v).toLowerCase().includes(q));}).sort((a,b)=>normal(a.nome).localeCompare(normal(b.nome),"pt-BR"));
+  $("tabelaAlunos").innerHTML=lista.map(a=>`<tr><td><strong>${escapar(a.nome)}</strong><div class="muted">ID: ${escapar(a.id)}</div></td><td>${escapar(a.turma||"—")}</td><td><span class="tag ${a.ativo!==false?"ok":"off"}">${a.ativo!==false?"Ativo":"Inativo"}</span></td><td><div class="row-actions"><button class="btn btn-light btn-sm" onclick="editarAluno('${escapar(a.id)}')">Editar</button><button class="btn btn-danger btn-sm" onclick="excluirAluno('${escapar(a.id)}')">Excluir</button></div></td></tr>`).join("");
   $("emptyAlunos").classList.toggle("hidden",lista.length>0);
 }
 function statusTag(l){ const s=normal(l.status).toLowerCase(); if(["lido","concluída","concluida","finalizada"].includes(s))return'<span class="tag ok">Concluída</span>'; if(["lendo","em andamento","andamento"].includes(s))return'<span class="tag warn">Em andamento</span>'; return `<span class="tag off">${escapar(l.status||"Registrada")}</span>`; }
@@ -294,15 +292,65 @@ async function sincronizarTudo(silencioso=false){
 $("btnRefresh").onclick=()=>sincronizarTudo();
 
 function novoAluno(){ $("formAluno").reset(); $("alunoId").value=""; $("alunoAtivo").value="true"; $("tituloModalAluno").textContent="Novo aluno"; abrirModal("modalAluno"); }
-function editarAluno(id){ const a=alunos.find(x=>String(x.id)===String(id)); if(!a)return; $("alunoId").value=a.id; $("alunoNome").value=a.nome||""; $("alunoTurma").value=a.turma||""; $("alunoEscola").value=a.escola||""; $("alunoAtivo").value=String(a.ativo!==false); $("alunoCodigo").value=a.codigo||""; $("tituloModalAluno").textContent="Editar aluno"; abrirModal("modalAluno"); }
+function editarAluno(id){ const a=alunos.find(x=>String(x.id)===String(id)); if(!a)return; $("alunoId").value=a.id; $("alunoNome").value=a.nome||""; $("alunoTurma").value=a.turma||""; $("alunoAtivo").value=String(a.ativo!==false); $("alunoCodigo").value=a.codigo||""; $("tituloModalAluno").textContent="Editar aluno"; abrirModal("modalAluno"); }
 $("formAluno").addEventListener("submit",async e=>{
-  e.preventDefault(); try{ ensureWriteConfig(); const id=normal($("alunoId").value)||gerarId("alu"); const reg={id,nome:normal($("alunoNome").value),turma:normal($("alunoTurma").value),escola:normal($("alunoEscola").value),ativo:$("alunoAtivo").value==="true",codigo:normal($("alunoCodigo").value),updatedAt:new Date().toISOString()}; const atual=await lerJsonGh(PATH_ALUNOS); const i=atual.dados.findIndex(a=>String(a.id)===String(id)); if(i>=0) reg.createdAt=atual.dados[i].createdAt||reg.updatedAt; else reg.createdAt=reg.updatedAt; if(i>=0) atual.dados[i]={...atual.dados[i],...reg}; else atual.dados.push(reg); await salvarJsonGh(PATH_ALUNOS,atual.dados,`${i>=0?"Atualiza":"Cadastra"} aluno ${reg.nome}`); alunos=atual.dados; fecharModal("modalAluno"); renderTudo(); toast("Aluno salvo no GitHub.");
+  e.preventDefault(); try{ ensureWriteConfig(); const id=normal($("alunoId").value)||gerarId("alu"); const reg={id,nome:normal($("alunoNome").value),turma:normal($("alunoTurma").value),ativo:$("alunoAtivo").value==="true",codigo:normal($("alunoCodigo").value),updatedAt:new Date().toISOString()}; const atual=await lerJsonGh(PATH_ALUNOS); const i=atual.dados.findIndex(a=>String(a.id)===String(id)); if(i>=0) reg.createdAt=atual.dados[i].createdAt||reg.updatedAt; else reg.createdAt=reg.updatedAt; let registroFinal=i>=0?{...atual.dados[i],...reg}:reg; delete registroFinal.escola; if(i>=0) atual.dados[i]=registroFinal; else atual.dados.push(registroFinal); await salvarJsonGh(PATH_ALUNOS,atual.dados,`${i>=0?"Atualiza":"Cadastra"} aluno ${reg.nome}`); alunos=atual.dados; fecharModal("modalAluno"); renderTudo(); toast("Aluno salvo no GitHub.");
   }catch(err){toast(err.message,"error");}
 });
 async function excluirAluno(id){ const a=alunos.find(x=>String(x.id)===String(id)); if(!a)return; const qtd=leituras.filter(l=>String(l.alunoId)===String(id)).length; const msg=qtd?`O aluno ${a.nome} possui ${qtd} leitura(s). Excluir o aluno não apagará automaticamente essas leituras. Continuar?`:`Excluir ${a.nome}?`; if(!confirm(msg))return; try{const atual=await lerJsonGh(PATH_ALUNOS); const nova=atual.dados.filter(x=>String(x.id)!==String(id)); await salvarJsonGh(PATH_ALUNOS,nova,`Remove aluno ${a.nome}`); alunos=nova;renderTudo();toast("Aluno removido.");}catch(e){toast(e.message,"error");}}
 
+function baixarModeloCsv(){
+  const conteudo="sep=;\nnome;sala\nAna Clara da Silva;6º Ano A\nJoão Miguel Santos;6º Ano A\nMaria Eduarda Lima;7º Ano B\n";
+  const blob=new Blob(["\ufeff"+conteudo],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="modelo_alunos_leiturafy.csv"; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+function normalizarCabecalhoCsv(v){ return normal(v).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,""); }
+function chaveAlunoCsv(nome,turma){ return `${normal(nome).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()}|${normal(turma).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()}`; }
+function detectarSeparadorCsv(linha){
+  let virgulas=0,pontos=0,aspas=false; for(let i=0;i<linha.length;i++){const c=linha[i]; if(c==='"'){if(aspas&&linha[i+1]==='"'){i++;continue;} aspas=!aspas;} else if(!aspas&&c===',')virgulas++; else if(!aspas&&c===';')pontos++;} return pontos>=virgulas?';':',';
+}
+function parseLinhaCsv(linha,sep){
+  const out=[]; let atual="",aspas=false; for(let i=0;i<linha.length;i++){const c=linha[i]; if(c==='"'){if(aspas&&linha[i+1]==='"'){atual+='"';i++;}else aspas=!aspas;}else if(c===sep&&!aspas){out.push(atual.trim());atual="";}else atual+=c;} out.push(atual.trim()); return out;
+}
+async function importarAlunosCsv(file){
+  if(!file)return;
+  try{
+    ensureWriteConfig();
+    let texto=(await file.text()).replace(/^\ufeff/,"").replace(/\r\n?/g,"\n");
+    let linhas=texto.split("\n").filter(l=>l.trim());
+    let sepForcado=null;
+    if(linhas[0] && /^sep\s*=\s*[;,]$/i.test(linhas[0].trim())){
+      sepForcado=linhas[0].trim().slice(-1);
+      linhas=linhas.slice(1);
+    }
+    if(linhas.length<2) throw new Error("O CSV precisa ter cabeçalho e pelo menos um aluno.");
+    const sep=sepForcado||detectarSeparadorCsv(linhas[0]);
+    const cab=parseLinhaCsv(linhas[0],sep).map(normalizarCabecalhoCsv);
+    const iNome=cab.findIndex(h=>["nome","aluno","nomedoaluno"].includes(h));
+    const iSala=cab.findIndex(h=>["sala","turma","classe","salaturma"].includes(h));
+    if(iNome<0||iSala<0) throw new Error('Use as colunas "nome" e "sala" (ou "turma").');
+    const atual=await lerJsonGh(PATH_ALUNOS);
+    const existentes=new Set(atual.dados.map(a=>chaveAlunoCsv(a.nome,a.turma)));
+    const agora=new Date().toISOString(); let duplicados=0,invalidos=0; const novos=[];
+    for(const linha of linhas.slice(1)){
+      const cols=parseLinhaCsv(linha,sep); const nome=normal(cols[iNome]), turma=normal(cols[iSala]);
+      if(!nome||!turma){invalidos++;continue;}
+      const chave=chaveAlunoCsv(nome,turma); if(existentes.has(chave)){duplicados++;continue;}
+      existentes.add(chave); novos.push({id:gerarId("alu"),nome,turma,ativo:true,codigo:"",createdAt:agora,updatedAt:agora});
+    }
+    if(!novos.length){toast(`Nenhum aluno novo para importar. ${duplicados} duplicado(s) e ${invalidos} linha(s) incompleta(s).`,"error");return;}
+    const dados=[...atual.dados,...novos];
+    await salvarJsonGh(PATH_ALUNOS,dados,`Importa ${novos.length} aluno(s) via CSV`);
+    alunos=dados; renderTudo();
+    toast(`${novos.length} aluno(s) importado(s). ${duplicados?duplicados+" duplicado(s) ignorado(s). ":""}${invalidos?invalidos+" linha(s) incompleta(s) ignorada(s).":""}`);
+  }catch(e){toast(e.message,"error");}
+  finally{$("csvAlunosInput").value="";}
+}
+$("csvAlunosInput").addEventListener("change",e=>importarAlunosCsv(e.target.files?.[0]));
+
+
 function novoRegistroLeitura(){ $("formLeitura").reset(); $("leituraId").value=""; $("leituraData").value=hoje(); $("tituloModalLeitura").textContent="Nova leitura"; $("audioAtual").classList.add("hidden"); $("capaAtual").classList.add("hidden"); $("saveProgressBox").classList.add("hidden"); abrirModal("modalLeitura"); }
-function editarLeitura(id){ const l=leituras.find(x=>String(x.id)===String(id)); if(!l)return; $("formLeitura").reset(); $("leituraId").value=l.id; $("leituraAluno").value=l.alunoId||""; $("leituraTitulo").value=l.titulo||""; $("leituraAutor").value=l.autor||""; $("leituraStatus").value=l.status||"Lido"; $("leituraData").value=normal(l.data).slice(0,10); $("leituraAvaliacao").value=String(l.avaliacao??l.estrelas??""); $("leituraObs").value=l.observacao??l.resumo??""; const aud=normal(l.audio)||(l.tipoMidia==="audio"?normal(l.midia):""); if(aud){$("audioAtual").innerHTML=`🎧 Arquivo atual: <b>${escapar(aud)}</b>`;$("audioAtual").classList.remove("hidden")}else $("audioAtual").classList.add("hidden"); if(normal(l.capa)){$("capaAtual").innerHTML=`🖼️ Capa atual: <b>${escapar(l.capa)}</b>`;$("capaAtual").classList.remove("hidden")}else $("capaAtual").classList.add("hidden"); $("tituloModalLeitura").textContent="Editar leitura"; $("saveProgressBox").classList.add("hidden"); abrirModal("modalLeitura"); }
+function editarLeitura(id){ const l=leituras.find(x=>String(x.id)===String(id)); if(!l)return; $("formLeitura").reset(); $("leituraId").value=l.id; $("leituraAluno").value=l.alunoId||""; $("leituraTitulo").value=l.titulo||""; $("leituraAutor").value=l.autor||""; $("leituraStatus").value=l.status||"Lido"; $("leituraData").value=normal(l.data).slice(0,10); $("leituraObs").value=l.observacao??l.resumo??""; const aud=normal(l.audio)||(l.tipoMidia==="audio"?normal(l.midia):""); if(aud){$("audioAtual").innerHTML=`🎧 Arquivo atual: <b>${escapar(aud)}</b>`;$("audioAtual").classList.remove("hidden")}else $("audioAtual").classList.add("hidden"); if(normal(l.capa)){$("capaAtual").innerHTML=`🖼️ Capa atual: <b>${escapar(l.capa)}</b>`;$("capaAtual").classList.remove("hidden")}else $("capaAtual").classList.add("hidden"); $("tituloModalLeitura").textContent="Editar leitura"; $("saveProgressBox").classList.add("hidden"); abrirModal("modalLeitura"); }
 function setProgress(p,text){ $("saveProgressBox").classList.remove("hidden"); $("saveProgressBar").style.width=`${p}%`; $("saveProgressText").textContent=text; }
 async function subirArquivo(file,pasta,alunoId){ if(!file)return""; const ext=(file.name.split(".").pop()||"bin").toLowerCase().replace(/[^a-z0-9]/g,""); const base=file.name.replace(/\.[^.]+$/g,""); const nome=`${slug(alunoId)}_${Date.now()}_${slug(base)}.${ext}`; const path=`${pasta}/${nome}`; const b64=await fileToBase64(file); await ghPut(path,b64,`Adiciona mídia ${nome}`); return nome; }
 $("formLeitura").addEventListener("submit",async e=>{
@@ -312,8 +360,8 @@ $("formLeitura").addEventListener("submit",async e=>{
     const audioFile=$("leituraAudio").files[0]; const capaFile=$("leituraCapa").files[0];
     if(audioFile){setProgress(25,"Enviando áudio para dados/audios/..."); audio=await subirArquivo(audioFile,"dados/audios",alunoId);}
     if(capaFile){setProgress(55,"Enviando capa para dados/capas/..."); capa=await subirArquivo(capaFile,"dados/capas",alunoId);}
-    const agora=new Date().toISOString(); const reg={id,alunoId,titulo:normal($("leituraTitulo").value),autor:normal($("leituraAutor").value),status:$("leituraStatus").value,data:$("leituraData").value,avaliacao:$("leituraAvaliacao").value?Number($("leituraAvaliacao").value):null,observacao:normal($("leituraObs").value),audio,capa,updatedAt:agora,createdAt:antigo.createdAt||agora};
-    if(idx>=0) atual.dados[idx]={...antigo,...reg}; else atual.dados.unshift(reg); setProgress(78,"Atualizando dados/leituras.json..."); await salvarJsonGh(PATH_LEITURAS,atual.dados,`${idx>=0?"Atualiza":"Registra"} leitura ${reg.titulo}`); leituras=atual.dados; setProgress(100,"Concluído."); renderTudo(); setTimeout(()=>fecharModal("modalLeitura"),350); toast("Leitura salva no GitHub.");
+    const agora=new Date().toISOString(); const reg={id,alunoId,titulo:normal($("leituraTitulo").value),autor:normal($("leituraAutor").value),status:$("leituraStatus").value,data:$("leituraData").value,observacao:normal($("leituraObs").value),audio,capa,updatedAt:agora,createdAt:antigo.createdAt||agora};
+    let registroFinal=idx>=0?{...antigo,...reg}:reg; delete registroFinal.avaliacao; delete registroFinal.estrelas; if(idx>=0) atual.dados[idx]=registroFinal; else atual.dados.unshift(registroFinal); setProgress(78,"Atualizando dados/leituras.json..."); await salvarJsonGh(PATH_LEITURAS,atual.dados,`${idx>=0?"Atualiza":"Registra"} leitura ${reg.titulo}`); leituras=atual.dados; setProgress(100,"Concluído."); renderTudo(); setTimeout(()=>fecharModal("modalLeitura"),350); toast("Leitura salva no GitHub.");
   }catch(err){toast(err.message,"error"); setProgress(0,"Não foi possível concluir o salvamento.");}finally{btn.disabled=false;}
 });
 async function excluirLeitura(id){ const l=leituras.find(x=>String(x.id)===String(id)); if(!l)return; if(!confirm(`Excluir o registro “${l.titulo}” de ${nomeAluno(l.alunoId)}?\n\nOs arquivos de áudio/capa vinculados não serão apagados automaticamente.`))return; try{const atual=await lerJsonGh(PATH_LEITURAS);const nova=atual.dados.filter(x=>String(x.id)!==String(id));await salvarJsonGh(PATH_LEITURAS,nova,`Remove leitura ${l.titulo}`);leituras=nova;renderTudo();toast("Leitura removida.");}catch(e){toast(e.message,"error");}}
