@@ -1,1 +1,398 @@
-[]
+[
+  {
+    "id": "alu_muyeg9vk_rtsi4",
+    "nome": "ADRYEL VINICIUS PEREIRA DOS SANTOS",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_ejeh5",
+    "nome": "AUREA LAIS SILVA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_39je8",
+    "nome": "BRENDA ESTEFANY CABRAL DE SOUZA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_7vts7",
+    "nome": "BRENDA EVILY DO NASCIMENTO SILVA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_0534s",
+    "nome": "EMILLY SOPHIA DA SILVA CANDIDO",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_dn1zt",
+    "nome": "EVELLY MARIA DA SILV A",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_mcp0m",
+    "nome": "GABRIEL MOURA DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_4ha0m",
+    "nome": "IASMIN MIRELLY ALAIDE DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_nqvvb",
+    "nome": "ISAAC OZEAS ALVES CABRAL",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_725nx",
+    "nome": "JADILMA GISLAINE CAVALCANTI LOPES",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_0l4xw",
+    "nome": "JHENNIFER NICOLLY ALVES DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_qrjl9",
+    "nome": "JOSE FELYPE PEREIRA DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_rypmq",
+    "nome": "JOSE VITOR MARTINS DA ROCHA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_3n92t",
+    "nome": "LORENA VITORIA FARIAS MOTA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_8fymg",
+    "nome": "LUIZ FERNANDO MARTINS ALVES",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vk_96jb0",
+    "nome": "MARIA JULIA MONTEIRO DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_rp6qx",
+    "nome": "MARIA VITORIA DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_a7sxz",
+    "nome": "MAYSA LOUANNE DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_3wior",
+    "nome": "MYLLENNA VITORIA DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_lod48",
+    "nome": "NATALICIA DA SILVA BATISTA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_i1b62",
+    "nome": "VALENTINA AUGUSTO DE AMORIM",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_2r3pz",
+    "nome": "YASMIN MARIA VIEIRA DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL A",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_iwfue",
+    "nome": "ALEXANDRE ARAUJO DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_rntvf",
+    "nome": "ALYNE PRISCILLA SILVA DE MELO",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_7rshw",
+    "nome": "ANTONY MIGUEL FARIAS SILVA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_ujaa9",
+    "nome": "ARTHUR VINÍCIUS FARIAS DOS SANTOS",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_7watj",
+    "nome": "BIANCA KAROLLYNE DE ANDRADE LIMA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_bcp3x",
+    "nome": "CAIO VINICIUS FRANCISCO DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_gii9m",
+    "nome": "CAUA ALVES DE SOUZA E SILVA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_j0h40",
+    "nome": "DAVY DE OLIVEIRA SANTOS",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_0d1t1",
+    "nome": "ISABELA OZEAS DE SOUZA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_0j16b",
+    "nome": "JEFFERSON RICARDO LUIS DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_8hqlc",
+    "nome": "JOSE GABRIEL CANDIDO DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_q2hwc",
+    "nome": "LUANNA GABRIELLY BARBOSA DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_n83nq",
+    "nome": "LUIZ CARLOS DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_jlrci",
+    "nome": "LUIZ OTAVIO OLIVEIRA DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_togmf",
+    "nome": "MARIA IZABELLA DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_mzo9g",
+    "nome": "MARINA ARRUDA DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_wu2ji",
+    "nome": "NATALI VITORIA DOS SANTOS PEREIRA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_uu9eq",
+    "nome": "NAYARA BARBOSA DOS SANTOS",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_nkwc5",
+    "nome": "NICKOLLY FERNANDA DA CONCEICAO FRANÇA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_r97ab",
+    "nome": "RAYSSA MANUELA GONCALVES DA SILVA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_lfuw6",
+    "nome": "RENAN SANTANA DE SOUZA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  },
+  {
+    "id": "alu_muyeg9vl_gm1oa",
+    "nome": "RODRIGO ARAUJO DE SOUZA",
+    "turma": "5º ANO FUNDAMENTAL B",
+    "ativo": true,
+    "codigo": "",
+    "createdAt": "2026-10-07T17:46:44.096Z",
+    "updatedAt": "2026-10-07T17:46:44.096Z"
+  }
+]
