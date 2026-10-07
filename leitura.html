@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f3c68" />
+  <title>LeituraFy | Área da Família</title>
+  <style>
+    :root {
+      --azul-900:#0b3157;
+      --azul-800:#0f3c68;
+      --azul-700:#155a96;
+      --azul-600:#1976d2;
+      --azul-500:#2d8be0;
+      --azul-300:#9bcff7;
+      --azul-100:#eaf5ff;
+      --azul-050:#f5faff;
+      --branco:#fff;
+      --texto:#173047;
+      --texto-suave:#61758a;
+      --borda:#d8e9f7;
+      --verde:#16885f;
+      --verde-bg:#e9f8f2;
+      --amarelo:#a66a00;
+      --amarelo-bg:#fff6dc;
+      --cinza-bg:#eef3f7;
+      --sombra:0 16px 42px rgba(21,90,150,.12);
+      --radius:24px;
+    }
+
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0;
+      min-height:100vh;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--texto);
+      background:
+        radial-gradient(circle at 85% 5%, rgba(45,139,224,.12), transparent 32%),
+        linear-gradient(180deg, #fff 0%, #f5faff 58%, #eef8ff 100%);
+    }
+
+    button, select { font:inherit; }
+    button { cursor:pointer; }
+
+    .topbar {
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--borda);
+    }
+
+    .nav {
+      width:min(1120px, 92%);
+      min-height:72px;
+      margin:auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+
+    .brand { display:flex; align-items:center; gap:12px; min-width:0; }
+    .brand-icon {
+      width:46px; height:46px; flex:0 0 46px;
+      display:grid; place-items:center;
+      border-radius:15px;
+      color:#fff;
+      font-size:1.05rem;
+      background:linear-gradient(135deg,var(--azul-800),var(--azul-500));
+      box-shadow:0 10px 28px rgba(25,118,210,.24);
+    }
+    .brand strong { display:block; color:var(--azul-900); font-size:1.18rem; }
+    .brand small { display:block; color:var(--texto-suave); margin-top:2px; }
+
+    .sync-badge {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 12px;
+      border:1px solid var(--borda);
+      border-radius:999px;
+      background:#fff;
+      color:var(--texto-suave);
+      font-size:.85rem;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .sync-dot { width:9px; height:9px; border-radius:50%; background:#9aa8b5; }
+    .sync-badge.ok .sync-dot { background:#22a06b; box-shadow:0 0 0 4px rgba(34,160,107,.12); }
+    .sync-badge.error .sync-dot { background:#d34b4b; box-shadow:0 0 0 4px rgba(211,75,75,.12); }
+
+    .wrap { width:min(1120px, 92%); margin:auto; }
+
+    .hero {
+      padding:48px 0 26px;
+      display:grid;
+      grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);
+      gap:26px;
+      align-items:stretch;
+    }
+
+    .hero-copy {
+      padding:18px 0 10px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    .eyebrow {
+      align-self:flex-start;
+      margin-bottom:15px;
+      padding:8px 13px;
+      border:1px solid #cfe7f9;
+      border-radius:999px;
+      background:var(--azul-100);
+      color:var(--azul-700);
+      font-weight:850;
+      font-size:.88rem;
+    }
+    h1 {
+      margin:0;
+      max-width:760px;
+      color:var(--azul-900);
+      font-size:clamp(2.15rem, 5.8vw, 4rem);
+      line-height:1.02;
+      letter-spacing:-1.7px;
+    }
+    h1 span { color:var(--azul-600); }
+    .hero-copy p {
+      max-width:720px;
+      margin:18px 0 0;
+      color:var(--texto-suave);
+      font-size:1.03rem;
+      line-height:1.65;
+    }
+
+    .lookup-card {
+      align-self:center;
+      padding:24px;
+      border:1px solid var(--borda);
+      border-radius:30px;
+      background:#fff;
+      box-shadow:var(--sombra);
+    }
+    .lookup-card h2 { margin:0 0 6px; color:var(--azul-900); font-size:1.35rem; }
+    .lookup-card p { margin:0 0 18px; color:var(--texto-suave); line-height:1.45; font-size:.92rem; }
+    .field-label { display:block; margin-bottom:8px; color:var(--azul-900); font-size:.9rem; font-weight:850; }
+    .select-wrap { position:relative; }
+    select {
+      width:100%;
+      appearance:none;
+      border:1px solid var(--borda);
+      border-radius:16px;
+      padding:14px 44px 14px 14px;
+      outline:none;
+      background:#fbfdff;
+      color:var(--texto);
+      font-size:.97rem;
+    }
+    select:focus { border-color:var(--azul-500); box-shadow:0 0 0 4px rgba(45,139,224,.12); }
+    .select-arrow {
+      position:absolute; right:15px; top:50%; transform:translateY(-50%);
+      pointer-events:none; color:var(--azul-600); font-weight:900;
+    }
+    .helper { margin-top:10px; color:var(--texto-suave); font-size:.79rem; line-height:1.4; }
+
+    .state-card {
+      display:none;
+      margin:4px 0 28px;
+      padding:22px;
+      border:1px solid var(--borda);
+      border-radius:22px;
+      background:#fff;
+      color:var(--texto-suave);
+      box-shadow:0 10px 28px rgba(21,90,150,.08);
+    }
+    .state-card.show { display:block; }
+    .state-card strong { color:var(--azul-900); }
+    .state-card.error { border-color:#f1cece; background:#fffafa; color:#934141; }
+
+    #painelAluno { display:none; padding:4px 0 48px; }
+    #painelAluno.show { display:block; }
+
+    .student-head {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      flex-wrap:wrap;
+      margin:0 0 18px;
+    }
+    .student-ident { display:flex; align-items:center; gap:14px; min-width:0; }
+    .avatar {
+      width:58px; height:58px; flex:0 0 58px;
+      display:grid; place-items:center;
+      border-radius:19px;
+      background:linear-gradient(135deg,var(--azul-800),var(--azul-500));
+      color:#fff;
+      font-weight:900;
+      font-size:1.25rem;
+      box-shadow:0 10px 28px rgba(25,118,210,.22);
+    }
+    .student-head h2 { margin:0; color:var(--azul-900); font-size:1.72rem; }
+    .student-meta { margin-top:5px; color:var(--texto-suave); font-size:.95rem; }
+
+    .btn {
+      border:0;
+      border-radius:14px;
+      padding:11px 15px;
+      font-weight:850;
+      transition:.18s ease;
+    }
+    .btn:hover { transform:translateY(-1px); }
+    .btn-light { color:var(--azul-700); background:var(--azul-100); }
+
+    .stats {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-bottom:26px;
+    }
+    .stat {
+      padding:18px;
+      border:1px solid var(--borda);
+      border-radius:20px;
+      background:#fff;
+      box-shadow:0 9px 24px rgba(21,90,150,.07);
+    }
+    .stat strong { display:block; color:var(--azul-600); font-size:1.85rem; line-height:1; margin-bottom:7px; }
+    .stat span { color:var(--texto-suave); font-size:.85rem; font-weight:750; }
+
+    .section-title {
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+      margin:10px 0 14px;
+    }
+    .section-title h3 { margin:0; color:var(--azul-900); font-size:1.55rem; }
+    .section-title p { margin:5px 0 0; color:var(--texto-suave); }
+
+    .filter-row { display:flex; gap:8px; flex-wrap:wrap; }
+    .filter {
+      border:1px solid var(--borda);
+      border-radius:999px;
+      background:#fff;
+      color:var(--azul-700);
+      padding:8px 12px;
+      font-size:.86rem;
+      font-weight:800;
+    }
+    .filter.active { background:var(--azul-600); color:#fff; border-color:var(--azul-600); }
+
+    .reading-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:17px;
+    }
+    .reading-card {
+      overflow:hidden;
+      border:1px solid var(--borda);
+      border-radius:24px;
+      background:#fff;
+      box-shadow:0 12px 30px rgba(21,90,150,.08);
+    }
+    .reading-cover {
+      min-height:134px;
+      padding:18px;
+      position:relative;
+      display:flex;
+      align-items:flex-end;
+      background:linear-gradient(135deg,var(--azul-900),var(--azul-500));
+      color:#fff;
+      overflow:hidden;
+    }
+    .reading-cover::after {
+      content:"";
+      position:absolute;
+      width:145px; height:145px;
+      right:-45px; top:-58px;
+      border-radius:50%;
+      background:rgba(255,255,255,.11);
+    }
+    .reading-cover.has-image { background:#dbefff; }
+    .reading-cover img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .cover-shade { position:absolute; inset:0; background:linear-gradient(180deg,rgba(5,25,42,.08),rgba(5,25,42,.78)); }
+    .cover-text { position:relative; z-index:2; }
+    .cover-text small { display:block; opacity:.88; margin-top:5px; font-weight:650; }
+    .cover-text strong { font-size:1.2rem; line-height:1.2; }
+
+    .reading-body { padding:17px; }
+    .reading-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:13px; }
+    .tag { display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:7px 10px; font-size:.77rem; font-weight:850; }
+    .tag.concluida { color:var(--verde); background:var(--verde-bg); }
+    .tag.andamento { color:var(--amarelo); background:var(--amarelo-bg); }
+    .tag.outro { color:var(--azul-700); background:var(--azul-100); }
+    .date { color:var(--texto-suave); font-size:.78rem; font-weight:700; }
+    .stars { color:#e2a11c; letter-spacing:1px; margin:0 0 10px; }
+    .notes { margin:0; min-height:44px; color:var(--texto-suave); font-size:.91rem; line-height:1.5; }
+
+    .audio-box {
+      margin-top:14px;
+      padding:13px;
+      border:1px solid #d4eafb;
+      border-radius:17px;
+      background:var(--azul-050);
+    }
+    .audio-head { display:flex; align-items:center; gap:8px; margin-bottom:9px; color:var(--azul-800); font-size:.86rem; font-weight:850; }
+    audio { width:100%; height:38px; }
+    .no-audio { margin-top:14px; color:#8998a7; font-size:.82rem; }
+
+    .empty-readings {
+      grid-column:1/-1;
+      padding:26px;
+      border:1px dashed #bad9f0;
+      border-radius:22px;
+      background:rgba(255,255,255,.76);
+      text-align:center;
+      color:var(--texto-suave);
+    }
+    .empty-readings strong { display:block; color:var(--azul-900); margin-bottom:5px; }
+
+    footer {
+      border-top:1px solid var(--borda);
+      background:var(--azul-900);
+      color:#fff;
+      padding:26px 0;
+      text-align:center;
+      line-height:1.55;
+    }
+    footer small { opacity:.86; }
+
+    .skeleton { animation:pulse 1.3s infinite; }
+    @keyframes pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+
+    @media (max-width:860px) {
+      .hero { grid-template-columns:1fr; padding-top:32px; }
+      .hero-copy { padding-bottom:0; }
+      .stats { grid-template-columns:repeat(2,1fr); }
+    }
+    @media (max-width:560px) {
+      .nav { min-height:auto; padding:12px 0; align-items:flex-start; }
+      .brand small { display:none; }
+      .sync-badge { padding:8px 10px; font-size:.75rem; }
+      .hero { gap:18px; }
+      .lookup-card { padding:19px; border-radius:24px; }
+      .stats { grid-template-columns:1fr 1fr; }
+      .student-head { align-items:center; }
+      .section-title { align-items:flex-start; }
+      .reading-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="nav">
+      <div class="brand">
+        <div class="brand-icon">▶</div>
+        <div>
+          <strong>LeituraFy</strong>
+          <small>Área de acompanhamento da família</small>
+        </div>
+      </div>
+      <div class="sync-badge" id="syncBadge" title="Situação da leitura dos arquivos no GitHub">
+        <span class="sync-dot"></span>
+        <span id="syncText">Carregando dados...</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">📚 Família presente na leitura</div>
+        <h1>Acompanhe as <span>leituras</span> do seu filho.</h1>
+        <p>
+          Consulte os livros registrados pela escola, acompanhe o progresso de leitura e ouça os áudios produzidos pelos estudantes.
+        </p>
+      </div>
+
+      <div class="lookup-card">
+        <h2>Consultar estudante</h2>
+        <p>Selecione o nome do estudante cadastrado pela Secretaria.</p>
+        <label class="field-label" for="alunoSelect">Nome do estudante</label>
+        <div class="select-wrap">
+          <select id="alunoSelect" disabled>
+            <option value="">Carregando alunos...</option>
+          </select>
+          <span class="select-arrow">⌄</span>
+        </div>
+        <div class="helper">A lista é carregada automaticamente do arquivo <strong>dados/alunos.json</strong>.</div>
+      </div>
+    </section>
+
+    <div class="state-card show skeleton" id="estadoSistema">
+      <strong>Carregando...</strong> Estamos buscando os dados registrados pela escola.
+    </div>
+
+    <section id="painelAluno">
+      <div class="student-head">
+        <div class="student-ident">
+          <div class="avatar" id="avatarAluno">AL</div>
+          <div>
+            <h2 id="nomeAluno">Nome do estudante</h2>
+            <div class="student-meta" id="metaAluno"></div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-light" id="trocarAluno">Trocar estudante</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><strong id="statTotal">0</strong><span>leituras registradas</span></div>
+        <div class="stat"><strong id="statConcluidas">0</strong><span>leituras concluídas</span></div>
+        <div class="stat"><strong id="statAudios">0</strong><span>áudios disponíveis</span></div>
+        <div class="stat"><strong id="statMedia">—</strong><span>média de avaliação</span></div>
+      </div>
+
+      <div class="section-title">
+        <div>
+          <h3>Histórico de leitura</h3>
+          <p>Registros vinculados ao estudante selecionado.</p>
+        </div>
+        <div class="filter-row" aria-label="Filtros de leitura">
+          <button type="button" class="filter active" data-filter="todas">Todas</button>
+          <button type="button" class="filter" data-filter="concluida">Concluídas</button>
+          <button type="button" class="filter" data-filter="andamento">Em andamento</button>
+          <button type="button" class="filter" data-filter="audio">Com áudio</button>
+        </div>
+      </div>
+
+      <div class="reading-grid" id="listaLeituras"></div>
+    </section>
+  </main>
+
+  <footer>
+    <strong>LeituraFy</strong> — leitura, escola e família conectadas.<br>
+    <small id="footerEscola">Dados fornecidos pela rede de ensino.</small>
+  </footer>
+
+  <script>
+    /*
+      ESTRUTURA ESPERADA NO REPOSITÓRIO:
+
+      /Leitura_Pais.html
+      /dados/alunos.json
+      /dados/leituras.json
+      /dados/audios/...
+      /dados/capas/...
+
+      alunos.json -> [{ id, nome, turma, escola, ativo }]
+      leituras.json -> [{ id, alunoId, titulo, autor, status, avaliacao, data, observacao, audio, capa }]
+    */
+
+    const CONFIG = {
+      alunosUrl: "./dados/alunos.json",
+      leiturasUrl: "./dados/leituras.json",
+      cacheBust: true
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    const alunoSelect = $("alunoSelect");
+    const painelAluno = $("painelAluno");
+    const estadoSistema = $("estadoSistema");
+    const listaLeituras = $("listaLeituras");
+    const syncBadge = $("syncBadge");
+    const syncText = $("syncText");
+
+    let alunos = [];
+    let leituras = [];
+    let alunoAtual = null;
+    let filtroAtual = "todas";
+
+    function urlSemCache(url) {
+      if (!CONFIG.cacheBust) return url;
+      const sep = url.includes("?") ? "&" : "?";
+      return `${url}${sep}v=${Date.now()}`;
+    }
+
+    async function fetchJson(url) {
+      const resposta = await fetch(urlSemCache(url), { cache: "no-store" });
+      if (!resposta.ok) throw new Error(`Não foi possível carregar ${url} (HTTP ${resposta.status}).`);
+      const dados = await resposta.json();
+      if (!Array.isArray(dados)) throw new Error(`${url} precisa conter uma lista JSON.`);
+      return dados;
+    }
+
+    function normalizarTexto(valor) {
+      return String(valor ?? "").trim();
+    }
+
+    function valorAlunoId(registro) {
+      return normalizarTexto(registro.alunoId ?? registro.aluno_id ?? registro.idAluno ?? registro.estudanteId);
+    }
+
+    function resolverArquivo(caminho, pastaPadrao = "") {
+      const valor = normalizarTexto(caminho);
+      if (!valor) return "";
+      if (/^(https?:|data:|blob:)/i.test(valor)) return valor;
+      if (valor.startsWith("./") || valor.startsWith("../") || valor.startsWith("/")) return valor;
+      if (valor.startsWith("dados/")) return `./${valor}`;
+      return pastaPadrao ? `./${pastaPadrao}/${valor}` : `./${valor}`;
+    }
+
+    function iniciais(nome) {
+      const partes = normalizarTexto(nome).split(/\s+/).filter(Boolean);
+      if (!partes.length) return "AL";
+      if (partes.length === 1) return partes[0].slice(0,2).toUpperCase();
+      return `${partes[0][0]}${partes[partes.length - 1][0]}`.toUpperCase();
+    }
+
+    function escapar(texto) {
+      return String(texto ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatoData(valor) {
+      if (!valor) return "";
+      const bruto = String(valor).trim();
+      const partes = bruto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (partes) return `${partes[3]}/${partes[2]}/${partes[1]}`;
+      const data = new Date(bruto);
+      return Number.isNaN(data.getTime()) ? bruto : data.toLocaleDateString("pt-BR");
+    }
+
+    function statusNormalizado(leitura) {
+      const status = normalizarTexto(leitura.status).toLowerCase();
+      if (["lido", "concluída", "concluida", "finalizada", "finalizado"].includes(status)) return "concluida";
+      if (["lendo", "em andamento", "andamento", "iniciada", "iniciado"].includes(status)) return "andamento";
+      return "outro";
+    }
+
+    function statusRotulo(leitura) {
+      const tipo = statusNormalizado(leitura);
+      if (tipo === "concluida") return "✓ Concluída";
+      if (tipo === "andamento") return "… Em andamento";
+      return normalizarTexto(leitura.status) || "Registrada";
+    }
+
+    function estrelas(valor) {
+      const n = Math.max(0, Math.min(5, Number(valor ?? 0)));
+      if (!n) return "";
+      return "★".repeat(Math.round(n)) + "☆".repeat(5 - Math.round(n));
+    }
+
+    function leituraAudio(leitura) {
+      return normalizarTexto(leitura.audio ?? (leitura.tipoMidia === "audio" ? leitura.midia : ""));
+    }
+
+    function leituraObservacao(leitura) {
+      return normalizarTexto(leitura.observacao ?? leitura.resumo ?? leitura.comentario ?? leitura.recomendacao);
+    }
+
+    function mostrarEstado(tipo, html) {
+      estadoSistema.classList.remove("skeleton", "error");
+      estadoSistema.classList.add("show");
+      if (tipo === "erro") estadoSistema.classList.add("error");
+      estadoSistema.innerHTML = html;
+    }
+
+    function ocultarEstado() {
+      estadoSistema.classList.remove("show", "skeleton", "error");
+    }
+
+    function preencherDropdown() {
+      const ativos = alunos
+        .filter(a => a.ativo !== false)
+        .sort((a,b) => normalizarTexto(a.nome).localeCompare(normalizarTexto(b.nome), "pt-BR"));
+
+      alunoSelect.innerHTML = '<option value="">Selecione o estudante</option>';
+
+      ativos.forEach(aluno => {
+        const opt = document.createElement("option");
+        opt.value = normalizarTexto(aluno.id);
+        const turma = normalizarTexto(aluno.turma);
+        opt.textContent = turma ? `${normalizarTexto(aluno.nome)} — ${turma}` : normalizarTexto(aluno.nome);
+        alunoSelect.appendChild(opt);
+      });
+
+      alunoSelect.disabled = ativos.length === 0;
+
+      if (!ativos.length) {
+        alunoSelect.innerHTML = '<option value="">Nenhum estudante cadastrado</option>';
+      }
+    }
+
+    function leiturasDoAluno(id) {
+      return leituras
+        .filter(l => valorAlunoId(l) === String(id))
+        .sort((a,b) => String(b.data ?? "").localeCompare(String(a.data ?? "")));
+    }
+
+    function atualizarStats(lista) {
+      const concluidas = lista.filter(l => statusNormalizado(l) === "concluida").length;
+      const comAudio = lista.filter(l => leituraAudio(l)).length;
+      const notas = lista.map(l => Number(l.avaliacao ?? l.estrelas)).filter(n => Number.isFinite(n) && n > 0);
+      const media = notas.length ? (notas.reduce((a,b) => a+b,0) / notas.length).toFixed(1) : "—";
+
+      $("statTotal").textContent = lista.length;
+      $("statConcluidas").textContent = concluidas;
+      $("statAudios").textContent = comAudio;
+      $("statMedia").textContent = media;
+    }
+
+    function renderizarLeituras() {
+      if (!alunoAtual) return;
+
+      const todas = leiturasDoAluno(alunoAtual.id);
+      atualizarStats(todas);
+
+      let filtradas = todas;
+      if (filtroAtual === "concluida") filtradas = todas.filter(l => statusNormalizado(l) === "concluida");
+      if (filtroAtual === "andamento") filtradas = todas.filter(l => statusNormalizado(l) === "andamento");
+      if (filtroAtual === "audio") filtradas = todas.filter(l => leituraAudio(l));
+
+      if (!filtradas.length) {
+        listaLeituras.innerHTML = `
+          <div class="empty-readings">
+            <strong>Nenhum registro neste filtro.</strong>
+            ${todas.length ? "Escolha outro filtro para visualizar as leituras." : "As leituras aparecerão aqui quando forem registradas pela escola."}
+          </div>`;
+        return;
+      }
+
+      listaLeituras.innerHTML = filtradas.map(leitura => {
+        const titulo = escapar(leitura.titulo || "Livro sem título");
+        const autor = escapar(leitura.autor || "Autor não informado");
+        const data = formatoData(leitura.data);
+        const nota = estrelas(leitura.avaliacao ?? leitura.estrelas);
+        const obs = escapar(leituraObservacao(leitura));
+        const status = statusNormalizado(leitura);
+        const capa = resolverArquivo(leitura.capa, "dados/capas");
+        const audio = resolverArquivo(leituraAudio(leitura), "dados/audios");
+
+        const capaHtml = capa
+          ? `<img src="${escapar(capa)}" alt="Capa de ${titulo}" onerror="this.remove(); this.parentElement.classList.remove('has-image');"><div class="cover-shade"></div>`
+          : "";
+
+        const audioHtml = audio
+          ? `<div class="audio-box">
+               <div class="audio-head">🎧 Áudio do estudante</div>
+               <audio controls preload="none" src="${escapar(audio)}">Seu navegador não suporta reprodução de áudio.</audio>
+             </div>`
+          : `<div class="no-audio">Sem áudio vinculado a este registro.</div>`;
+
+        return `
+          <article class="reading-card">
+            <div class="reading-cover ${capa ? "has-image" : ""}">
+              ${capaHtml}
+              <div class="cover-text">
+                <strong>${titulo}</strong>
+                <small>${autor}</small>
+              </div>
+            </div>
+            <div class="reading-body">
+              <div class="reading-top">
+                <span class="tag ${status}">${escapar(statusRotulo(leitura))}</span>
+                <span class="date">${data ? escapar(data) : ""}</span>
+              </div>
+              ${nota ? `<p class="stars" aria-label="Avaliação: ${escapar(nota)}">${nota}</p>` : ""}
+              <p class="notes">${obs || "Nenhuma observação registrada para esta leitura."}</p>
+              ${audioHtml}
+            </div>
+          </article>`;
+      }).join("");
+    }
+
+    function selecionarAluno(id) {
+      alunoAtual = alunos.find(a => String(a.id) === String(id)) || null;
+
+      if (!alunoAtual) {
+        painelAluno.classList.remove("show");
+        if (alunos.length) mostrarEstado("info", "<strong>Selecione um estudante</strong> para visualizar o histórico de leitura.");
+        return;
+      }
+
+      filtroAtual = "todas";
+      document.querySelectorAll(".filter").forEach(btn => btn.classList.toggle("active", btn.dataset.filter === "todas"));
+
+      $("avatarAluno").textContent = iniciais(alunoAtual.nome);
+      $("nomeAluno").textContent = alunoAtual.nome || "Estudante";
+
+      const meta = [alunoAtual.turma, alunoAtual.escola].filter(Boolean).join(" • ");
+      $("metaAluno").textContent = meta || "Dados escolares não informados";
+      if (alunoAtual.escola) $("footerEscola").textContent = alunoAtual.escola;
+
+      ocultarEstado();
+      painelAluno.classList.add("show");
+      renderizarLeituras();
+
+      setTimeout(() => painelAluno.scrollIntoView({ behavior:"smooth", block:"start" }), 80);
+    }
+
+    async function iniciar() {
+      try {
+        const [dadosAlunos, dadosLeituras] = await Promise.all([
+          fetchJson(CONFIG.alunosUrl),
+          fetchJson(CONFIG.leiturasUrl)
+        ]);
+
+        alunos = dadosAlunos;
+        leituras = dadosLeituras;
+        preencherDropdown();
+
+        syncBadge.classList.add("ok");
+        syncText.textContent = "Dados atualizados";
+
+        if (!alunos.length) {
+          mostrarEstado("info", "<strong>Nenhum estudante cadastrado.</strong> O arquivo dados/alunos.json está vazio.");
+        } else {
+          mostrarEstado("info", "<strong>Selecione um estudante</strong> no campo acima para acompanhar suas leituras.");
+        }
+      } catch (erro) {
+        console.error(erro);
+        alunoSelect.disabled = true;
+        alunoSelect.innerHTML = '<option value="">Dados indisponíveis</option>';
+        syncBadge.classList.add("error");
+        syncText.textContent = "Falha ao carregar";
+        mostrarEstado("erro", `<strong>Não foi possível carregar os dados.</strong><br>${escapar(erro.message)}<br><br>Confira se <code>dados/alunos.json</code> e <code>dados/leituras.json</code> existem no GitHub e se esta página está sendo aberta pelo GitHub Pages/servidor.`);
+      }
+    }
+
+    alunoSelect.addEventListener("change", () => selecionarAluno(alunoSelect.value));
+
+    $("trocarAluno").addEventListener("click", () => {
+      alunoSelect.value = "";
+      alunoAtual = null;
+      painelAluno.classList.remove("show");
+      mostrarEstado("info", "<strong>Selecione um estudante</strong> para visualizar o histórico de leitura.");
+      window.scrollTo({ top:0, behavior:"smooth" });
+      setTimeout(() => alunoSelect.focus(), 350);
+    });
+
+    document.querySelectorAll(".filter").forEach(botao => {
+      botao.addEventListener("click", () => {
+        filtroAtual = botao.dataset.filter;
+        document.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
+        botao.classList.add("active");
+        renderizarLeituras();
+      });
+    });
+
+    iniciar();
+  </script>
+</body>
+</html>
