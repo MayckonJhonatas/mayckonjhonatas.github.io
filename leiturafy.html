@@ -166,7 +166,7 @@
       leiturasUrl:"./dados/leituras.json",
       avaliacoesUrl:"./dados/avaliacoes.json",
       // COLE AQUI a URL do Worker depois de publicar, sem barra no final.
-      avaliacoesApiUrl:"COLE_AQUI_A_URL_DO_WORKER",
+      avaliacoesApiUrl:"",
       cacheBust:true
     };
 
@@ -233,8 +233,7 @@
 
     function htmlAvaliacao(id){
       const nome=localStorage.getItem("leiturafy_nome_avaliador")||"";
-      const aviso=!apiConfigurada()?`<div class="firebase-warning">Para publicar avaliações no GitHub, configure a URL do endpoint seguro no arquivo. As avaliações já existentes em <strong>dados/avaliacoes.json</strong> continuam visíveis.</div>`:"";
-      return `${aviso}<div class="public-summary"><div class="public-score"><span class="score-number" data-media>—</span><div><div class="score-stars" data-media-stars>☆☆☆☆☆</div><div class="score-count" data-count>Carregando avaliações...</div></div></div><span class="reviews-status" data-live-status>Dados salvos no GitHub</span></div>
+      return `<div class="public-summary"><div class="public-score"><span class="score-number" data-media>—</span><div><div class="score-stars" data-media-stars>☆☆☆☆☆</div><div class="score-count" data-count>Carregando avaliações...</div></div></div><span class="reviews-status" data-live-status>${apiConfigurada()?"Avaliações públicas":"Avaliações existentes"}</span></div>
       <div class="comments" data-comments></div>
       <div class="rate-box" data-rate-box data-reading-id="${escapar(id)}" data-stars="0">
         <div class="rate-title">⭐ Avalie depois de ouvir</div>
@@ -243,7 +242,7 @@
           <div class="rate-field"><label>Seu nome ou identificação</label><input maxlength="80" data-name value="${escapar(nome)}" placeholder="Ex.: Maria, mãe de João"></div>
           <div class="rate-field"><label>Sua avaliação</label><div class="stars-input" aria-label="Escolha de 1 a 5 estrelas">${[1,2,3,4,5].map(n=>`<button type="button" class="star-btn" data-star="${n}" aria-label="${n} estrela${n>1?"s":""}">★</button>`).join("")}</div></div>
           <div class="rate-field"><label>Comentário</label><textarea maxlength="600" data-comment placeholder="Escreva o que achou da leitura ou do áudio."></textarea></div>
-          <button class="save-review" type="button" data-save ${apiConfigurada()?"":"disabled"}>Publicar avaliação</button>
+          <button class="save-review" type="button" data-save>Publicar avaliação</button>
           <div class="review-result" data-result></div>
         </div>
       </div>`;
@@ -271,22 +270,58 @@
       validarForm(rate);
     }
 
-    function validarForm(rate){if(!rate)return;const ok=apiConfigurada()&&normalizar(rate.querySelector("[data-name]")?.value)&&Number(rate.dataset.stars)>0;rate.querySelector("[data-save]").disabled=!ok}
+    function validarForm(rate){if(!rate)return;const ok=normalizar(rate.querySelector("[data-name]")?.value)&&Number(rate.dataset.stars)>0;rate.querySelector("[data-save]").disabled=!ok}
 
+    function lerPendentes(){
+      try{return JSON.parse(localStorage.getItem("leiturafy_avaliacoes_pendentes")||"[]")||[]}catch{return[]}
+    }
+    function salvarPendentes(lista){localStorage.setItem("leiturafy_avaliacoes_pendentes",JSON.stringify(lista))}
+    function guardarPendente(payload){
+      const lista=lerPendentes();
+      const i=lista.findIndex(x=>x.leituraId===payload.leituraId&&x.clientId===payload.clientId);
+      const item={...payload,salvoEm:new Date().toISOString()};
+      if(i>=0)lista[i]=item;else lista.push(item);
+      salvarPendentes(lista);
+    }
+    async function enviarPayload(payload){
+      const r=await fetch(CONFIG.avaliacoesApiUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
+      return d;
+    }
+    async function sincronizarPendentes(){
+      if(!apiConfigurada())return;
+      const lista=lerPendentes();
+      if(!lista.length)return;
+      const restantes=[];
+      for(const item of lista){
+        try{await enviarPayload(item)}catch(e){console.warn("Avaliação pendente não sincronizada:",e);restantes.push(item)}
+      }
+      salvarPendentes(restantes);
+      if(restantes.length!==lista.length)await carregarAvaliacoes();
+    }
     async function salvarReview(rate){
-      if(!apiConfigurada()||!rate)return;
+      if(!rate)return;
       const id=rate.dataset.readingId,nome=normalizar(rate.querySelector("[data-name]").value),comentario=normalizar(rate.querySelector("[data-comment]").value),estrelas=Number(rate.dataset.stars||0),result=rate.querySelector("[data-result]"),btn=rate.querySelector("[data-save]");
       if(!nome||!estrelas)return;
-      btn.disabled=true;btn.textContent="Publicando...";result.className="review-result";result.textContent="";
+      const payload={clientId:meuClientId,leituraId:id,alunoId:String(alunoAtual?.id||""),avaliador:nome,estrelas,comentario};
+      localStorage.setItem("leiturafy_nome_avaliador",nome);
+      btn.disabled=true;btn.textContent=apiConfigurada()?"Publicando...":"Salvando...";result.className="review-result";result.textContent="";
+      if(!apiConfigurada()){
+        guardarPendente(payload);
+        result.className="review-result ok";
+        result.textContent="Avaliação guardada neste aparelho. Ela será publicada automaticamente quando o serviço de gravação estiver conectado.";
+        btn.textContent="Publicar avaliação";validarForm(rate);return;
+      }
       try{
-        const r=await fetch(CONFIG.avaliacoesApiUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({clientId:meuClientId,leituraId:id,alunoId:String(alunoAtual?.id||""),avaliador:nome,estrelas,comentario})});
-        const d=await r.json().catch(()=>({}));
-        if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
-        localStorage.setItem("leiturafy_nome_avaliador",nome);
+        const d=await enviarPayload(payload);
         if(Array.isArray(d.avaliacoes))avaliacoes=d.avaliacoes;else await carregarAvaliacoes();
         const card=rate.closest("[data-card]");if(card)renderReviews(card,id);
         result.className="review-result ok";result.textContent="✓ Avaliação salva em dados/avaliacoes.json e publicada para todos.";
-      }catch(e){console.error(e);result.className="review-result error";result.textContent=`Não foi possível publicar: ${e.message}`}
+      }catch(e){
+        console.error(e);guardarPendente(payload);
+        result.className="review-result error";result.textContent="Não foi possível publicar agora. A avaliação foi guardada neste aparelho para tentar novamente depois.";
+      }
       btn.textContent="Publicar avaliação";validarForm(rate);
     }
 
@@ -308,7 +343,7 @@
       listaLeituras.innerHTML=filtradas.map((l,i)=>{
         const titulo=escapar(l.titulo||"Livro sem título"),autor=escapar(l.autor||"Autor não informado"),status=statusNorm(l),data=formatoData(l.data),obs=escapar(obsLeitura(l)),capa=resolverArquivo(l.capa,"dados/capas"),audio=resolverArquivo(audioLeitura(l),"dados/audios"),id=leituraId(l,i);
         const cover=capa?`<img src="${escapar(capa)}" alt="Capa de ${titulo}" onerror="this.remove();this.parentElement.textContent='📘'">`:"📘";
-        const audioHtml=audio?`<div class="audio-box"><div class="audio-title">🎧 Ouvir áudio do estudante</div><audio controls preload="none" src="${escapar(audio)}"></audio><p class="listen-note">Ouça antes de avaliar. As avaliações abaixo ficam registradas no GitHub e são públicas.</p>${htmlAvaliacao(id)}</div>`:`<div class="no-audio">Esta leitura ainda não possui áudio para avaliação.</div>`;
+        const audioHtml=audio?`<div class="audio-box"><div class="audio-title">🎧 Ouvir áudio do estudante</div><audio controls preload="none" src="${escapar(audio)}"></audio><p class="listen-note">Ouça antes de avaliar. As avaliações publicadas abaixo são visíveis para todas as famílias.</p>${htmlAvaliacao(id)}</div>`:`<div class="no-audio">Esta leitura ainda não possui áudio para avaliação.</div>`;
         return`<article class="reading-card" data-card data-id="${escapar(id)}"><div class="reading-main"><div class="cover">${cover}</div><div class="reading-info"><h3>${titulo}</h3><div class="author">${autor}</div><div class="meta"><span class="tag ${status}">${escapar(statusRotulo(l))}</span>${data?`<span class="date">${escapar(data)}</span>`:""}</div></div></div><div class="reading-extra">${obs?`<p class="note">${obs}</p>`:""}${audioHtml}</div></article>`;
       }).join("");
       ligarFormularios();
@@ -320,6 +355,8 @@
         meuClientHash=await hashTexto(meuClientId);
         const [a,l]=await Promise.all([fetchJson(CONFIG.alunosUrl),fetchJson(CONFIG.leiturasUrl)]);alunos=a;leituras=l;preencherDropdown();
         await carregarAvaliacoes();
+        await sincronizarPendentes();
+        if(apiConfigurada()) await carregarAvaliacoes();
         $("syncBadge").classList.add("ok");$("syncText").textContent=apiConfigurada()?"Dados e avaliações no GitHub":"Dados atualizados";
         estadoSistema.textContent=alunos.length?"Selecione o estudante para continuar.":"Nenhum estudante cadastrado.";
         if(!alunos.length)estadoSistema.classList.add("error");
