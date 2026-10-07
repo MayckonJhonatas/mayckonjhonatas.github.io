@@ -164,19 +164,45 @@ function alertBox(tipo,html){ return `<div class="alert ${tipo}">${html}</div>`;
 function escapar(v){ return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
 function gerarId(prefixo){ return `${prefixo}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,7)}`; }
 function slug(v){ return normal(v).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,45)||"arquivo"; }
+function detectarRepositorioPages(){
+  const host=location.hostname.toLowerCase();
+  if(!host.endsWith(".github.io")) return null;
+  const owner=host.split(".")[0];
+  const partes=location.pathname.split("/").filter(Boolean);
+  const repo=partes.length ? partes[0] : `${owner}.github.io`;
+  return {owner,repo,branch:"main"};
+}
 function config(){ return {owner:normal($("ghOwner").value),repo:normal($("ghRepo").value),branch:normal($("ghBranch").value)||"main",token:normal($("ghToken").value)}; }
 function salvarConfigLocal(){ const c=config(); localStorage.setItem("leiturafyGhConfig",JSON.stringify({owner:c.owner,repo:c.repo,branch:c.branch})); if(c.token) sessionStorage.setItem("leiturafyGhToken",c.token); }
-function carregarConfig(){ try{const c=JSON.parse(localStorage.getItem("leiturafyGhConfig")||"{}"); $("ghOwner").value=c.owner||"";$("ghRepo").value=c.repo||"";$("ghBranch").value=c.branch||"main";}catch{} $("ghToken").value=sessionStorage.getItem("leiturafyGhToken")||""; }
+function carregarConfig(){
+  let c={};
+  try{ c=JSON.parse(localStorage.getItem("leiturafyGhConfig")||"{}"); }catch{}
+  const auto=detectarRepositorioPages()||{};
+  $("ghOwner").value=c.owner||auto.owner||"";
+  $("ghRepo").value=c.repo||auto.repo||"";
+  $("ghBranch").value=c.branch||auto.branch||"main";
+  $("ghToken").value=sessionStorage.getItem("leiturafyGhToken")||"";
+}
 function apiUrl(path){ const c=config(); return `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${path.split("/").map(encodeURIComponent).join("/")}`; }
 function headers(auth=true){ const c=config(); const h={"Accept":"application/vnd.github+json","X-GitHub-Api-Version":GH_API_VERSION}; if(auth&&c.token) h.Authorization=`Bearer ${c.token}`; return h; }
 function utf8ToBase64(str){ const bytes=new TextEncoder().encode(str); let bin=""; const step=0x8000; for(let i=0;i<bytes.length;i+=step) bin+=String.fromCharCode(...bytes.subarray(i,i+step)); return btoa(bin); }
 function base64ToUtf8(b64){ const bin=atob(b64.replace(/\n/g,"")); const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0)); return new TextDecoder().decode(bytes); }
 async function fileToBase64(file){ const buf=await file.arrayBuffer(); const bytes=new Uint8Array(buf); let bin=""; const step=0x8000; for(let i=0;i<bytes.length;i+=step) bin+=String.fromCharCode(...bytes.subarray(i,i+step)); return btoa(bin); }
-function ensureConfig(){ const c=config(); if(!c.owner||!c.repo||!c.branch||!c.token){ irPara("github"); throw new Error("Configure usuário, repositório, branch e token do GitHub antes de salvar."); } return c; }
-async function ghGet(path){ const c=ensureConfig(); const r=await fetch(`${apiUrl(path)}?ref=${encodeURIComponent(c.branch)}`,{headers:headers()}); if(r.status===404) return null; if(!r.ok){ const t=await r.text(); throw new Error(`GitHub respondeu ${r.status}: ${t.slice(0,180)}`); } return r.json(); }
-async function ghPut(path,contentB64,message,sha=null){ const c=ensureConfig(); const body={message,content:contentB64,branch:c.branch}; if(sha) body.sha=sha; const r=await fetch(apiUrl(path),{method:"PUT",headers:{...headers(),"Content-Type":"application/json"},body:JSON.stringify(body)}); if(!r.ok){ const t=await r.text(); throw new Error(`Falha ao salvar ${path} (${r.status}): ${t.slice(0,220)}`); } return r.json(); }
-async function ghDelete(path,message){ const c=ensureConfig(); const atual=await ghGet(path); if(!atual) return; const r=await fetch(apiUrl(path),{method:"DELETE",headers:{...headers(),"Content-Type":"application/json"},body:JSON.stringify({message,sha:atual.sha,branch:c.branch})}); if(!r.ok){const t=await r.text();throw new Error(`Falha ao apagar ${path} (${r.status}): ${t.slice(0,180)}`);} }
+function ensureRepoConfig(){ const c=config(); if(!c.owner||!c.repo||!c.branch){ irPara("github"); throw new Error("Informe usuário, repositório e branch do GitHub."); } return c; }
+function ensureWriteConfig(){ const c=ensureRepoConfig(); if(!c.token){ irPara("github"); throw new Error("Informe o token do GitHub para cadastrar, editar ou excluir dados."); } return c; }
+async function ghGet(path){ const c=ensureRepoConfig(); const r=await fetch(`${apiUrl(path)}?ref=${encodeURIComponent(c.branch)}`,{headers:headers(true),cache:"no-store"}); if(r.status===404) return null; if(!r.ok){ const t=await r.text(); throw new Error(`GitHub respondeu ${r.status}: ${t.slice(0,180)}`); } return r.json(); }
+async function ghPut(path,contentB64,message,sha=null){ const c=ensureWriteConfig(); const body={message,content:contentB64,branch:c.branch}; if(sha) body.sha=sha; const r=await fetch(apiUrl(path),{method:"PUT",headers:{...headers(true),"Content-Type":"application/json"},body:JSON.stringify(body)}); if(!r.ok){ const t=await r.text(); throw new Error(`Falha ao salvar ${path} (${r.status}): ${t.slice(0,220)}`); } return r.json(); }
+async function ghDelete(path,message){ const c=ensureWriteConfig(); const atual=await ghGet(path); if(!atual) return; const r=await fetch(apiUrl(path),{method:"DELETE",headers:{...headers(true),"Content-Type":"application/json"},body:JSON.stringify({message,sha:atual.sha,branch:c.branch})}); if(!r.ok){const t=await r.text();throw new Error(`Falha ao apagar ${path} (${r.status}): ${t.slice(0,180)}`);} }
 async function lerJsonGh(path){ const f=await ghGet(path); if(!f) return {dados:[],sha:null}; const txt=base64ToUtf8(f.content||""); const dados=JSON.parse(txt||"[]"); if(!Array.isArray(dados)) throw new Error(`${path} precisa conter uma lista JSON.`); return {dados,sha:f.sha}; }
+async function lerJsonPublicado(path){
+  const url=new URL(path,location.href).href;
+  const r=await fetch(url,{cache:"no-store"});
+  if(r.status===404) return [];
+  if(!r.ok) throw new Error(`Não foi possível carregar ${path} (${r.status}).`);
+  const dados=await r.json();
+  if(!Array.isArray(dados)) throw new Error(`${path} precisa conter uma lista JSON.`);
+  return dados;
+}
 async function salvarJsonGh(path,dados,message){ const atual=await ghGet(path); return ghPut(path,utf8ToBase64(JSON.stringify(dados,null,2)+"\n"),message,atual?.sha||null); }
 
 function irPara(page){ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); $(`page-${page}`).classList.add("active"); document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page)); const nomes={resumo:"Resumo",alunos:"Alunos",leituras:"Leituras",github:"GitHub"}; $("topTitle").textContent=nomes[page]||"LeituraFy"; $("sidebar").classList.remove("open"); }
@@ -213,15 +239,40 @@ function renderLeituras(){
 function renderTudo(){ atualizarStats(); preencherSelects(); renderAlunos(); renderLeituras(); }
 
 async function sincronizarTudo(silencioso=false){
-  try{ ensureConfig(); if(!silencioso) $("globalAlert").innerHTML=alertBox("info","Sincronizando dados com o GitHub..."); const [a,l]=await Promise.all([lerJsonGh(PATH_ALUNOS),lerJsonGh(PATH_LEITURAS)]); alunos=a.dados; leituras=l.dados; renderTudo(); atualizarEstadoConexao(true,`${config().owner}/${config().repo} • ${config().branch}`); $("lastSync").textContent=`Atualizado ${new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}`; if(!silencioso) $("globalAlert").innerHTML=alertBox("ok","Dados sincronizados com sucesso."); return true;
-  }catch(e){ atualizarEstadoConexao(false); if(!silencioso) $("globalAlert").innerHTML=alertBox("error",escapar(e.message)); return false; }
+  try{
+    if(!silencioso) $("globalAlert").innerHTML=alertBox("info","Carregando dados...");
+    const c=config();
+    if(c.owner&&c.repo){
+      try{
+        const [a,l]=await Promise.all([lerJsonGh(PATH_ALUNOS),lerJsonGh(PATH_LEITURAS)]);
+        alunos=a.dados; leituras=l.dados;
+        atualizarEstadoConexao(!!c.token,c.token?`${c.owner}/${c.repo} • ${c.branch}`:"Dados públicos carregados • informe o token para editar");
+      }catch(apiErro){
+        const [a,l]=await Promise.all([lerJsonPublicado(PATH_ALUNOS),lerJsonPublicado(PATH_LEITURAS)]);
+        alunos=a; leituras=l;
+        atualizarEstadoConexao(false,"Dados publicados carregados • GitHub API indisponível");
+      }
+    }else{
+      const [a,l]=await Promise.all([lerJsonPublicado(PATH_ALUNOS),lerJsonPublicado(PATH_LEITURAS)]);
+      alunos=a; leituras=l;
+      atualizarEstadoConexao(false,"Dados publicados carregados");
+    }
+    renderTudo();
+    $("lastSync").textContent=`Atualizado ${new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}`;
+    if(!silencioso) $("globalAlert").innerHTML=alertBox("ok","Dados carregados com sucesso.");
+    return true;
+  }catch(e){
+    alunos=[]; leituras=[]; renderTudo(); atualizarEstadoConexao(false);
+    if(!silencioso) $("globalAlert").innerHTML=alertBox("error",`O painel abriu, mas não conseguiu carregar os dados: ${escapar(e.message)}`);
+    return false;
+  }
 }
 $("btnRefresh").onclick=()=>sincronizarTudo();
 
 function novoAluno(){ $("formAluno").reset(); $("alunoId").value=""; $("alunoAtivo").value="true"; $("tituloModalAluno").textContent="Novo aluno"; abrirModal("modalAluno"); }
 function editarAluno(id){ const a=alunos.find(x=>String(x.id)===String(id)); if(!a)return; $("alunoId").value=a.id; $("alunoNome").value=a.nome||""; $("alunoTurma").value=a.turma||""; $("alunoEscola").value=a.escola||""; $("alunoAtivo").value=String(a.ativo!==false); $("alunoCodigo").value=a.codigo||""; $("tituloModalAluno").textContent="Editar aluno"; abrirModal("modalAluno"); }
 $("formAluno").addEventListener("submit",async e=>{
-  e.preventDefault(); try{ ensureConfig(); const id=normal($("alunoId").value)||gerarId("alu"); const reg={id,nome:normal($("alunoNome").value),turma:normal($("alunoTurma").value),escola:normal($("alunoEscola").value),ativo:$("alunoAtivo").value==="true",codigo:normal($("alunoCodigo").value),updatedAt:new Date().toISOString()}; const atual=await lerJsonGh(PATH_ALUNOS); const i=atual.dados.findIndex(a=>String(a.id)===String(id)); if(i>=0) reg.createdAt=atual.dados[i].createdAt||reg.updatedAt; else reg.createdAt=reg.updatedAt; if(i>=0) atual.dados[i]={...atual.dados[i],...reg}; else atual.dados.push(reg); await salvarJsonGh(PATH_ALUNOS,atual.dados,`${i>=0?"Atualiza":"Cadastra"} aluno ${reg.nome}`); alunos=atual.dados; fecharModal("modalAluno"); renderTudo(); toast("Aluno salvo no GitHub.");
+  e.preventDefault(); try{ ensureWriteConfig(); const id=normal($("alunoId").value)||gerarId("alu"); const reg={id,nome:normal($("alunoNome").value),turma:normal($("alunoTurma").value),escola:normal($("alunoEscola").value),ativo:$("alunoAtivo").value==="true",codigo:normal($("alunoCodigo").value),updatedAt:new Date().toISOString()}; const atual=await lerJsonGh(PATH_ALUNOS); const i=atual.dados.findIndex(a=>String(a.id)===String(id)); if(i>=0) reg.createdAt=atual.dados[i].createdAt||reg.updatedAt; else reg.createdAt=reg.updatedAt; if(i>=0) atual.dados[i]={...atual.dados[i],...reg}; else atual.dados.push(reg); await salvarJsonGh(PATH_ALUNOS,atual.dados,`${i>=0?"Atualiza":"Cadastra"} aluno ${reg.nome}`); alunos=atual.dados; fecharModal("modalAluno"); renderTudo(); toast("Aluno salvo no GitHub.");
   }catch(err){toast(err.message,"error");}
 });
 async function excluirAluno(id){ const a=alunos.find(x=>String(x.id)===String(id)); if(!a)return; const qtd=leituras.filter(l=>String(l.alunoId)===String(id)).length; const msg=qtd?`O aluno ${a.nome} possui ${qtd} leitura(s). Excluir o aluno não apagará automaticamente essas leituras. Continuar?`:`Excluir ${a.nome}?`; if(!confirm(msg))return; try{const atual=await lerJsonGh(PATH_ALUNOS); const nova=atual.dados.filter(x=>String(x.id)!==String(id)); await salvarJsonGh(PATH_ALUNOS,nova,`Remove aluno ${a.nome}`); alunos=nova;renderTudo();toast("Aluno removido.");}catch(e){toast(e.message,"error");}}
@@ -233,7 +284,7 @@ async function subirArquivo(file,pasta,alunoId){ if(!file)return""; const ext=(f
 $("formLeitura").addEventListener("submit",async e=>{
   e.preventDefault(); const btn=$("btnSalvarLeitura"); btn.disabled=true;
   try{
-    ensureConfig(); setProgress(8,"Preparando registro..."); const id=normal($("leituraId").value)||gerarId("lei"); const atual=await lerJsonGh(PATH_LEITURAS); const idx=atual.dados.findIndex(l=>String(l.id)===String(id)); const antigo=idx>=0?atual.dados[idx]:{}; const alunoId=$("leituraAluno").value; let audio=normal(antigo.audio)||(antigo.tipoMidia==="audio"?normal(antigo.midia):""); let capa=normal(antigo.capa);
+    ensureWriteConfig(); setProgress(8,"Preparando registro..."); const id=normal($("leituraId").value)||gerarId("lei"); const atual=await lerJsonGh(PATH_LEITURAS); const idx=atual.dados.findIndex(l=>String(l.id)===String(id)); const antigo=idx>=0?atual.dados[idx]:{}; const alunoId=$("leituraAluno").value; let audio=normal(antigo.audio)||(antigo.tipoMidia==="audio"?normal(antigo.midia):""); let capa=normal(antigo.capa);
     const audioFile=$("leituraAudio").files[0]; const capaFile=$("leituraCapa").files[0];
     if(audioFile){setProgress(25,"Enviando áudio para dados/audios/..."); audio=await subirArquivo(audioFile,"dados/audios",alunoId);}
     if(capaFile){setProgress(55,"Enviando capa para dados/capas/..."); capa=await subirArquivo(capaFile,"dados/capas",alunoId);}
@@ -244,10 +295,22 @@ $("formLeitura").addEventListener("submit",async e=>{
 async function excluirLeitura(id){ const l=leituras.find(x=>String(x.id)===String(id)); if(!l)return; if(!confirm(`Excluir o registro “${l.titulo}” de ${nomeAluno(l.alunoId)}?\n\nOs arquivos de áudio/capa vinculados não serão apagados automaticamente.`))return; try{const atual=await lerJsonGh(PATH_LEITURAS);const nova=atual.dados.filter(x=>String(x.id)!==String(id));await salvarJsonGh(PATH_LEITURAS,nova,`Remove leitura ${l.titulo}`);leituras=nova;renderTudo();toast("Leitura removida.");}catch(e){toast(e.message,"error");}}
 
 $("buscaAluno").addEventListener("input",renderAlunos); $("filtroAlunoAtivo").addEventListener("change",renderAlunos); $("buscaLeitura").addEventListener("input",renderLeituras); $("filtroLeituraAluno").addEventListener("change",renderLeituras);
-$("formGithub").addEventListener("submit",async e=>{ e.preventDefault(); salvarConfigLocal(); $("githubResult").innerHTML=alertBox("info","Testando acesso ao repositório..."); const ok=await sincronizarTudo(true); $("githubResult").innerHTML=ok?alertBox("ok",`Conectado a <b>${escapar(config().owner)}/${escapar(config().repo)}</b> na branch <b>${escapar(config().branch)}</b>.`):alertBox("error","Não foi possível conectar. Confira o token, repositório e permissões."); });
+$("formGithub").addEventListener("submit",async e=>{
+  e.preventDefault(); salvarConfigLocal(); $("githubResult").innerHTML=alertBox("info","Testando acesso ao repositório...");
+  const ok=await sincronizarTudo(true); const c=config();
+  if(ok&&c.token) $("githubResult").innerHTML=alertBox("ok",`Conectado a <b>${escapar(c.owner)}/${escapar(c.repo)}</b> na branch <b>${escapar(c.branch)}</b>. O painel está pronto para editar.`);
+  else if(ok) $("githubResult").innerHTML=alertBox("warn","Os dados foram carregados, mas falta informar o token para salvar alterações.");
+  else $("githubResult").innerHTML=alertBox("error","Não foi possível conectar. Confira repositório, branch, token e as permissões do GitHub Pages.");
+});
 function limparToken(){ sessionStorage.removeItem("leiturafyGhToken"); $("ghToken").value=""; atualizarEstadoConexao(false); toast("Token removido desta sessão."); }
 
-async function iniciar(){ carregarConfig(); $("leituraData").value=hoje(); const c=config(); if(c.owner&&c.repo&&c.token){await sincronizarTudo(true);} else {$("globalAlert").innerHTML=alertBox("warn",'Configure a integração em <b>GitHub</b> antes de cadastrar ou editar dados.'); renderTudo();} }
+async function iniciar(){
+  carregarConfig(); $("leituraData").value=hoje();
+  const ok=await sincronizarTudo(true); const c=config();
+  if(ok&&c.token) $("globalAlert").innerHTML=alertBox("ok","Painel carregado e conectado ao GitHub. Você pode cadastrar e editar dados.");
+  else if(ok) $("globalAlert").innerHTML=alertBox("warn",'Painel carregado. Para cadastrar, editar ou excluir, abra <b>GitHub</b> e informe um token com permissão de escrita.');
+  else $("globalAlert").innerHTML=alertBox("error",'O painel abriu, mas os arquivos <b>dados/alunos.json</b> e <b>dados/leituras.json</b> não puderam ser carregados. Confira se eles estão publicados junto com este HTML.');
+}
 iniciar();
 </script>
 </body>
