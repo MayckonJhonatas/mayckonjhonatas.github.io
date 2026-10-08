@@ -1,3 +1,13 @@
 [
-  
+  {
+    "id": "d50c12e0-479b-4e61-ae85-7a1b76ebdfae",
+    "leituraId": "lei_muyf5e2r_dz5g0",
+    "alunoId": "alu_muyej2ut_q1jx2",
+    "clientHash": "b80a9b1ea2951a58c1a0829961f6360beccdc73dc6d1a0b90b58da24fa91f623",
+    "avaliador": "Andréia",
+    "estrelas": 4,
+    "comentario": "",
+    "criadoEm": "2026-10-08T19:38:33.593Z",
+    "atualizadoEm": "2026-10-08T19:38:33.593Z"
+  }
 ]
