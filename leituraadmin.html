@@ -27,7 +27,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 .status-list{display:grid;gap:10px}.status-row{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #edf3f8}.status-row:last-child{border-bottom:0}.status-row span{color:var(--suave)}
 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.full{grid-column:1/-1}.field label{display:block;font-size:.86rem;font-weight:900;color:var(--azul-900);margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--borda);border-radius:13px;padding:11px 12px;background:#fbfdff;color:var(--texto);outline:0}.field textarea{min-height:100px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--azul-700);box-shadow:0 0 0 4px rgba(25,118,210,.11)}.hint{font-size:.78rem;color:var(--suave);margin-top:5px;line-height:1.4}.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
 .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.search{min-width:220px;flex:1;position:relative}.search input{width:100%;border:1px solid var(--borda);border-radius:13px;padding:10px 12px 10px 36px;background:#fff}.search span{position:absolute;left:12px;top:9px;color:var(--suave)}
-.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:760px}.table th{font-size:.78rem;text-align:left;color:var(--suave);padding:11px 13px;background:#f8fbfe;border-bottom:1px solid var(--borda)}.table td{padding:12px 13px;border-bottom:1px solid #edf3f8;vertical-align:middle}.table tr:last-child td{border-bottom:0}.table strong{color:var(--azul-900)}.muted{color:var(--suave);font-size:.84rem}.tag{display:inline-flex;align-items:center;border-radius:999px;padding:6px 9px;font-size:.75rem;font-weight:900}.tag.ok{background:var(--verde-bg);color:var(--verde)}.tag.warn{background:var(--amarelo-bg);color:var(--amarelo)}.tag.off{background:#edf1f5;color:#677483}.row-actions{display:flex;gap:6px;flex-wrap:wrap}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:760px}.table th{font-size:.78rem;text-align:left;color:var(--suave);padding:11px 13px;background:#f8fbfe;border-bottom:1px solid var(--borda)}.table td{padding:12px 13px;border-bottom:1px solid #edf3f8;vertical-align:middle}.table tr:last-child td{border-bottom:0}.table strong{color:var(--azul-900)}.audio-lista{width:230px;max-width:100%;height:38px;display:block}.midia-lista{min-width:240px}.midia-lista .muted{margin-top:5px;display:block}.muted{color:var(--suave);font-size:.84rem}.tag{display:inline-flex;align-items:center;border-radius:999px;padding:6px 9px;font-size:.75rem;font-weight:900}.tag.ok{background:var(--verde-bg);color:var(--verde)}.tag.warn{background:var(--amarelo-bg);color:var(--amarelo)}.tag.off{background:#edf1f5;color:#677483}.row-actions{display:flex;gap:6px;flex-wrap:wrap}
 .empty{padding:34px;text-align:center;color:var(--suave)}.empty strong{display:block;color:var(--azul-900);margin-bottom:6px}
 .alert{border-radius:15px;padding:12px 14px;margin-bottom:16px;font-size:.88rem;line-height:1.5;border:1px solid}.alert.info{background:var(--azul-50);border-color:#cfe7fa;color:#265c87}.alert.ok{background:var(--verde-bg);border-color:#bce7d5;color:#176b50}.alert.error{background:var(--vermelho-bg);border-color:#ffd1d1;color:#963838}.alert.warn{background:var(--amarelo-bg);border-color:#f5dfa9;color:#7d5805}.hidden{display:none!important}
 .progress{height:7px;background:#edf3f8;border-radius:999px;overflow:hidden;margin-top:10px}.progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--azul-700),#65b8f4);transition:.25s}.file-preview{display:flex;gap:10px;align-items:center;margin-top:8px;padding:9px 10px;background:var(--azul-50);border-radius:11px;color:var(--suave);font-size:.82rem}.file-preview img{width:44px;height:44px;object-fit:cover;border-radius:9px}
@@ -356,8 +356,39 @@ function renderAlunos(){
 function statusTag(l){ const s=normal(l.status).toLowerCase(); if(["lido","concluída","concluida","finalizada"].includes(s))return'<span class="tag ok">Concluída</span>'; if(["lendo","em andamento","andamento"].includes(s))return'<span class="tag warn">Em andamento</span>'; return `<span class="tag off">${escapar(l.status||"Registrada")}</span>`; }
 function renderLeituras(){
   const q=normal($("buscaLeitura").value).toLowerCase(), fa=$("filtroLeituraAluno").value;
-  const lista=leituras.filter(l=>{if(fa!=="todos"&&String(l.alunoId)!==String(fa))return false; const n=nomeAluno(l.alunoId);return !q||[l.titulo,l.autor,n].some(v=>normal(v).toLowerCase().includes(q));}).sort((a,b)=>normal(b.data).localeCompare(normal(a.data))||normal(b.createdAt).localeCompare(normal(a.createdAt)));
-  $("tabelaLeituras").innerHTML=lista.map(l=>{const aud=normal(l.audio)||(l.tipoMidia==="audio"?normal(l.midia):"");return `<tr><td><strong>${escapar(l.titulo||"Sem título")}</strong><div class="muted">${escapar(l.autor||"Autor não informado")}</div></td><td>${escapar(nomeAluno(l.alunoId))}</td><td>${statusTag(l)}</td><td>${escapar(formatarData(l.data))}</td><td>${aud?"🎧 Áudio":"—"}${normal(l.capa)?" &nbsp;🖼️":""}</td><td><div class="row-actions"><button class="btn btn-light btn-sm" onclick="editarLeitura('${escapar(l.id)}')">Editar</button><button class="btn btn-danger btn-sm" onclick="excluirLeitura('${escapar(l.id)}')">Excluir</button></div></td></tr>`}).join("");
+  const lista=leituras.filter(l=>{
+    if(fa!=="todos"&&String(l.alunoId)!==String(fa))return false;
+    const n=nomeAluno(l.alunoId);
+    return !q||[l.titulo,l.autor,n].some(v=>normal(v).toLowerCase().includes(q));
+  }).sort((a,b)=>normal(b.data).localeCompare(normal(a.data))||normal(b.createdAt).localeCompare(normal(a.createdAt)));
+
+  $("tabelaLeituras").innerHTML=lista.map(l=>{
+    const aud=normal(l.audio)||(l.tipoMidia==="audio"?normal(l.midia):"");
+    const audioUrl=aud?urlMidiaPublica(aud,"dados/audios"):"";
+    const capa=normal(l.capa);
+
+    const midiaHtml=audioUrl
+      ? `<div class="midia-lista">
+           <audio class="audio-lista" controls preload="none" src="${escapar(audioUrl)}"></audio>
+           ${capa?'<span class="muted">🖼️ Capa cadastrada</span>':""}
+         </div>`
+      : (capa
+          ? '<div class="midia-lista"><span class="muted">🖼️ Capa cadastrada • Sem áudio</span></div>'
+          : '<span class="muted">Sem áudio</span>');
+
+    return `<tr>
+      <td><strong>${escapar(l.titulo||"Sem título")}</strong><div class="muted">${escapar(l.autor||"Autor não informado")}</div></td>
+      <td>${escapar(nomeAluno(l.alunoId))}</td>
+      <td>${statusTag(l)}</td>
+      <td>${escapar(formatarData(l.data))}</td>
+      <td>${midiaHtml}</td>
+      <td><div class="row-actions">
+        <button class="btn btn-light btn-sm" onclick="editarLeitura('${escapar(l.id)}')">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirLeitura('${escapar(l.id)}')">Excluir</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+
   $("emptyLeituras").classList.toggle("hidden",lista.length>0);
 }
 
