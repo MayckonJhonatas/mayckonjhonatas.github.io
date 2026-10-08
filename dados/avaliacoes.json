@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": "b9962051-f5f8-4442-8047-0eb0cb0e269c",
+    "leituraId": "lei_muyg84o8_eebrj",
+    "alunoId": "alu_muyej2ut_sqlfq",
+    "clientHash": "fef4676f43eb62704b07f21dd71918c001d2cf6faf698e7ac8ec0abf3d72e948",
+    "avaliador": "Andréia Cristina",
+    "estrelas": 4,
+    "comentario": "Linda leitura.",
+    "criadoEm": "2026-10-08T21:37:52.830Z",
+    "atualizadoEm": "2026-10-08T21:37:52.830Z"
+  }
+]
