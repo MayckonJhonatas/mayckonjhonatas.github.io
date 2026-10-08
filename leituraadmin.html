@@ -46,9 +46,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
       <button class="active" data-page="resumo">⌂ Resumo</button>
       <button data-page="alunos">👤 Alunos</button>
       <button data-page="leituras">📚 Leituras</button>
-      <button data-page="github">⚙ GitHub</button>
+      <button data-page="comentarios">💬 Comentários</button>
+      <button data-page="github">🔐 Acesso</button>
     </div>
-    <div class="side-status"><b><span class="dot" id="sideDot"></span><span id="sideTitle">GitHub não conectado</span></b><span id="sideText">Configure o repositório para salvar os dados.</span></div>
+    <div class="side-status"><b><span class="dot" id="sideDot"></span><span id="sideTitle">Firebase não conectado</span></b><span id="sideText">Conecte o painel com sua chave administrativa.</span></div>
   </aside>
 
   <main class="main">
@@ -99,19 +100,91 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
         </div>
       </section>
 
+
+      <section class="page" id="page-comentarios">
+        <div class="page-head">
+          <div>
+            <h2>Comentários</h2>
+            <p>Visualize as avaliações das famílias e modere os comentários publicados.</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-light" onclick="sincronizarTudo()">↻ Atualizar</button>
+          </div>
+        </div>
+
+        <div class="grid-stats">
+          <div class="stat"><span class="kicker">AVALIAÇÕES</span><strong id="statAvaliacoes">0</strong><small>avaliações publicadas</small></div>
+          <div class="stat"><span class="kicker">COMENTÁRIOS</span><strong id="statComentarios">0</strong><small>com texto publicado</small></div>
+          <div class="stat"><span class="kicker">MÉDIA</span><strong id="statMediaAvaliacoes">—</strong><small>média das estrelas</small></div>
+          <div class="stat"><span class="kicker">5 ESTRELAS</span><strong id="statCincoEstrelas">0</strong><small>avaliações máximas</small></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="toolbar" style="width:100%">
+              <div class="search"><span>⌕</span><input id="buscaComentario" placeholder="Buscar por responsável, comentário, aluno ou livro"></div>
+              <select id="filtroComentario" style="border:1px solid var(--borda);border-radius:13px;padding:10px 12px;background:#fff">
+                <option value="todos">Todas as avaliações</option>
+                <option value="comentario">Com comentário</option>
+                <option value="semcomentario">Sem comentário</option>
+                <option value="5">5 estrelas</option>
+                <option value="4">4 estrelas</option>
+                <option value="3">3 estrelas</option>
+                <option value="2">2 estrelas</option>
+                <option value="1">1 estrela</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="table" style="min-width:1100px">
+              <thead>
+                <tr>
+                  <th>RESPONSÁVEL</th>
+                  <th>AVALIAÇÃO</th>
+                  <th>COMENTÁRIO</th>
+                  <th>LEITURA</th>
+                  <th>ALUNO</th>
+                  <th>DATA</th>
+                  <th>ÁUDIO</th>
+                  <th>AÇÕES</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaComentarios"></tbody>
+            </table>
+            <div class="empty hidden" id="emptyComentarios"><strong>Nenhuma avaliação encontrada.</strong>As avaliações publicadas pelas famílias aparecerão aqui.</div>
+          </div>
+        </div>
+      </section>
+
+      
       <section class="page" id="page-github">
-        <div class="page-head"><div><h2>Integração com GitHub</h2><p>Todos os dados serão gravados na pasta <b>dados</b> do repositório informado.</p></div></div>
-        <div class="alert warn"><b>Segurança:</b> o token não é escrito dentro deste HTML. Ele fica apenas nesta sessão do navegador. Use de preferência um token refinado limitado a este repositório, com permissão de escrita em <b>Contents</b>.</div>
-        <div class="card"><div class="card-head"><h3>Configuração do repositório</h3></div><div class="card-body">
-          <form id="formGithub" class="form-grid">
-            <div class="field"><label>Usuário ou organização</label><input id="ghOwner" required placeholder="Ex: mayckonjhonatas"></div>
-            <div class="field"><label>Repositório</label><input id="ghRepo" required placeholder="Ex: leiturafy"></div>
-            <div class="field"><label>Branch</label><input id="ghBranch" required value="main"></div>
-            <div class="field"><label>Token do GitHub</label><input id="ghToken" type="password" autocomplete="off" placeholder="github_pat_..."><div class="hint">O token é mantido apenas na sessão atual.</div></div>
-            <div class="full form-actions"><button class="btn btn-primary" type="submit">✓ Salvar e testar conexão</button><button class="btn btn-light" type="button" onclick="limparToken()">Limpar token</button></div>
-          </form>
-          <div id="githubResult" style="margin-top:16px"></div>
-        </div></div>
+        <div class="page-head">
+          <div>
+            <h2>Acesso administrativo</h2>
+            <p>O token do GitHub fica protegido no Firebase. Este painel nunca recebe o <b>GITHUB_TOKEN</b>.</p>
+          </div>
+        </div>
+        <div class="alert info"><b>Protegido pelo Firebase:</b> digite apenas a chave administrativa criada como <b>ADMIN_KEY</b>. Ela fica somente nesta sessão do navegador.</div>
+        <div class="card">
+          <div class="card-head"><h3>Conectar painel</h3></div>
+          <div class="card-body">
+            <form id="formGithub" class="form-grid">
+              <input id="ghOwner" type="hidden" value="MayckonJhonatas">
+              <input id="ghRepo" type="hidden" value="mayckonjhonatas.github.io">
+              <input id="ghBranch" type="hidden" value="main">
+              <div class="field full">
+                <label>Chave administrativa</label>
+                <input id="ghToken" type="password" autocomplete="off" placeholder="Digite a ADMIN_KEY">
+                <div class="hint">Não é o token do GitHub. O GITHUB_TOKEN permanece secreto no Firebase.</div>
+              </div>
+              <div class="full form-actions">
+                <button class="btn btn-primary" type="submit">✓ Conectar pelo Firebase</button>
+                <button class="btn btn-light" type="button" onclick="limparToken()">Sair desta sessão</button>
+              </div>
+            </form>
+            <div id="githubResult" style="margin-top:16px"></div>
+          </div>
+        </div>
       </section>
     </div>
   </main>
@@ -145,10 +218,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 <div class="toast-wrap" id="toastWrap"></div>
 <script>
 const GH_API_VERSION = "2026-03-10";
+const FIREBASE_ADMIN_API = "https://southamerica-east1-sme-vicencia.cloudfunctions.net/leiturafyAdmin";
 const PATH_ALUNOS = "dados/alunos.json";
 const PATH_LEITURAS = "dados/leituras.json";
+const PATH_AVALIACOES = "dados/avaliacoes.json";
 let alunos = [];
 let leituras = [];
+let avaliacoes = [];
 let conectado = false;
 
 const $ = id => document.getElementById(id);
@@ -174,47 +250,73 @@ function detectarRepositorioPages(){
   const repo = pareceArquivo ? `${owner}.github.io` : partes[0];
   return {owner,repo,branch:"main"};
 }
-function config(){ return {owner:normal($("ghOwner").value),repo:normal($("ghRepo").value),branch:normal($("ghBranch").value)||"main",token:normal($("ghToken").value)}; }
-function salvarConfigLocal(){ const c=config(); localStorage.setItem("leiturafyGhConfig",JSON.stringify({owner:c.owner,repo:c.repo,branch:c.branch})); if(c.token) sessionStorage.setItem("leiturafyGhToken",c.token); }
+function config(){ return {owner:"MayckonJhonatas",repo:"mayckonjhonatas.github.io",branch:"main",token:normal($("ghToken").value)}; }
+function salvarConfigLocal(){ const c=config(); if(c.token) sessionStorage.setItem("leiturafyAdminKey",c.token); }
 function carregarConfig(){
-  let c={};
-  try{ c=JSON.parse(localStorage.getItem("leiturafyGhConfig")||"{}"); }catch{}
-  const auto=detectarRepositorioPages()||{};
-  // Corrige automaticamente configurações antigas criadas pelo bug que salvava
-  // admin.html/leituraadmin.html como nome do repositório.
-  const repoSalvo=normal(c.repo);
-  const repoInvalido=/\.(html?|php|asp|aspx)$/i.test(repoSalvo) || repoSalvo==="admin.html" || repoSalvo==="leituraadmin.html";
-  if(repoInvalido){ c.repo=""; localStorage.removeItem("leiturafyGhConfig"); }
-  $("ghOwner").value=c.owner||auto.owner||"";
-  $("ghRepo").value=c.repo||auto.repo||"";
-  $("ghBranch").value=c.branch||auto.branch||"main";
-  $("ghToken").value=sessionStorage.getItem("leiturafyGhToken")||"";
+  $("ghOwner").value="MayckonJhonatas";
+  $("ghRepo").value="mayckonjhonatas.github.io";
+  $("ghBranch").value="main";
+  $("ghToken").value=sessionStorage.getItem("leiturafyAdminKey")||"";
 }
-function apiUrl(path){ const c=config(); return `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${path.split("/").map(encodeURIComponent).join("/")}`; }
-function headers(auth=true){ const c=config(); const h={"Accept":"application/vnd.github+json","X-GitHub-Api-Version":GH_API_VERSION}; if(auth&&c.token) h.Authorization=`Bearer ${c.token}`; return h; }
+function ensureRepoConfig(){ return config(); }
+function ensureWriteConfig(){
+  const c=config();
+  if(!c.token){ irPara("github"); throw new Error("Informe a chave administrativa para continuar."); }
+  return c;
+}
+
+async function adminApi(payload){
+  const c=ensureWriteConfig();
+  const r=await fetch(FIREBASE_ADMIN_API,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "X-Admin-Key":c.token
+    },
+    body:JSON.stringify(payload),
+    cache:"no-store"
+  });
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(d.error||`Firebase respondeu HTTP ${r.status}.`);
+  return d;
+}
+
+async function diagnosticarGithub(){
+  const d=await adminApi({action:"test"});
+  return {default_branch:d.defaultBranch||"main"};
+}
+
+async function ghGet(path){
+  const d=await adminApi({action:"getFile",path});
+  return d.file||null;
+}
+
+async function ghPut(path,contentB64,message,sha=null){
+  const d=await adminApi({
+    action:"putFile",
+    path,
+    contentBase64:contentB64,
+    message,
+    sha:sha||null
+  });
+  return d.result;
+}
+
+async function ghDelete(path,message){
+  const atual=await ghGet(path);
+  if(!atual)return;
+  await adminApi({
+    action:"deleteFile",
+    path,
+    message,
+    sha:atual.sha
+  });
+}
+
 function utf8ToBase64(str){ const bytes=new TextEncoder().encode(str); let bin=""; const step=0x8000; for(let i=0;i<bytes.length;i+=step) bin+=String.fromCharCode(...bytes.subarray(i,i+step)); return btoa(bin); }
 function base64ToUtf8(b64){ const bin=atob(b64.replace(/\n/g,"")); const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0)); return new TextDecoder().decode(bytes); }
 async function fileToBase64(file){ const buf=await file.arrayBuffer(); const bytes=new Uint8Array(buf); let bin=""; const step=0x8000; for(let i=0;i<bytes.length;i+=step) bin+=String.fromCharCode(...bytes.subarray(i,i+step)); return btoa(bin); }
-function ensureRepoConfig(){ const c=config(); if(!c.owner||!c.repo||!c.branch){ irPara("github"); throw new Error("Informe usuário, repositório e branch do GitHub."); } return c; }
-function ensureWriteConfig(){ const c=ensureRepoConfig(); if(!c.token){ irPara("github"); throw new Error("Informe o token do GitHub para cadastrar, editar ou excluir dados."); } return c; }
-async function diagnosticarGithub(){
-  const c=ensureRepoConfig();
-  const authHeaders=headers(true);
-  const repoUrl=`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}`;
-  const rr=await fetch(repoUrl,{headers:authHeaders,cache:"no-store"});
-  if(rr.status===401) throw new Error("Token inválido ou expirado. Gere um novo token e tente novamente.");
-  if(rr.status===404) throw new Error(`Repositório não encontrado ou token sem acesso: ${c.owner}/${c.repo}. Confira se o token foi liberado especificamente para esse repositório.`);
-  if(!rr.ok){ const t=await rr.text(); throw new Error(`Falha ao acessar o repositório (${rr.status}): ${t.slice(0,180)}`); }
-  const repoInfo=await rr.json();
-  const branchUrl=`${repoUrl}/branches/${encodeURIComponent(c.branch)}`;
-  const rb=await fetch(branchUrl,{headers:authHeaders,cache:"no-store"});
-  if(rb.status===404) throw new Error(`A branch “${c.branch}” não foi encontrada em ${c.owner}/${c.repo}. A branch padrão informada pelo GitHub é “${repoInfo.default_branch||"desconhecida"}”.`);
-  if(!rb.ok){ const t=await rb.text(); throw new Error(`Falha ao verificar a branch (${rb.status}): ${t.slice(0,180)}`); }
-  return repoInfo;
-}
-async function ghGet(path){ const c=ensureRepoConfig(); const r=await fetch(`${apiUrl(path)}?ref=${encodeURIComponent(c.branch)}`,{headers:headers(true),cache:"no-store"}); if(r.status===404) return null; if(!r.ok){ const t=await r.text(); throw new Error(`GitHub respondeu ${r.status}: ${t.slice(0,180)}`); } return r.json(); }
-async function ghPut(path,contentB64,message,sha=null){ const c=ensureWriteConfig(); await diagnosticarGithub(); const body={message,content:contentB64,branch:c.branch}; if(sha) body.sha=sha; const r=await fetch(apiUrl(path),{method:"PUT",headers:{...headers(true),"Content-Type":"application/json"},body:JSON.stringify(body)}); if(!r.ok){ const t=await r.text(); if(r.status===404) throw new Error(`GitHub não permitiu gravar em ${c.owner}/${c.repo}. Verifique se o token tem acesso a ESTE repositório e permissão “Contents: Read and write”.`); throw new Error(`Falha ao salvar ${path} (${r.status}): ${t.slice(0,220)}`); } return r.json(); }
-async function ghDelete(path,message){ const c=ensureWriteConfig(); const atual=await ghGet(path); if(!atual) return; const r=await fetch(apiUrl(path),{method:"DELETE",headers:{...headers(true),"Content-Type":"application/json"},body:JSON.stringify({message,sha:atual.sha,branch:c.branch})}); if(!r.ok){const t=await r.text();throw new Error(`Falha ao apagar ${path} (${r.status}): ${t.slice(0,180)}`);} }
+
 async function lerJsonGh(path){ const f=await ghGet(path); if(!f) return {dados:[],sha:null}; const txt=base64ToUtf8(f.content||""); const dados=JSON.parse(txt||"[]"); if(!Array.isArray(dados)) throw new Error(`${path} precisa conter uma lista JSON.`); return {dados,sha:f.sha}; }
 async function lerJsonPublicado(path){
   const url=new URL(path,location.href).href;
@@ -227,7 +329,7 @@ async function lerJsonPublicado(path){
 }
 async function salvarJsonGh(path,dados,message){ const atual=await ghGet(path); return ghPut(path,utf8ToBase64(JSON.stringify(dados,null,2)+"\n"),message,atual?.sha||null); }
 
-function irPara(page){ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); $(`page-${page}`).classList.add("active"); document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page)); const nomes={resumo:"Resumo",alunos:"Alunos",leituras:"Leituras",github:"GitHub"}; $("topTitle").textContent=nomes[page]||"LeituraFy"; $("sidebar").classList.remove("open"); }
+function irPara(page){ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); $(`page-${page}`).classList.add("active"); document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page)); const nomes={resumo:"Resumo",alunos:"Alunos",leituras:"Leituras",comentarios:"Comentários",github:"Acesso"}; $("topTitle").textContent=nomes[page]||"LeituraFy"; $("sidebar").classList.remove("open"); }
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>irPara(b.dataset.page)));
 $("menuBtn").onclick=()=>$("sidebar").classList.toggle("open");
 function abrirModal(id){ $(id).classList.add("show"); }
@@ -235,7 +337,7 @@ function fecharModal(id){ $(id).classList.remove("show"); }
 document.querySelectorAll(".modal-bg").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("show")}));
 
 function atualizarEstadoConexao(ok,texto=""){
-  conectado=ok; $("sideDot").classList.toggle("ok",ok); $("sideTitle").textContent=ok?"GitHub conectado":"GitHub não conectado"; $("sideText").textContent=ok?(texto||"Dados prontos para edição."):"Configure o repositório para salvar os dados.";
+  conectado=ok; $("sideDot").classList.toggle("ok",ok); $("sideTitle").textContent=ok?"Firebase conectado":"Firebase não conectado"; $("sideText").textContent=ok?(texto||"Dados prontos para edição."):"Conecte o painel com sua chave administrativa.";
 }
 function formatarData(v){ if(!v)return"—"; const m=String(v).match(/^(\d{4})-(\d{2})-(\d{2})/); return m?`${m[3]}/${m[2]}/${m[1]}`:v; }
 function nomeAluno(id){ return alunos.find(a=>String(a.id)===String(id))?.nome||"Aluno não encontrado"; }
@@ -258,7 +360,109 @@ function renderLeituras(){
   $("tabelaLeituras").innerHTML=lista.map(l=>{const aud=normal(l.audio)||(l.tipoMidia==="audio"?normal(l.midia):"");return `<tr><td><strong>${escapar(l.titulo||"Sem título")}</strong><div class="muted">${escapar(l.autor||"Autor não informado")}</div></td><td>${escapar(nomeAluno(l.alunoId))}</td><td>${statusTag(l)}</td><td>${escapar(formatarData(l.data))}</td><td>${aud?"🎧 Áudio":"—"}${normal(l.capa)?" &nbsp;🖼️":""}</td><td><div class="row-actions"><button class="btn btn-light btn-sm" onclick="editarLeitura('${escapar(l.id)}')">Editar</button><button class="btn btn-danger btn-sm" onclick="excluirLeitura('${escapar(l.id)}')">Excluir</button></div></td></tr>`}).join("");
   $("emptyLeituras").classList.toggle("hidden",lista.length>0);
 }
-function renderTudo(){ atualizarStats(); preencherSelects(); renderAlunos(); renderLeituras(); }
+
+function leituraDaAvaliacao(a){
+  const id=String(a?.leituraId??"");
+  return leituras.find(l=>String(l.id??l.leituraId??l.leitura_id)===id)||null;
+}
+function tituloLeituraAvaliacao(a){ return leituraDaAvaliacao(a)?.titulo||a?.leituraId||"Leitura não encontrada"; }
+function alunoDaAvaliacao(a){
+  const l=leituraDaAvaliacao(a);
+  return alunos.find(x=>String(x.id)===String(a?.alunoId||l?.alunoId))||null;
+}
+function estrelasHtml(n){
+  const v=Math.max(0,Math.min(5,Math.round(Number(n)||0)));
+  return `<span style="color:#e5a400;font-size:1.08rem;white-space:nowrap" title="${v} de 5 estrelas">${"★".repeat(v)}${"☆".repeat(5-v)}</span>`;
+}
+function dataAvaliacao(a){
+  const d=new Date(a?.atualizadoEm||a?.criadoEm||"");
+  return Number.isNaN(d.getTime())?"—":d.toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"});
+}
+function urlMidiaPublica(valor,pasta){
+  const v=normal(valor); if(!v)return"";
+  if(/^https?:\/\//i.test(v))return v;
+  let path=v;
+  if(!v.startsWith("dados/")) path=`${pasta}/${v.replace(/^\.?\//,"")}`;
+  return new URL(path,location.href).href;
+}
+function audioDaAvaliacao(a){
+  const l=leituraDaAvaliacao(a); if(!l)return"";
+  return normal(l.audio)||(l.tipoMidia==="audio"?normal(l.midia):"");
+}
+function atualizarStatsComentarios(){
+  const total=avaliacoes.length;
+  const com=avaliacoes.filter(a=>normal(a.comentario)).length;
+  const media=total?avaliacoes.reduce((s,a)=>s+(Number(a.estrelas)||0),0)/total:0;
+  $("statAvaliacoes").textContent=total;
+  $("statComentarios").textContent=com;
+  $("statMediaAvaliacoes").textContent=total?media.toFixed(1):"—";
+  $("statCincoEstrelas").textContent=avaliacoes.filter(a=>Number(a.estrelas)===5).length;
+}
+function renderComentarios(){
+  atualizarStatsComentarios();
+  const buscaEl=$("buscaComentario"), filtroEl=$("filtroComentario");
+  if(!buscaEl||!filtroEl)return;
+  const q=normal(buscaEl.value).toLowerCase(), filtro=filtroEl.value;
+  const lista=avaliacoes.filter(a=>{
+    const comentario=normal(a.comentario);
+    if(filtro==="comentario"&&!comentario)return false;
+    if(filtro==="semcomentario"&&comentario)return false;
+    if(/^[1-5]$/.test(filtro)&&Number(a.estrelas)!==Number(filtro))return false;
+    const l=leituraDaAvaliacao(a), al=alunoDaAvaliacao(a);
+    return !q||[a.avaliador,a.comentario,l?.titulo,l?.autor,al?.nome,a.leituraId].some(v=>normal(v).toLowerCase().includes(q));
+  }).sort((a,b)=>String(b.atualizadoEm||b.criadoEm||"").localeCompare(String(a.atualizadoEm||a.criadoEm||"")));
+
+  $("tabelaComentarios").innerHTML=lista.map(a=>{
+    const l=leituraDaAvaliacao(a), al=alunoDaAvaliacao(a);
+    const audio=audioDaAvaliacao(a), audioUrl=audio?urlMidiaPublica(audio,"dados/audios"):"";
+    const comentario=normal(a.comentario);
+    const id=String(a.id||"");
+    const chave=id||`${String(a.leituraId||"")}|${String(a.clientHash||"")}`;
+    return `<tr>
+      <td><strong>${escapar(a.avaliador||"Família")}</strong></td>
+      <td>${estrelasHtml(a.estrelas)}<div class="muted">${Number(a.estrelas)||0}/5</div></td>
+      <td style="min-width:260px;max-width:380px"><div style="white-space:pre-wrap;overflow-wrap:anywhere">${comentario?escapar(comentario):'<span class="muted">Sem comentário</span>'}</div></td>
+      <td><strong>${escapar(l?.titulo||"Leitura não encontrada")}</strong><div class="muted">${escapar(l?.autor||a.leituraId||"")}</div></td>
+      <td>${escapar(al?.nome||"Aluno não encontrado")}</td>
+      <td>${escapar(dataAvaliacao(a))}</td>
+      <td>${audioUrl?`<audio controls preload="none" src="${escapar(audioUrl)}" style="width:210px;max-width:100%"></audio>`:'<span class="muted">Sem áudio</span>'}</td>
+      <td><div class="row-actions">
+        ${comentario?`<button class="btn btn-light btn-sm" onclick='apagarSomenteComentario(${JSON.stringify(chave)})'>Apagar comentário</button>`:""}
+        <button class="btn btn-danger btn-sm" onclick='excluirAvaliacao(${JSON.stringify(chave)})'>Excluir avaliação</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+  $("emptyComentarios").classList.toggle("hidden",lista.length>0);
+}
+function chaveAvaliacao(a){ return String(a.id||"")||`${String(a.leituraId||"")}|${String(a.clientHash||"")}`; }
+async function apagarSomenteComentario(chave){
+  const a=avaliacoes.find(x=>chaveAvaliacao(x)===String(chave)); if(!a)return;
+  if(!normal(a.comentario)){toast("Essa avaliação não possui comentário.","error");return;}
+  if(!confirm(`Apagar somente o comentário de ${a.avaliador||"Família"}?\n\nA avaliação em estrelas será mantida.`))return;
+  try{
+    ensureWriteConfig();
+    const atual=await lerJsonGh(PATH_AVALIACOES);
+    const i=atual.dados.findIndex(x=>chaveAvaliacao(x)===String(chave));
+    if(i<0)throw new Error("A avaliação não foi encontrada no arquivo.");
+    atual.dados[i]={...atual.dados[i],comentario:"",atualizadoEm:new Date().toISOString()};
+    await salvarJsonGh(PATH_AVALIACOES,atual.dados,`Modera comentário do LeituraFy`);
+    avaliacoes=atual.dados; renderComentarios(); toast("Comentário apagado. As estrelas foram mantidas.");
+  }catch(e){toast(e.message,"error");}
+}
+async function excluirAvaliacao(chave){
+  const a=avaliacoes.find(x=>chaveAvaliacao(x)===String(chave)); if(!a)return;
+  if(!confirm(`Excluir completamente a avaliação de ${a.avaliador||"Família"}?\n\nIsso removerá estrelas e comentário.`))return;
+  try{
+    ensureWriteConfig();
+    const atual=await lerJsonGh(PATH_AVALIACOES);
+    const nova=atual.dados.filter(x=>chaveAvaliacao(x)!==String(chave));
+    if(nova.length===atual.dados.length)throw new Error("A avaliação não foi encontrada no arquivo.");
+    await salvarJsonGh(PATH_AVALIACOES,nova,`Remove avaliação do LeituraFy`);
+    avaliacoes=nova; renderComentarios(); toast("Avaliação excluída.");
+  }catch(e){toast(e.message,"error");}
+}
+
+function renderTudo(){ atualizarStats(); preencherSelects(); renderAlunos(); renderLeituras(); renderComentarios(); }
 
 async function sincronizarTudo(silencioso=false){
   try{
@@ -266,12 +470,12 @@ async function sincronizarTudo(silencioso=false){
     const c=config();
     if(c.owner&&c.repo){
       try{
-        const [a,l]=await Promise.all([lerJsonGh(PATH_ALUNOS),lerJsonGh(PATH_LEITURAS)]);
-        alunos=a.dados; leituras=l.dados;
-        atualizarEstadoConexao(!!c.token,c.token?`${c.owner}/${c.repo} • ${c.branch}`:"Dados públicos carregados • informe o token para editar");
+        const [a,l,av]=await Promise.all([lerJsonGh(PATH_ALUNOS),lerJsonGh(PATH_LEITURAS),lerJsonGh(PATH_AVALIACOES)]);
+        alunos=a.dados; leituras=l.dados; avaliacoes=av.dados;
+        atualizarEstadoConexao(!!c.token,c.token?`${c.owner}/${c.repo} • ${c.branch}`:"Dados públicos carregados • informe o chave administrativa para editar");
       }catch(apiErro){
-        const [a,l]=await Promise.all([lerJsonPublicado(PATH_ALUNOS),lerJsonPublicado(PATH_LEITURAS)]);
-        alunos=a; leituras=l;
+        const [a,l,av]=await Promise.all([lerJsonPublicado(PATH_ALUNOS),lerJsonPublicado(PATH_LEITURAS),lerJsonPublicado(PATH_AVALIACOES)]);
+        alunos=a; leituras=l; avaliacoes=av;
         atualizarEstadoConexao(false,"Dados publicados carregados • GitHub API indisponível");
       }
     }else{
@@ -284,7 +488,7 @@ async function sincronizarTudo(silencioso=false){
     if(!silencioso) $("globalAlert").innerHTML=alertBox("ok","Dados carregados com sucesso.");
     return true;
   }catch(e){
-    alunos=[]; leituras=[]; renderTudo(); atualizarEstadoConexao(false);
+    alunos=[]; leituras=[]; avaliacoes=[]; renderTudo(); atualizarEstadoConexao(false);
     if(!silencioso) $("globalAlert").innerHTML=alertBox("error",`O painel abriu, mas não conseguiu carregar os dados: ${escapar(e.message)}`);
     return false;
   }
@@ -366,33 +570,32 @@ $("formLeitura").addEventListener("submit",async e=>{
 });
 async function excluirLeitura(id){ const l=leituras.find(x=>String(x.id)===String(id)); if(!l)return; if(!confirm(`Excluir o registro “${l.titulo}” de ${nomeAluno(l.alunoId)}?\n\nOs arquivos de áudio/capa vinculados não serão apagados automaticamente.`))return; try{const atual=await lerJsonGh(PATH_LEITURAS);const nova=atual.dados.filter(x=>String(x.id)!==String(id));await salvarJsonGh(PATH_LEITURAS,nova,`Remove leitura ${l.titulo}`);leituras=nova;renderTudo();toast("Leitura removida.");}catch(e){toast(e.message,"error");}}
 
-$("buscaAluno").addEventListener("input",renderAlunos); $("filtroAlunoAtivo").addEventListener("change",renderAlunos); $("buscaLeitura").addEventListener("input",renderLeituras); $("filtroLeituraAluno").addEventListener("change",renderLeituras);
+$("buscaAluno").addEventListener("input",renderAlunos); $("filtroAlunoAtivo").addEventListener("change",renderAlunos); $("buscaLeitura").addEventListener("input",renderLeituras); $("filtroLeituraAluno").addEventListener("change",renderLeituras); $("buscaComentario").addEventListener("input",renderComentarios); $("filtroComentario").addEventListener("change",renderComentarios);
 $("formGithub").addEventListener("submit",async e=>{
-  e.preventDefault(); salvarConfigLocal(); $("githubResult").innerHTML=alertBox("info","Testando repositório, token e branch...");
+  e.preventDefault();
+  salvarConfigLocal();
+  $("githubResult").innerHTML=alertBox("info","Testando a chave administrativa e a conexão com o Firebase...");
   const c=config();
   try{
-    if(c.token){
-      const info=await diagnosticarGithub();
-      const ok=await sincronizarTudo(true);
-      if(!ok) throw new Error("O repositório foi encontrado, mas não foi possível carregar os arquivos de dados.");
-      $("githubResult").innerHTML=alertBox("ok",`✓ Repositório encontrado: <b>${escapar(c.owner)}/${escapar(c.repo)}</b><br>✓ Branch: <b>${escapar(c.branch)}</b><br>✓ Token aceito<br>✓ dados/alunos.json e dados/leituras.json carregados<br><br><b>Pronto para salvar.</b>`);
-      atualizarEstadoConexao(true,`${c.owner}/${c.repo} • ${c.branch}`);
-    }else{
-      const ok=await sincronizarTudo(true);
-      $("githubResult").innerHTML=ok?alertBox("warn","Dados públicos carregados. Informe o token para salvar alterações."):alertBox("error","Não foi possível carregar os dados publicados.");
-    }
+    if(!c.token) throw new Error("Informe a chave administrativa.");
+    await diagnosticarGithub();
+    const ok=await sincronizarTudo(true);
+    if(!ok) throw new Error("A conexão foi aceita, mas não foi possível carregar os arquivos.");
+    $("githubResult").innerHTML=alertBox("ok",`✓ Firebase conectado<br>✓ Repositório protegido: <b>MayckonJhonatas/mayckonjhonatas.github.io</b><br>✓ GITHUB_TOKEN permanece secreto no Firebase<br>✓ dados/alunos.json, dados/leituras.json e dados/avaliacoes.json carregados<br><br><b>Pronto para administrar.</b>`);
+    atualizarEstadoConexao(true,"Firebase • GitHub protegido");
   }catch(err){
     atualizarEstadoConexao(false);
-    $("githubResult").innerHTML=alertBox("error",`<b>Falha no teste:</b><br>${escapar(err.message)}`);
+    $("githubResult").innerHTML=alertBox("error",`<b>Falha no acesso:</b><br>${escapar(err.message)}`);
   }
 });
-function limparToken(){ sessionStorage.removeItem("leiturafyGhToken"); $("ghToken").value=""; atualizarEstadoConexao(false); toast("Token removido desta sessão."); }
+
+function limparToken(){ sessionStorage.removeItem("leiturafyAdminKey"); $("ghToken").value=""; atualizarEstadoConexao(false); toast("Acesso administrativo removido desta sessão."); }
 
 async function iniciar(){
   carregarConfig(); $("leituraData").value=hoje();
   const ok=await sincronizarTudo(true); const c=config();
-  if(ok&&c.token) $("globalAlert").innerHTML=alertBox("ok","Painel carregado e conectado ao GitHub. Você pode cadastrar e editar dados.");
-  else if(ok) $("globalAlert").innerHTML=alertBox("warn",'Painel carregado. Para cadastrar, editar ou excluir, abra <b>GitHub</b> e informe um token com permissão de escrita.');
+  if(ok&&c.token) $("globalAlert").innerHTML=alertBox("ok","Painel carregado e conectado pelo Firebase. Você pode cadastrar, editar e moderar dados.");
+  else if(ok) $("globalAlert").innerHTML=alertBox("warn",'Painel carregado. Para cadastrar, editar ou excluir, abra <b>Acesso</b> e informe sua chave administrativa.');
   else $("globalAlert").innerHTML=alertBox("error",'O painel abriu, mas os arquivos <b>dados/alunos.json</b> e <b>dados/leituras.json</b> não puderam ser carregados. Confira se eles estão publicados junto com este HTML.');
 }
 iniciar();
