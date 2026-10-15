@@ -1,5 +1,16 @@
 [
   {
+    "id": "d885e78a-9de0-4246-a892-21e36ca2e669",
+    "leituraId": "lei_muygo1bz_k3bin",
+    "alunoId": "alu_muyej2ut_15mne",
+    "clientHash": "f1ca07ef038b07bb765d7b7441eeffdc0e08a2479ed8e79dc3360606cc6f6b78",
+    "avaliador": "Adeilda mãe de Luiz Fernando",
+    "estrelas": 5,
+    "comentario": "Uma bela leitura",
+    "criadoEm": "2026-10-15T15:35:47.946Z",
+    "atualizadoEm": "2026-10-15T15:35:47.946Z"
+  },
+  {
     "id": "543eb404-783b-442b-80f5-4201d8cc2668",
     "leituraId": "lei_mv8czohp_mxy4s",
     "alunoId": "alu_muyej2ut_kcxlc",
