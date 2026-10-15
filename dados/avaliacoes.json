@@ -1,5 +1,16 @@
 [
   {
+    "id": "0b9c9a0d-7713-4249-a356-51c6203725aa",
+    "leituraId": "lei_muygzhpr_hr46r",
+    "alunoId": "alu_muyej2ut_4oo4c",
+    "clientHash": "9505a9db0eaae283727953a25e29423bf48afd55c9aa54c199ce5ba81066da78",
+    "avaliador": "Ana Luisa Alexandre",
+    "estrelas": 1,
+    "comentario": "Parabéns pela leitura. Precisa apenas perder a timidez",
+    "criadoEm": "2026-10-15T22:38:37.134Z",
+    "atualizadoEm": "2026-10-15T22:38:37.134Z"
+  },
+  {
     "id": "8660848d-152d-49f2-9e0b-461bd3e1c973",
     "leituraId": "lei_muyfz38w_r0nlp",
     "alunoId": "alu_muyej2ut_g23ne",
